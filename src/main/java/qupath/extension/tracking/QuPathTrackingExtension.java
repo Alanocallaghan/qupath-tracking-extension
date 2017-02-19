@@ -48,12 +48,12 @@ import qupath.lib.gui.extensions.QuPathExtension;
  * 
  * This is mostly concerned with providing scripts, and moving them into the right places.
  * 
- * @author Pete Bankhead
+ * @author Alan O'Callaghan
  *
  */
-public class QuPathMATLABExtension implements QuPathExtension {
+public class QuPathTrackingExtension implements QuPathExtension {
 
-	private static Logger logger = LoggerFactory.getLogger(QuPathMATLABExtension.class);
+	private static Logger logger = LoggerFactory.getLogger(QuPathTrackingExtension.class);
 	
 	public void installExtension(QuPathGUI qupath) {
 		QuPathGUI.addMenuItems(
@@ -89,11 +89,11 @@ public class QuPathMATLABExtension implements QuPathExtension {
 	}
 
 	public String getName() {
-		return "QuPath MATLAB extension";
+		return "QuPath Tracking extension";
 	}
 
 	public String getDescription() {
-		return "Helps facilitate integration between QuPath and MATLAB";
+		return "Helps facilitate slide and cursor tracking in QuPath";
 	}
 	
 	
@@ -121,48 +121,5 @@ public class QuPathMATLABExtension implements QuPathExtension {
 	
 	
 	
-	/**
-	 * Read scripts from resources directory, putting them into a map of name and full script text.
-	 * 
-	 * @param scriptPath
-	 * @param ext
-	 * @return
-	 */
-	static Map<String, String> readScriptMap(final String scriptPath, final String ext) {
-		Map<String, String> scriptMap = new LinkedHashMap<>();
-		try {
-			// Load sample scripts
-			File codeLocation = new File(QuPathMATLABExtension.class.getProtectionDomain().getCodeSource().getLocation().getPath());
-			if (codeLocation.isFile()) {
-				// Read scripts from Jar file
-				JarFile jar = new JarFile(codeLocation);
-				for (JarEntry jarEntry : Collections.list(jar.entries())) {
-					String name = jarEntry.getName();
-					if (name.startsWith(scriptPath) && name.toLowerCase().endsWith(ext)) {
-						try {
-							String scriptText = GeneralTools.readInputStreamAsString(jar.getInputStream(jarEntry));
-							String scriptName = name.substring(scriptPath.length());
-							scriptMap.put(scriptName, scriptText);
-							logger.info(scriptName);
-							logger.debug("Read script from Jar: {}", name);
-						} catch (IOException e) {
-							logger.error("Error reading script from Jar", e);
-						}
-					}
-				}
-				jar.close();
-			} else {
-				// Read scripts from directory
-				URL url = QuPathMATLABExtension.class.getClassLoader().getResource(scriptPath);
-				for (File file : new File(url.toURI()).listFiles((File f) -> f.isFile() && f.getName().toLowerCase().endsWith(".m"))) {
-					scriptMap.put(file.getName(), GeneralTools.readFileAsString(file.getAbsolutePath()));
-					logger.debug("Read script: {}", file.getName());
-				}
-			}
-		} catch (Exception e) {
-			logger.error("Error reading scripts", e);
-		}
-		return scriptMap;
-	}
 
 }
