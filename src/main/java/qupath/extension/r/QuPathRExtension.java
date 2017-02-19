@@ -44,16 +44,16 @@ import qupath.lib.gui.commands.OpenWebpageCommand;
 import qupath.lib.gui.extensions.QuPathExtension;
 
 /**
- * QuPath extension to help facilitate integration between QuPath and MATLAB.
+ * QuPath extension to help facilitate integration between QuPath and R.
  * 
  * This is mostly concerned with providing scripts, and moving them into the right places.
  * 
- * @author Pete Bankhead
+ * @author Alan O'Callaghan
  *
  */
-public class QuPathMATLABExtension implements QuPathExtension {
+public class QuPathRExtension implements QuPathExtension {
 
-	private static Logger logger = LoggerFactory.getLogger(QuPathMATLABExtension.class);
+	private static Logger logger = LoggerFactory.getLogger(QuPathRExtension.class);
 	
 	public void installExtension(QuPathGUI qupath) {
 		QuPathGUI.addMenuItems(
