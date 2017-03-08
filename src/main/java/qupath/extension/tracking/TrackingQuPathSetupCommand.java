@@ -23,11 +23,6 @@
 
 package qupath.extension.tracking;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.util.Map;
-import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +32,7 @@ import qupath.lib.gui.commands.interfaces.PathCommand;
 /**
  * Command to help with the setup of QuPath and MATLAB integration.
  * 
- * @author Pete Bankhead
+ * @author Alan O'Callaghan
  *
  */
 public class TrackingQuPathSetupCommand implements PathCommand {

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="qupath-matlab">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/classes/artifacts/qupath_matlab_jar/qupath-matlab.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/classes/artifacts/qupath_matlab_jar/qupath-matlab.jar!/" />
+    </SOURCES>
+  </library>
+</component>
