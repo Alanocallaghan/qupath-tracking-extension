@@ -32,6 +32,8 @@ import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.commands.OpenWebpageCommand;
 import qupath.lib.gui.extensions.QuPathExtension;
 
+
+
 /**
  * QuPath extension to help facilitate integration between QuPath and R.
  * 
@@ -48,14 +50,20 @@ public class QuPathTrackingExtension implements QuPathExtension {
 	public void installExtension(QuPathGUI qupath) {
         QuPathGUI.addMenuItems(
 				qupath.getMenu("Extensions>Tracking", true),
-				QuPathGUI.createCommandAction(new OpenWebpageCommand(qupath, "http://go.qub.ac.uk/qupath-matlab"), "QuPath-MATLAB documentation (web)")
+				QuPathGUI.createCommandAction(new OpenWebpageCommand(qupath, "http://google.com"), "Google")
 				);
-//
-//		QuPathGUI.addMenuItems(
-//				qupath.getMenu("Extensions>MATLAB", true),
-//				QuPathGUI.createCommandAction(new TrackingQuPathSetupCommand(qupath), "Export MATLAB scripts")
-//				);
-//
+
+		QuPathGUI.addMenuItems(
+				qupath.getMenu("Extensions>Tracking", true),
+				QuPathGUI.createCommandAction(new TrackingQuPathSetupCommand(qupath), "Open CSV")
+				);
+
+        // TODO: Open CSV tracking file
+        // TODO: Generate heatmaps
+        // TODO: Generate tracking visualisations
+        // TODO: Cursor fixation algorithms
+        // TODO: Use md5 sum to tie tracking instance to image (using MessageDigest) http://stackoverflow.com/questions/4187111/how-to-get-the-md5sum-of-a-file-in-java
+
 //		// Add script for setting engine path
 //		QuPathGUI.addMenuItems(
 //				qupath.getMenu("Extensions>MATLAB", true),
