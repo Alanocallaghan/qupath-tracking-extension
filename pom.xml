@@ -3,8 +3,8 @@
 	<modelVersion>4.0.0</modelVersion>
 
 
-	<artifactId>qupath-matlab-extension</artifactId>
-	<name>qupath-matlab-extension</name>
+	<artifactId>qupath-tracking-extension</artifactId>
+	<name>qupath-tracking-extension</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -57,7 +57,7 @@
 		</plugins>
 	</build>
 
-	<description>Support to help with using QuPath together with MATLAB</description>
+	<description>Support to help with tracking in QuPath</description>
 	<groupId>qupath</groupId>
 	<version>0.0.1</version>
 </project>

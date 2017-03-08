@@ -21,7 +21,7 @@
  * #L%
  */
 
-package qupath.extension.matlab;
+package qupath.extension.tracking;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -40,49 +40,23 @@ import qupath.lib.gui.commands.interfaces.PathCommand;
  * @author Pete Bankhead
  *
  */
-public class MATLABQuPathSetupCommand implements PathCommand {
+public class TrackingQuPathSetupCommand implements PathCommand {
 	
-	private final static Logger logger = LoggerFactory.getLogger(MATLABQuPathSetupCommand.class);
+	private final static Logger logger = LoggerFactory.getLogger(TrackingQuPathSetupCommand.class);
 	
 	private QuPathGUI qupath;
 	
-	public MATLABQuPathSetupCommand(final QuPathGUI qupath) {
+	public TrackingQuPathSetupCommand(final QuPathGUI qupath) {
 		this.qupath = qupath;
 	}
 
 	public void run() {
-		
-		File dirMATLAB = qupath.getDialogHelper().promptForDirectory(null);
-		if (dirMATLAB == null)
-			return;
-		
-		// Get a map of all MATLAB files
-		String scriptPath = "matlab-qupath/";
-		Map<String, String> scriptMap = QuPathMATLABExtension.readScriptMap(scriptPath, ".m");
-		
-		// Write into the selected directory
-		for (Entry<String, String> entry : scriptMap.entrySet()) {
-			
-			File fileOutput = dirMATLAB;
-			for (String part : entry.getKey().split("/")) {
-				if (!part.isEmpty())
-					fileOutput = new File(fileOutput, part);
-			}
-			logger.info(fileOutput.getAbsolutePath());
-			
-			// Ensure the directory exists
-			if (!fileOutput.getParentFile().exists())
-				fileOutput.getParentFile().mkdirs();
-			
-			// Write the script
-			try (PrintWriter writer = new PrintWriter(fileOutput)) {
-				writer.print(entry.getValue());
-			} catch (FileNotFoundException e) {
-				logger.error("Error writing file", e);
-			}
-		}
-		
+
 	}
-	
-	
+
+    public static void main(String args[]) {
+
+    }
+
+
 }
