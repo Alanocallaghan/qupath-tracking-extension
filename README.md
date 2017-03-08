@@ -1,9 +1,12 @@
 QuPath Tracking Extension
 =======================
 
-The **QuPath Tracking Extension** is designed to help use QuPath for tracking.
+The **QuPath Tracking Extension** is designed to help use QuPath 
+for the analysis of tracking data in whole slide image analysis.
 
-For more information, see the [QuPath wiki](https://github.com/qupath/qupath/wiki/).
+For more information, see the 
+[QuPath wiki](https://github.com/qupath/qupath/wiki/).
 
-Note: This extension is unlikely to ever be anything more than experimental. Also,
-I am definitely not a Java developer by trade, so bug reports are appreciated.
+Caveat: This is produced in my spare time, and Java programming is not my main 
+area of expertise, so progress on this may be slow, and it may initially be very 
+buggy.
