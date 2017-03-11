@@ -32,6 +32,7 @@ import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.commands.OpenWebpageCommand;
 import qupath.lib.gui.extensions.QuPathExtension;
 
+import static qupath.extension.tracking.DefaultViewTrackerFactory.initDefaultViewTrackerFactory;
 
 
 /**
@@ -48,6 +49,8 @@ public class QuPathTrackingExtension implements QuPathExtension {
 
 
 	public void installExtension(QuPathGUI qupath) {
+		initDefaultViewTrackerFactory(qupath.getViewer());
+
         QuPathGUI.addMenuItems(
 				qupath.getMenu("Extensions>Tracking", true),
 				QuPathGUI.createCommandAction(new OpenWebpageCommand(qupath, "http://google.com"), "Google")
@@ -55,7 +58,7 @@ public class QuPathTrackingExtension implements QuPathExtension {
 
 		QuPathGUI.addMenuItems(
 				qupath.getMenu("Extensions>Tracking", true),
-				QuPathGUI.createCommandAction(new TrackingQuPathSetupCommand(qupath), "Open CSV")
+				QuPathGUI.createCommandAction(new TrackingQuPathLoadCommand(qupath), "Open CSV")
 				);
 
         // TODO: Open CSV tracking file
@@ -67,7 +70,7 @@ public class QuPathTrackingExtension implements QuPathExtension {
 //		// Add script for setting engine path
 //		QuPathGUI.addMenuItems(
 //				qupath.getMenu("Extensions>MATLAB", true),
-//				QuPathGUI.createCommandAction(new TrackingQuPathSetupCommand(qupath), "Set path to MATLAB engine"),
+//				QuPathGUI.createCommandAction(new TrackingQuPathLoadCommand(qupath), "Set path to MATLAB engine"),
 //				null
 //				);
 //

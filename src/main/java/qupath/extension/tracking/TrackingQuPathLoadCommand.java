@@ -23,11 +23,16 @@
 
 package qupath.extension.tracking;
 
+import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.commands.interfaces.PathCommand;
+import qupath.lib.gui.helpers.dialogs.DialogHelperFX;
+import qupath.lib.gui.viewer.recording.DefaultViewTracker;
+
+import java.io.File;
 
 /**
  * Command to help with the setup of QuPath and MATLAB integration.
@@ -35,18 +40,26 @@ import qupath.lib.gui.commands.interfaces.PathCommand;
  * @author Alan O'Callaghan
  *
  */
-public class TrackingQuPathSetupCommand implements PathCommand {
+public class TrackingQuPathLoadCommand implements PathCommand {
 	
-	private final static Logger logger = LoggerFactory.getLogger(TrackingQuPathSetupCommand.class);
+	private final static Logger logger = LoggerFactory.getLogger(TrackingQuPathLoadCommand.class);
 	
 	private QuPathGUI qupath;
 	
-	public TrackingQuPathSetupCommand(final QuPathGUI qupath) {
+	public TrackingQuPathLoadCommand(final QuPathGUI qupath) {
 		this.qupath = qupath;
 	}
 
 	public void run() {
-
+		DialogHelperFX dfx = new DialogHelperFX(qupath.getStage());
+		File file = dfx.promptForFile(new File(System.getProperty("user.home")));
+        DefaultViewTracker tracker = DefaultViewTrackerFactory.createViewTracker(file);
+        try {
+            Stage stage = TrackerPaintStage.getInstance(tracker);
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 	}
 
     public static void main(String args[]) {
