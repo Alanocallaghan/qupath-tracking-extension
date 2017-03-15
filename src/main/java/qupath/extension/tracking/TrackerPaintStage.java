@@ -1,28 +1,34 @@
 package qupath.extension.tracking;
 
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.CheckBox;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-import qupath.lib.gui.viewer.recording.ViewTracker;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
 
 /**
  * Created by alan on 11/03/17.
  */
 public class TrackerPaintStage extends Stage {
 
-    private ViewTracker tracker;
+    TrackerFeatures features;
     private Parent root;
     private static TrackerPaintStage instance = null;
 
-    private TrackerPaintStage(ViewTracker tracker) {
-        this.tracker = tracker;
+
+    private TrackerPaintStage(TrackerFeatures features) {
+        this.features = features;
 
         try {
-            root = FXMLLoader.load(getClass().getResource("TrackerScene.fxml"));
-        } catch (IOException e) {
+            root = FXMLLoader.load(getClass().getClassLoader().getResource("FXML/TrackerScene.fxml"));
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -30,14 +36,15 @@ public class TrackerPaintStage extends Stage {
         this.setScene(scene);
     }
 
-    public static TrackerPaintStage getInstance(ViewTracker tracker) {
+    public static TrackerPaintStage getInstance(TrackerFeatures features) {
         if (instance == null) {
-            instance = new TrackerPaintStage(tracker);
+            instance = new TrackerPaintStage(features);
         }
         return instance;
     }
 
-    public void updateTracker(ViewTracker tracker) {
-        instance.tracker = tracker;
+    public void updateTracker(TrackerFeatures features) {
+        instance.features = features;
     }
+
 }

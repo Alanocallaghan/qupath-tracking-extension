@@ -30,6 +30,8 @@ import org.slf4j.LoggerFactory;
 import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.commands.interfaces.PathCommand;
 import qupath.lib.gui.helpers.dialogs.DialogHelperFX;
+import qupath.lib.gui.viewer.QuPathViewer;
+import qupath.lib.gui.viewer.QuPathViewerPlus;
 import qupath.lib.gui.viewer.recording.DefaultViewTracker;
 
 import java.io.File;
@@ -51,14 +53,26 @@ public class TrackingQuPathLoadCommand implements PathCommand {
 	}
 
 	public void run() {
-		DialogHelperFX dfx = new DialogHelperFX(qupath.getStage());
-		File file = dfx.promptForFile(new File(System.getProperty("user.home")));
-        DefaultViewTracker tracker = DefaultViewTrackerFactory.createViewTracker(file);
-        try {
-            Stage stage = TrackerPaintStage.getInstance(tracker);
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
+        DialogHelperFX dfx = new DialogHelperFX(qupath.getStage());
+        File imageFile = dfx.promptForFile(new File (System.getProperty("user.home") + "/Documents/Images/Analysis"));
+        QuPathViewerPlus viewer = qupath.getViewer();
+
+        if (qupath.openImage(null, imageFile.getAbsolutePath(), true, true, false)) {
+            File file = dfx.promptForFile("Open csv",
+                    new File(System.getProperty("user.home") + "/Documents/Tracking Folder/Consultants/Fri 31st 3rd"),
+                    "Text files",
+                    "txt", "csv", "tsv");
+            if (file != null) {
+                DefaultViewTracker tracker = DefaultViewTrackerFactory.createViewTracker(file);
+                TrackerFeatures features = new TrackerFeatures(tracker, viewer.getServer());
+                try {
+                    Stage stage = TrackerPaintStage.getInstance(features);
+                    stage.show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                viewer.addOverlay(features.hOverlay);
+            }
         }
 	}
 

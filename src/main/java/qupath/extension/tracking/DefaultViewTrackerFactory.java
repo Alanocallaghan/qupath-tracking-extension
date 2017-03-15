@@ -10,14 +10,14 @@ import java.io.*;
  * Created by Alan O'Callaghan on 11/03/17.
  */
 public class DefaultViewTrackerFactory {
-    private static QuPathViewer qupath;
+    private static QuPathViewer quPath;
 
     public static void initDefaultViewTrackerFactory(QuPathViewer quPathGUI) {
-        qupath = quPathGUI;
+        quPath = quPathGUI;
     }
 
     public static DefaultViewTracker createViewTracker(File csvFile) {
-        DefaultViewTracker tracker = new DefaultViewTracker(qupath);
+        DefaultViewTracker tracker = new DefaultViewTracker(quPath);
         try {
             tracker = (DefaultViewTracker)DefaultViewTracker.parseSummaryString(readFile(csvFile), null, tracker);
         } catch (Exception e) {
@@ -25,7 +25,6 @@ public class DefaultViewTrackerFactory {
         }
         return tracker;
     }
-
 
     private static String readFile(File file) {
         BufferedReader br = null;
@@ -52,7 +51,6 @@ public class DefaultViewTrackerFactory {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                br = null;
             }
         }
         return everything;
