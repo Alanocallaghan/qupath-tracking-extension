@@ -20,11 +20,11 @@
         <CheckBox fx:id="bHCheck" mnemonicParsing="false" text="Bounds Heatmap" />
         <CheckBox fx:id="cHCheck" mnemonicParsing="false" text="Cursor Heatmap" GridPane.columnIndex="1" />
         <CheckBox fx:id="eHCheck" mnemonicParsing="false" text="Eye Heatmap" GridPane.columnIndex="2" />
-        <CheckBox mnemonicParsing="false" text="Bounds Features" GridPane.rowIndex="1" />
-        <CheckBox mnemonicParsing="false" text="Cursor trail" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-        <CheckBox mnemonicParsing="false" text="Eye trail" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-        <CheckBox mnemonicParsing="false" text="Slow Pans" GridPane.rowIndex="2" />
-        <CheckBox mnemonicParsing="false" text="Bounds fixations" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-        <CheckBox mnemonicParsing="false" text="Zoom peaks" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+        <CheckBox fx:id="bTCheck" mnemonicParsing="false" text="Bounds Features" GridPane.rowIndex="1" />
+        <CheckBox fx:id="cTCheck" mnemonicParsing="false" text="Cursor trail" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+        <CheckBox fx:id="eTCheck" mnemonicParsing="false" text="Eye trail" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+        <CheckBox fx:id="spCheck" mnemonicParsing="false" text="Slow Pans" GridPane.rowIndex="2" />
+        <CheckBox fx:id="bfCheck" mnemonicParsing="false" text="Bounds fixations" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+        <CheckBox fx:id="zpCheck" mnemonicParsing="false" text="Zoom peaks" GridPane.columnIndex="2" GridPane.rowIndex="2" />
     </children>
 </GridPane>

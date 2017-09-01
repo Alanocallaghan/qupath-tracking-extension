@@ -47,13 +47,15 @@ public class QuPathTrackingExtension implements QuPathExtension {
 
 	private static Logger logger = LoggerFactory.getLogger(QuPathTrackingExtension .class);
 
-
 	public void installExtension(QuPathGUI qupath) {
 		initDefaultViewTrackerFactory(qupath.getViewer());
 
         QuPathGUI.addMenuItems(
 				qupath.getMenu("Extensions>Tracking", true),
-				QuPathGUI.createCommandAction(new OpenWebpageCommand(qupath, "http://google.com"), "Google")
+				QuPathGUI.createCommandAction(
+						new OpenWebpageCommand(qupath,
+							"http://github.com/Alanocallaghan/qupath-tracking-extension/issues"),
+							"Bug reports/issues")
 				);
 
 		QuPathGUI.addMenuItems(
@@ -67,26 +69,6 @@ public class QuPathTrackingExtension implements QuPathExtension {
         // TODO: Cursor fixation algorithms
         // TODO: Use md5 sum to tie tracking instance to image (using MessageDigest) http://stackoverflow.com/questions/4187111/how-to-get-the-md5sum-of-a-file-in-java
 
-//		// Add script for setting engine path
-//		QuPathGUI.addMenuItems(
-//				qupath.getMenu("Extensions>MATLAB", true),
-//				QuPathGUI.createCommandAction(new TrackingQuPathLoadCommand(qupath), "Set path to MATLAB engine"),
-//				null
-//				);
-//
-//		// Link useful scripts
-//		for (Entry<String, String> entry : readScriptMap("groovy", ".groovy").entrySet()) {
-//			Menu menuGroovy = qupath.getMenu("Extensions>MATLAB>Groovy MATLAB samples", true);
-//			String scriptName = entry.getKey().replaceAll("_", " ").replaceAll("/", " ").trim();
-//			if (scriptName.toLowerCase().endsWith(".groovy"))
-//				scriptName = scriptName.substring(0, scriptName.length() - ".groovy".length());
-//			MenuItem item = new MenuItem(scriptName);
-//			item.setOnAction(e -> {
-//				qupath.getScriptEditor().showScript(entry.getKey(), entry.getValue());
-//			});
-//			QuPathGUI.addMenuItems(menuGroovy, item);
-//		}
-		
 	}
 
 	public String getName() {

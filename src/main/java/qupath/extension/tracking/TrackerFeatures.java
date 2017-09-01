@@ -21,15 +21,21 @@ public class TrackerFeatures {
     private Point2D[] eyeArray;
     private Point2D[] cursorArray;
     HeatmapOverlay hOverlay;
+    TrackerFeatureOverlay tOverlay;
     private double[] eyeSpeedArray, zoomArray;
+    Fixations fixations;
 
     TrackerFeatures(ViewTracker tracker, ImageServer server) {
         this.server = server;
         this.tracker = tracker;
         this.boundsArray = makeBounds();
         this.cursorArray = makeCursor();
+
         addEye();
+        generateBoundsArray();
+        generateEyeArray();
         hOverlay = new HeatmapOverlay(this);
+        tOverlay = new TrackerFeatureOverlay(this);
     }
 
     private void addEye() {
@@ -80,6 +86,7 @@ public class TrackerFeatures {
         }
         return point2Ds;
     }
+
     private void generateBoundsArray() {
         int nFrames = tracker.nFrames();
 
@@ -99,6 +106,37 @@ public class TrackerFeatures {
             double currentZoom = TrackerUtils.calculateZoom(rect, imageVisible, this.getServer());
             zoomArray[i] = currentZoom;
         }
+    }
+
+    private void generateEyeArray() {
+        if (!tracker.hasEyeTrackingData()) {
+            return;
+        }
+        ViewRecordingFrame currentFrame;
+        ViewRecordingFrame previousFrame = null;
+
+        Point2D previousEye = null;
+        Point2D currentEye;
+        int nFrames = tracker.nFrames();
+        Point2D[] point2Ds = new Point2D[nFrames];
+
+
+        eyeSpeedArray = new double[nFrames];
+
+        for (int i = 0; i < nFrames; i++) {
+            currentFrame = tracker.getFrame(i);
+            currentEye = tracker.getFrame(i).getEyePosition();
+            if (currentEye != null && previousEye != null && previousFrame!=null) {
+                eyeSpeedArray[i] = TrackerUtils.getSpeed(currentFrame, previousFrame, TrackerUtils.SpeedType.EYE)
+                        / TrackerUtils.calculateDownsample(currentFrame.getImageBounds(), currentFrame.getSize());
+            }
+            if (currentEye != null && !(currentEye.getX() == 0 && currentEye.getY() == 0)) {
+                point2Ds[i] = currentEye;
+            }
+            previousEye = currentEye;
+            previousFrame = currentFrame;
+        }
+        eyeArray = point2Ds;
     }
 
     private Rectangle[] makeBounds() {

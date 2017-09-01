@@ -54,14 +54,13 @@ public class TrackingQuPathLoadCommand implements PathCommand {
 
 	public void run() {
         DialogHelperFX dfx = new DialogHelperFX(qupath.getStage());
-        File imageFile = dfx.promptForFile(new File (System.getProperty("user.home") + "/Documents/Images/Analysis"));
         QuPathViewerPlus viewer = qupath.getViewer();
 
-        if (qupath.openImage(null, imageFile.getAbsolutePath(), true, true, false)) {
-            File file = dfx.promptForFile("Open csv",
-                    new File(System.getProperty("user.home") + "/Documents/Tracking Folder/Consultants/Fri 31st 3rd"),
-                    "Text files",
-                    "txt", "csv", "tsv");
+        File file = dfx.promptForFile("Open csv",
+                new File(System.getProperty("user.home") + "/Documents/Tracking Folder/Consultants/Fri 31st 3rd"),
+                "Text files",
+                "txt", "csv", "tsv");
+        if (viewer.getServer() != null) {
             if (file != null) {
                 DefaultViewTracker tracker = DefaultViewTrackerFactory.createViewTracker(file);
                 TrackerFeatures features = new TrackerFeatures(tracker, viewer.getServer());

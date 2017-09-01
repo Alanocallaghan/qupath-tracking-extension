@@ -25,12 +25,13 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
 //    TODO: Separate class for bounds features?
     private final TrackerFeatures trackerFeatures;
 
-    private boolean paintBoundsTrail;
-    private boolean paintBoundFixations;
-    private boolean paintSlowPans;
-    private boolean paintZoomPeaks;
-    private boolean paintCursorTrail;
-    private boolean paintEyeTrail;
+    boolean doPaintBoundFixations;
+    boolean doPaintSlowPans;
+    boolean doPaintZoomPeaks;
+
+    boolean doPaintBoundsTrail;
+    boolean doPaintCursorTrail;
+    boolean doPaintEyeTrail;
 
     private final QuPathViewer viewer;
 
@@ -43,13 +44,10 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
     private Rectangle[] boundsArray = null;
     private double[] zoomArray = null;
     private Fixations eyeFixations = null;
-    private Point2D[] fixationCentroids;
-    private double[] fixationDurations;
 
     private FixationType fixationType = EYETRIBE;
 
-    private ArrayList<ArrayList<ViewRecordingFrame>> fixations;
-    private boolean paintNumbers = false;
+    private boolean doPaintNumbers = false;
     private int lowZoomThreshold = 5, medZoomThreshold = 1;
 
     public enum FixationType {
@@ -69,14 +67,14 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
                 return null;
             }
         }
-
-
     }
+
     public TrackerFeatureOverlay(TrackerFeatures trackerFeatures) {
         this.viewer = QuPathGUI.getInstance().getViewer();
         this.trackerFeatures = trackerFeatures;
+        eyeFixations = new Fixations(trackerFeatures);
+        setFixationType(null);
         viewer.addOverlay(this);
-//        trackerFeatures.setTrackerVisualOverlay(this);
     }
 
     private void drawBoundsTrail(Graphics2D g2d, double downsampleFactor, Rectangle clippingRectangle) {
@@ -143,26 +141,20 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
         if (zoomArray==null) {
             zoomArray = trackerFeatures.getZoomArray();
         }
-//
-//        if (eyeFixations==null) {
-//            eyeFixations = trackerFeatures.getEyeFixations();
-//            updateFixationType();
-//        }
-//
 
         double[] zoomLevel;
-        if (fixations == null) {
+        if (eyeFixations == null) {
             zoomLevel = zoomArray;
         } else {
-            zoomLevel = new double[fixations.size()];
+            zoomLevel = new double[eyeFixations.getFixations().size()];
             int j = 0;
-            for (ArrayList<ViewRecordingFrame> frames : fixations) {
-                zoomLevel[j] = eyeFixations.calculateAverageZoom(fixations.get(j++));
+            for (ArrayList<ViewRecordingFrame> frames : eyeFixations.getFixations()) {
+                zoomLevel[j] = eyeFixations.calculateAverageZoom(eyeFixations.getFixations().get(j++));
             }
         }
         Point2D previousPoint = null;
-        for(int i = 0; i < fixationCentroids.length; i++) {
-            Point2D point = fixationCentroids[i];
+        for(int i = 0; i < eyeFixations.getCentroids().length; i++) {
+            Point2D point = eyeFixations.getCentroids()[i];
             if(point!=null) {
                 if (clippingRectangle.contains(point)) {
 
@@ -176,14 +168,14 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
                         g2d.setColor(Color.RED);
                     }
 
-                    double circleSizeCoef = (downsampleFactor * fixationDurations[i] / 30);
+                    double circleSizeCoef = (downsampleFactor * eyeFixations.getDurations()[i] / 30);
 
                     g2d.fillOval((int) point.getX() - (int) (circleSizeCoef / 2), (int) point.getY() - (int) (circleSizeCoef / 2),
                             (int) circleSizeCoef, (int) circleSizeCoef);
                     if (previousPoint != null) {
                         g2d.drawLine((int) point.getX(), (int) point.getY(), (int) previousPoint.getX(), (int) previousPoint.getY());
                     }
-                    if(fixations!=null && paintNumbers) {
+                    if(eyeFixations.getFixations() != null && doPaintNumbers) {
 
                         Font font = new Font("Impact", Font.BOLD, (int) (30 * downsampleFactor));
                         g2d.setFont(font);
@@ -205,31 +197,7 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
     }
 
     private void updateFixationType() {
-        switch (fixationType) {
-            case EYETRIBE:
-                fixationCentroids = eyeFixations.getEyeTribeCentroids();
-                fixationDurations = eyeFixations.getEyeTribeDurations();
-                fixations = eyeFixations.getEyeTribeFixations();
-                viewer.repaint();
-                break;
-            case IDT:
-                fixationCentroids = eyeFixations.getIDTCentroids();
-                fixationDurations = eyeFixations.getIDTDurations();
-                fixations = eyeFixations.getIDTFixations();
-                viewer.repaint();
-                break;
-            case IVT:
-                fixationCentroids = eyeFixations.getIVTCentroids();
-                fixationDurations = eyeFixations.getIVTDurations();
-                fixations = eyeFixations.getIVTFixations();
-                viewer.repaint();
-                break;
-            case ALL_POINTS:
-                fixationCentroids = trackerFeatures.getEyeArray();
-                fixationDurations = trackerFeatures.getZoomArray();
-                fixations = null;
-                viewer.repaint();
-        }
+        eyeFixations.updateFixationType(fixationType);
     }
 
     @Override
@@ -237,42 +205,83 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
 
         Rectangle clippingRectangle = new Rectangle(imageRegion.getX(),imageRegion.getY(),imageRegion.getWidth(),imageRegion.getHeight());
         if (trackerFeatures.getBoundsArray() != null) {
-            if(paintBoundsTrail) {
+            if(doPaintBoundsTrail) {
                 drawBoundsTrail(g2d, downsampleFactor, clippingRectangle);
             }
         }
 
         if (trackerFeatures.getCursorArray() != null) {
-            if(paintCursorTrail) {
+            if(doPaintCursorTrail) {
                 drawCursorTrail(g2d, downsampleFactor, clippingRectangle);
             }
         }
         if (trackerFeatures.getEyeArray() != null) {
-            if(paintEyeTrail) {
+            if(doPaintEyeTrail) {
                 drawEyeTrail(g2d, downsampleFactor, clippingRectangle);
             }
         }
+
+
+
+//        if (trackerFeatures.getBoundsArray() != null) {
+//            if(doPaintZoomPeaks) {
+//                drawBoundsTrail(g2d, downsampleFactor, clippingRectangle);
+//            }
+//        }
+//
+//        if (trackerFeatures.getCursorArray() != null) {
+//            if(doPaintSlowPans) {
+//                drawCursorTrail(g2d, downsampleFactor, clippingRectangle);
+//            }
+//        }
+//        if (trackerFeatures.() != null) {
+//            if(doPaintBoundFixations) {
+//                drawEyeTrail(g2d, downsampleFactor, clippingRectangle);
+//            }
+//        }
     }
 
-    public void setPaintCursorTrail(boolean paintCursorTrail) {
-        this.paintCursorTrail = paintCursorTrail;
+    void setDoPaintCursorTrail(boolean paintCursorTrail) {
+        this.doPaintCursorTrail = paintCursorTrail;
+        this.viewer.repaint();
     }
 
-    public void setPaintEyeTrail(boolean paintEyeTrail) {
-        this.paintEyeTrail = paintEyeTrail;
+    void setDoPaintEyeTrail(boolean paintEyeTrail) {
+        this.doPaintEyeTrail = paintEyeTrail;
+        this.viewer.repaint();
     }
 
-    public void setPaintBoundsTrail(boolean paintBoundsTrail) {
-        this.paintBoundsTrail = paintBoundsTrail;
+    void setDoPaintBoundsTrail(boolean paintBoundsTrail) {
+        this.doPaintBoundsTrail = paintBoundsTrail;
+        this.viewer.repaint();
     }
 
-    public void setFixationType(FixationType fixationType) {
+    void setFixationType(FixationType fixationType) {
+        if (fixationType == null) fixationType = EYETRIBE;
         this.fixationType = fixationType;
         updateFixationType();
+        this.viewer.repaint();
     }
 
-    public void setPaintNumbers(boolean paintNumbers) {
-        this.paintNumbers = paintNumbers;
+    public void setDoPaintBoundFixations(boolean doPaintBoundFixations) {
+        this.doPaintBoundFixations = doPaintBoundFixations;
+        this.viewer.repaint();
+    }
+
+    public void setDoPaintZoomPeaks(boolean doPaintZoomPeaks) {
+        this.doPaintZoomPeaks = doPaintZoomPeaks;
+        this.viewer.repaint();
+    }
+
+    public void setDoPaintSlowPans(boolean doPaintSlowPans) {
+        this.doPaintSlowPans = doPaintSlowPans;
+        this.viewer.repaint();
+    }
+
+
+    public void setDoPaintNumbers(boolean doPaintNumbers) {
+        this.doPaintNumbers = doPaintNumbers;
+        this.viewer.repaint();
     }
 
 }

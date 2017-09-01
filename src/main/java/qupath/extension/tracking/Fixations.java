@@ -19,7 +19,10 @@ public class Fixations {
     private final ArrayList<ArrayList<ViewRecordingFrame>> IVTFixations;
     private final ArrayList<ArrayList<ViewRecordingFrame>> IDTFixations;
     private final ArrayList<ArrayList<ViewRecordingFrame>> eyeTribeFixations;
+    private ArrayList<ArrayList<ViewRecordingFrame>> fixations;
 
+    private double[] durations;
+    private Point2D[] centroids;
 
     private double[] IVTDurations;
     private double[] IDTDurations;
@@ -29,16 +32,17 @@ public class Fixations {
     private Point2D[] IDTCentroids;
 
     private Point2D[] eyeTribeCentroids;
-    private final TrackerFeatures TrackerFeatures;
+    private final TrackerFeatures trackerFeatures;
 
     private final ViewRecordingFrame[] allFrames;
+    private TrackerFeatureOverlay.FixationType fixationType;
 
 
     //    todo: check correlation between this method and EyeTribe method using real tracking data
-    public Fixations(TrackerFeatures TrackerFeatures) {
-        this.TrackerFeatures = TrackerFeatures;
+    public Fixations(TrackerFeatures trackerFeatures) {
+        this.trackerFeatures = trackerFeatures;
 
-        ViewTracker tracker = (ViewTracker) TrackerFeatures.getTracker();
+        ViewTracker tracker = (ViewTracker) trackerFeatures.getTracker();
         allFrames = TrackerUtils.getFrames(tracker);
 
         IDTFixations = calculateIDTFixations();
@@ -159,7 +163,7 @@ public class Fixations {
     //    todo: meaningful threshold!!!
     private ArrayList<ArrayList<ViewRecordingFrame>> calculateIVTFixations() {
         List<ViewRecordingFrame> allFramesForMethod = new ArrayList<>(Arrays.asList(this.allFrames));
-        double[] eyeSpeedArray = TrackerFeatures.getEyeSpeedArray();
+        double[] eyeSpeedArray = trackerFeatures.getEyeSpeedArray();
         boolean[] isFixated = new boolean[allFramesForMethod.size()];
 
         ArrayList<ArrayList<ViewRecordingFrame>> fixations = new ArrayList<>();
@@ -298,7 +302,7 @@ public class Fixations {
         double sumzoom = 0;
         for(int i = 0; i < frames.size(); i++) {
             ViewRecordingFrame frame = frames.get(i);
-            sumzoom += TrackerUtils.calculateZoom(frame.getImageBounds(), frame.getSize(), TrackerFeatures.getServer());
+            sumzoom += TrackerUtils.calculateZoom(frame.getImageBounds(), frame.getSize(), trackerFeatures.getServer());
         }
         return sumzoom / frames.size();
     }
@@ -306,7 +310,7 @@ public class Fixations {
     public double[] calculateIDTSaccadeDistances() {
         Point2D lastPoint = null;
         double[] saccadeDistances = new double[IDTCentroids.length];
-        if(saccadeDistances.length==0) {
+        if(saccadeDistances.length == 0) {
             return new double[1];
         }
         int i = 0;
@@ -441,6 +445,38 @@ public class Fixations {
         return eyeTribeCentroids;
     }
 
+    public ArrayList<ArrayList<ViewRecordingFrame>> getFixations() {
+        return fixations;
+    }
+
+    public Point2D[] getCentroids() {
+        return centroids;
+    }
+
+    public double[] getDurations() {
+        return durations;
+    }
+
+    public void updateFixationType(TrackerFeatureOverlay.FixationType fixationType) {
+        this.fixationType = fixationType;
+        switch(fixationType) {
+            case IDT:
+                centroids = IDTCentroids;
+                durations = IDTDurations;
+                fixations = IDTFixations;
+                break;
+            case IVT:
+                centroids = IVTCentroids;
+                durations = IVTDurations;
+                fixations = IVTFixations;
+                break;
+            case EYETRIBE:
+                centroids = eyeTribeCentroids;
+                durations = eyeTribeDurations;
+                fixations = eyeTribeFixations;
+                break;
+        }
+    }
 }
 
 
