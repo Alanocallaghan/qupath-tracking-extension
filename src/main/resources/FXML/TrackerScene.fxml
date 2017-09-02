@@ -5,26 +5,53 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<GridPane fx:id="pStageScene" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="qupath.extension.tracking.TrackerPaintStageController">
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.ComboBox?>
+<?import java.lang.String?>
+<GridPane fx:id="pStageScene" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+          prefHeight="500.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.60"
+          xmlns:fx="http://javafx.com/fxml/1" fx:controller="qupath.extension.tracking.TrackerPaintStageController">
     <columnConstraints>
-        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
     </columnConstraints>
     <rowConstraints>
-        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
     </rowConstraints>
-    <children>
-        <CheckBox fx:id="bHCheck" mnemonicParsing="false" text="Bounds Heatmap" />
-        <CheckBox fx:id="cHCheck" mnemonicParsing="false" text="Cursor Heatmap" GridPane.columnIndex="1" />
-        <CheckBox fx:id="eHCheck" mnemonicParsing="false" text="Eye Heatmap" GridPane.columnIndex="2" />
-        <CheckBox fx:id="bTCheck" mnemonicParsing="false" text="Bounds Features" GridPane.rowIndex="1" />
-        <CheckBox fx:id="cTCheck" mnemonicParsing="false" text="Cursor trail" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-        <CheckBox fx:id="eTCheck" mnemonicParsing="false" text="Eye trail" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-        <CheckBox fx:id="spCheck" mnemonicParsing="false" text="Slow Pans" GridPane.rowIndex="2" />
-        <CheckBox fx:id="bfCheck" mnemonicParsing="false" text="Bounds fixations" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-        <CheckBox fx:id="zpCheck" mnemonicParsing="false" text="Zoom peaks" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-    </children>
+    <CheckBox fx:id="bHCheck" mnemonicParsing="false" text="Bounds Heatmap"/>
+    <CheckBox fx:id="cHCheck" mnemonicParsing="false" text="Cursor Heatmap" GridPane.columnIndex="1"/>
+    <CheckBox fx:id="eHCheck" mnemonicParsing="false" text="Eye Heatmap" GridPane.columnIndex="2"/>
+    <CheckBox fx:id="bTCheck" mnemonicParsing="false" text="Bounds Features" GridPane.rowIndex="1"/>
+    <CheckBox fx:id="cTCheck" mnemonicParsing="false" text="Cursor trail" GridPane.columnIndex="1"
+              GridPane.rowIndex="1"/>
+    <CheckBox fx:id="eTCheck" mnemonicParsing="false" text="Eye trail" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+    <CheckBox fx:id="spCheck" mnemonicParsing="false" text="Slow Pans" GridPane.rowIndex="2"/>
+    <CheckBox fx:id="bfCheck" mnemonicParsing="false" text="Bounds fixations" GridPane.columnIndex="1"
+              GridPane.rowIndex="2"/>
+    <CheckBox fx:id="zpCheck" mnemonicParsing="false" text="Zoom peaks" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+    <ComboBox fx:id="CursorFixationTypes" prefHeight="21.0" prefWidth="105.0" GridPane.columnIndex="1"
+              GridPane.rowIndex="3">
+        <items>
+            <FXCollections fx:factory="observableArrayList">
+                <String fx:value="IDT"/>
+                <String fx:value="IVT"/>
+                <String fx:value="All points"/>
+            </FXCollections>
+        </items>
+    </ComboBox>
+    <ComboBox fx:id="EyeFixationTypes" prefHeight="21.0" prefWidth="105.0" GridPane.columnIndex="2"
+              GridPane.rowIndex="3">
+        <items>
+            <FXCollections fx:factory="observableArrayList">
+                <String fx:value="Eyetribe"/>
+                <String fx:value="IDT"/>
+                <String fx:value="IVT"/>
+                <String fx:value="All points"/>
+            </FXCollections>
+        </items>
+
+    </ComboBox>
 </GridPane>

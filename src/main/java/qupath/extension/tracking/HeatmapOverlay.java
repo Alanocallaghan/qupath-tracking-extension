@@ -16,23 +16,8 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
-import ij.IJ;
-import ij.ImagePlus;
-import ij.process.FloatProcessor;
-import ij.process.ImageProcessor;
-import qupath.lib.gui.viewer.overlays.AbstractOverlay;
-import qupath.lib.gui.viewer.recording.ViewTracker;
 import qupath.lib.images.servers.ImageServer;
 import qupath.lib.regions.ImageRegion;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 
 /**
@@ -54,7 +39,7 @@ public class HeatmapOverlay extends AbstractOverlay {
             eyeHeatmapIsCalculating = false,
             cursorHeatmapIsCalculating = false;
 
-    public HeatmapOverlay(TrackerFeatures trackerDataFeatures) {
+    HeatmapOverlay(TrackerFeatures trackerDataFeatures) {
         this.trackerDataFeatures = trackerDataFeatures;
         this.viewer = QuPathGUI.getInstance().getViewer();
         viewer.addOverlay(this);
@@ -129,6 +114,7 @@ public class HeatmapOverlay extends AbstractOverlay {
         return new Rectangle((int)(rectangle.getX()*scaleX), (int)(rectangle.getY()*scaleY), (int)(rectangle.getWidth()*scaleX), (int)(rectangle.getHeight()*scaleY));
     }
 
+//    Bresenham's line algorithm
     private void drawLine(int x, int y, int x2, int y2, ImageProcessor ip, long time) {
         int w = x2 - x ;
         int h = y2 - y ;
@@ -144,13 +130,13 @@ public class HeatmapOverlay extends AbstractOverlay {
         if (!(longest > shortest)) {
             longest = Math.abs(h) ;
             shortest = Math.abs(w) ;
-            if (h < 0) dy2 = -1 ; else if (h>0) dy2 = 1 ;
+            dy2 = h < 0 ? -1: 1;
             dx2 = 0 ;
         }
-        int numerator = longest >> 1 ;
-        for (int i=0;i<=longest;i++) {
+        int numerator = longest >> 1;
+        for (int i = 0; i <= longest; i++) {
             if(x > 0 && y > 0 && x < ip.getWidth() && y < ip.getHeight())
-                ip.setf(x,y, ip.getf(x,y) + time);
+                ip.setf(x,y, ip.getf(x, y) + time);
             numerator += shortest ;
             if (!(numerator<longest)) {
                 numerator -= longest ;
@@ -172,22 +158,22 @@ public class HeatmapOverlay extends AbstractOverlay {
         for(int i = x; i < x + w; i++) {
             for(int j = y; j < y + h; j++) {
                 if(i >=0 && j >= 0 && i < ip.getWidth() && j < ip.getHeight())
-                    ip.setf(i,j, ip.getf(i,j)+time);
+                    ip.setf(i, j, ip.getf(i, j) + time);
             }
         }
     }
 
-    public void setDoPaintBoundsHeatmap(boolean doPaintBoundsHeatmap) {
+    void setDoPaintBoundsHeatmap(boolean doPaintBoundsHeatmap) {
         this.doPaintBoundsHeatmap = doPaintBoundsHeatmap;
         this.viewer.repaint();
     }
 
-    public void setDoPaintCursorHeatmap(boolean doPaintCursorHeatmap) {
+    void setDoPaintCursorHeatmap(boolean doPaintCursorHeatmap) {
         this.doPaintCursorHeatmap = doPaintCursorHeatmap;
         this.viewer.repaint();
     }
 
-    public void setDoPaintEyeHeatmap(boolean doPaintEyeHeatmap) {
+    void setDoPaintEyeHeatmap(boolean doPaintEyeHeatmap) {
         this.doPaintEyeHeatmap = doPaintEyeHeatmap;
         this.viewer.repaint();
     }
@@ -199,7 +185,7 @@ public class HeatmapOverlay extends AbstractOverlay {
         final int totalTasks;
         private int currentFrame = 0;
 
-        public ProgressBarFrame(int totalTasks) {
+        ProgressBarFrame(int totalTasks) {
             super("Calculating Heatmap...");
             this.totalTasks = totalTasks;
             JPanel panel = new JPanel(new BorderLayout());
@@ -229,7 +215,7 @@ public class HeatmapOverlay extends AbstractOverlay {
             }
         }
 
-        public void setCurrentFrame(int currentFrame) {
+        void setCurrentFrame(int currentFrame) {
             this.currentFrame = currentFrame;
             repaint();
         }
@@ -271,7 +257,6 @@ public class HeatmapOverlay extends AbstractOverlay {
         public void done() {
             progressBarFrame.dispose();
             viewer.repaint();
-//            System.out.println(cursorHeatmap.getWidth());
         }
 
 

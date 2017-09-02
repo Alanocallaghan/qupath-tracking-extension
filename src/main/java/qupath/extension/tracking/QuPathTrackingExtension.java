@@ -36,10 +36,8 @@ import static qupath.extension.tracking.DefaultViewTrackerFactory.initDefaultVie
 
 
 /**
- * QuPath extension to help facilitate integration between QuPath and R.
- * 
- * This is mostly concerned with providing scripts, and moving them into the right places.
- * 
+ * QuPath extension to help facilitate visualising tracking data.
+ *
  * @author Alan O'Callaghan
  *
  */

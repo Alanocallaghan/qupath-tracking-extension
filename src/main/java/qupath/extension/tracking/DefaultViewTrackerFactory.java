@@ -40,8 +40,6 @@ public class DefaultViewTrackerFactory {
                 line = br.readLine();
             }
             everything = sb.toString();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException ie) {
             ie.printStackTrace();
         } finally {

@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 /**
+ * @author Alan O'Callaghan
  * Created by Alan O'Callaghan on 11/03/17.
  */
 public class TrackerPaintStage extends Stage {

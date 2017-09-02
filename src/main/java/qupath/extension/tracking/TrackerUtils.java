@@ -7,6 +7,7 @@ import qupath.lib.images.servers.ImageServer;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.pow;
@@ -33,10 +34,19 @@ class TrackerUtils {
         return calculateDownsample(regionSize.getWidth(), regionSize.getHeight(), canvas.getWidth(), canvas.getHeight());
     }
 
-    static ViewRecordingFrame[] getFrames(ViewTracker tracker) {
-        ViewRecordingFrame[] frames = new ViewRecordingFrame[tracker.nFrames()];
+    static ArrayList<ViewRecordingFrame> getFramesAsArrayList(ViewTracker tracker) {
+        ArrayList<ViewRecordingFrame> frames = new ArrayList<>(tracker.nFrames());
         for (int i = 0; i < tracker.nFrames(); i++) {
-            frames[i] = tracker.getFrame(i);
+            frames.add(i, tracker.getFrame(i));
+        }
+        return frames;
+    }
+
+    static ViewRecordingFrame[] getFramesAsArray(ViewTracker tracker) {
+        ViewRecordingFrame[] frames = new ViewRecordingFrame[tracker.nFrames()];
+        Object[] array = getFramesAsArrayList(tracker).toArray();
+        for (int i = 0; i < array.length; i++) {
+            frames[i] = (ViewRecordingFrame)array[i];
         }
         return frames;
     }
@@ -46,7 +56,7 @@ class TrackerUtils {
     }
 
 
-    private static double calculateEuclideanDistance(double x1, double y1, double x2, double y2) {
+    static double calculateEuclideanDistance(double x1, double y1, double x2, double y2) {
         return (sqrt(pow(x1 - y1, 2) + pow(x2 - y2, 2)));
     }
 
@@ -57,6 +67,7 @@ class TrackerUtils {
     public enum SpeedType {
         EYE, BOUNDS, CURSOR
     }
+
     /**
      * This method takes 2 frames and calculates the instantaneous speed.
      * The "type" parameter may be one of "cursor" or "bounds".
@@ -74,13 +85,13 @@ class TrackerUtils {
             case EYE: {
                 Point2D point1 = frame1.getEyePosition();
                 Point2D point2 = frame2.getEyePosition();
-                double distance = calculateEuclideanDistance(point1.getX(), point1.getY(), point2.getX(), point2.getY()); //todo: scale by pixel size
+                double distance = calculateEuclideanDistance(point1, point2); //todo: scale by pixel size
                 return (distance / time);
             }
             case CURSOR: {
                 Point2D point1 = frame1.getCursorPosition();
                 Point2D point2 = frame2.getCursorPosition();
-                double distance = calculateEuclideanDistance(point1.getX(), point1.getY(), point2.getX(), point2.getY()); //todo: scale by pixel size
+                double distance = calculateEuclideanDistance(point1, point2); //todo: scale by pixel size
                 return (distance / time);
             }
             case BOUNDS: {

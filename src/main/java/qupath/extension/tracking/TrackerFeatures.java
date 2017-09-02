@@ -1,17 +1,16 @@
 package qupath.extension.tracking;
 
-import qupath.lib.gui.viewer.overlays.PathOverlay;
 import qupath.lib.gui.viewer.recording.ViewRecordingFrame;
 import qupath.lib.gui.viewer.recording.ViewTracker;
 import qupath.lib.images.servers.ImageServer;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * Created by alan on 15/03/17.
+ * @author Alan O'Callaghan
+ * Created by Alan O'Callaghan on 15/03/17.
  */
 public class TrackerFeatures {
 
@@ -23,7 +22,8 @@ public class TrackerFeatures {
     HeatmapOverlay hOverlay;
     TrackerFeatureOverlay tOverlay;
     private double[] eyeSpeedArray, zoomArray;
-    Fixations fixations;
+    Fixations eyeFixations;
+    Fixations cursorFixations;
 
     TrackerFeatures(ViewTracker tracker, ImageServer server) {
         this.server = server;
@@ -34,6 +34,8 @@ public class TrackerFeatures {
         addEye();
         generateBoundsArray();
         generateEyeArray();
+        eyeFixations = new Fixations(this, "eye", "IVT");
+        cursorFixations = new Fixations(this, "cursor", "IVT");
         hOverlay = new HeatmapOverlay(this);
         tOverlay = new TrackerFeatureOverlay(this);
     }
@@ -97,7 +99,6 @@ public class TrackerFeatures {
 
         Dimension imageVisible;
         for (int i = 0; i < nFrames; i++) {
-
             currentFrame = tracker.getFrame(i);
             rect = currentFrame.getImageBounds();
 
@@ -112,6 +113,7 @@ public class TrackerFeatures {
         if (!tracker.hasEyeTrackingData()) {
             return;
         }
+
         ViewRecordingFrame currentFrame;
         ViewRecordingFrame previousFrame = null;
 
@@ -119,7 +121,6 @@ public class TrackerFeatures {
         Point2D currentEye;
         int nFrames = tracker.nFrames();
         Point2D[] point2Ds = new Point2D[nFrames];
-
 
         eyeSpeedArray = new double[nFrames];
 
@@ -176,4 +177,13 @@ public class TrackerFeatures {
         return this.eyeArray;
     }
 
+    Point2D[] getArray(Fixations.FeatureType featureType) {
+        Point2D[] array;
+        if (featureType == Fixations.FeatureType.CURSOR) {
+            array = getCursorArray();
+        } else {
+            array = getEyeArray();
+        }
+        return array;
+    }
 }
