@@ -4,8 +4,7 @@ import qupath.lib.gui.viewer.recording.ViewRecordingFrame;
 import qupath.lib.gui.viewer.recording.ViewTracker;
 import qupath.lib.images.servers.ImageServer;
 
-import java.awt.Dimension;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
@@ -21,7 +20,7 @@ import static java.lang.Math.sqrt;
  */
 class TrackerUtils {
 
-    static double calculateDownsample(double regionWidth, double regionHeight, double visibleWidth, double visibleHeight) {
+    private static double calculateDownsample(double regionWidth, double regionHeight, double visibleWidth, double visibleHeight) {
         if(regionWidth != 0) {
             return (regionWidth / visibleWidth);
         } else if(regionHeight != 0) {
@@ -30,11 +29,25 @@ class TrackerUtils {
         return 0;
     }
 
+    static Color colorFXtoAWT(javafx.scene.paint.Color color) {
+        return new Color(
+                (float) color.getRed(),
+                (float) color.getGreen(),
+                (float) color.getBlue());
+    }
+
+    static javafx.scene.paint.Color colorAWTtoFX(Color color) {
+        return javafx.scene.paint.Color.color(
+                (double)color.getRed(),
+                (double)color.getGreen(),
+                (double)color.getBlue());
+    }
+
     static double calculateDownsample(Rectangle regionSize, Dimension canvas) {
         return calculateDownsample(regionSize.getWidth(), regionSize.getHeight(), canvas.getWidth(), canvas.getHeight());
     }
 
-    static ArrayList<ViewRecordingFrame> getFramesAsArrayList(ViewTracker tracker) {
+    private static ArrayList<ViewRecordingFrame> getFramesAsArrayList(ViewTracker tracker) {
         ArrayList<ViewRecordingFrame> frames = new ArrayList<>(tracker.nFrames());
         for (int i = 0; i < tracker.nFrames(); i++) {
             frames.add(i, tracker.getFrame(i));
@@ -56,11 +69,11 @@ class TrackerUtils {
     }
 
 
-    static double calculateEuclideanDistance(double x1, double y1, double x2, double y2) {
+    private static double calculateEuclideanDistance(double x1, double y1, double x2, double y2) {
         return (sqrt(pow(x1 - y1, 2) + pow(x2 - y2, 2)));
     }
 
-    static double calculateEuclideanDistance(Point2D point1, Point2D point2) {
+    private static double calculateEuclideanDistance(Point2D point1, Point2D point2) {
         return calculateEuclideanDistance(point1.getX(), point1.getY(), point2.getX(), point2.getY());
     }
 
@@ -74,10 +87,6 @@ class TrackerUtils {
      * Uses the 2-Dimensional Euclidean distance formula.
      * returns "null" as double object if type is incorrect
      *
-     * @param frame1
-     * @param frame2
-     * @param type
-     * @return
      */
     static double getSpeed(ViewRecordingFrame frame1, ViewRecordingFrame frame2, SpeedType type) {
         double time = abs(frame1.getTimestamp() - frame2.getTimestamp());

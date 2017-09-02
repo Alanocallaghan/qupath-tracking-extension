@@ -9,7 +9,7 @@ import java.io.*;
  * @author Alan O'Callaghan
  * Created by Alan O'Callaghan on 11/03/17.
  */
-public class DefaultViewTrackerFactory {
+class DefaultViewTrackerFactory {
     private static QuPathViewer quPath;
 
     public static void initDefaultViewTrackerFactory(QuPathViewer quPathGUI) {

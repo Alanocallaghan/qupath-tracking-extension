@@ -24,7 +24,6 @@
 package qupath.extension.tracking;
 
 
-import org.codehaus.groovy.runtime.powerassert.SourceText;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

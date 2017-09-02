@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.commands.interfaces.PathCommand;
 import qupath.lib.gui.helpers.dialogs.DialogHelperFX;
-import qupath.lib.gui.viewer.QuPathViewer;
 import qupath.lib.gui.viewer.QuPathViewerPlus;
 import qupath.lib.gui.viewer.recording.DefaultViewTracker;
 
@@ -42,7 +41,7 @@ import java.io.File;
  * @author Alan O'Callaghan
  *
  */
-public class TrackingQuPathLoadCommand implements PathCommand {
+class TrackingQuPathLoadCommand implements PathCommand {
 	
 	private final static Logger logger = LoggerFactory.getLogger(TrackingQuPathLoadCommand.class);
 	
@@ -59,7 +58,8 @@ public class TrackingQuPathLoadCommand implements PathCommand {
         File file = dfx.promptForFile("Open csv",
                 new File(System.getProperty("user.home") + "/Documents/Tracking Folder/Consultants/Fri 31st 3rd"),
                 "Text files",
-                "txt", "csv", "tsv");
+                "*.txt", "*.csv", "*.tsv");
+
         if (viewer.getServer() != null) {
             if (file != null) {
                 DefaultViewTracker tracker = DefaultViewTrackerFactory.createViewTracker(file);

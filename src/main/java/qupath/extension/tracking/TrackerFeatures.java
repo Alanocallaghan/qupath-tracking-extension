@@ -12,7 +12,7 @@ import java.util.Arrays;
  * @author Alan O'Callaghan
  * Created by Alan O'Callaghan on 15/03/17.
  */
-public class TrackerFeatures {
+class TrackerFeatures {
 
     private final ImageServer server;
     private final ViewTracker tracker;

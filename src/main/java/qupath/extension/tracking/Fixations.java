@@ -3,19 +3,16 @@ package qupath.extension.tracking;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import qupath.lib.gui.viewer.recording.ViewRecordingFrame;
-import qupath.lib.gui.viewer.recording.ViewTracker;
 
+import java.awt.*;
+import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.util.*;
-import java.awt.Rectangle;
-import java.util.ArrayList;
 import java.util.List;
 
-import static javafx.application.Platform.exit;
 import static qupath.extension.tracking.Fixations.FeatureType.EYE;
-import static qupath.extension.tracking.Fixations.FixationType.EYETRIBE;
-import static qupath.extension.tracking.Fixations.FixationType.IDT;
-import static qupath.extension.tracking.Fixations.FixationType.IVT;
+import static qupath.extension.tracking.Fixations.FixationType.*;
+import static qupath.extension.tracking.TrackerUtils.colorFXtoAWT;
 
 
 /**
@@ -40,6 +37,11 @@ public class Fixations {
     private final ViewRecordingFrame[] allFrames;
     private FeatureType featureType;
 
+    private Color highColor = colorFXtoAWT(javafx.scene.paint.Color.RED),
+            medColor = colorFXtoAWT(javafx.scene.paint.Color.LIME),
+            lowColor = colorFXtoAWT(javafx.scene.paint.Color.BLUE);
+    double thicknessScalar = 1;
+
     // todo: check correlation between this method and EyeTribe method using real tracking data
     Fixations(TrackerFeatures trackerFeatures, String featureType, String fixationType) {
         this.trackerFeatures = trackerFeatures;
@@ -47,13 +49,15 @@ public class Fixations {
         allFrames = TrackerUtils.getFramesAsArray(trackerFeatures.getTracker());
         IDTFixations = calculateIDTFixations();
         IVTFixations = calculateIVTFixations();
+
         if (this.featureType == EYE) {
             eyeTribeFixations = findEyeTribeFixations();
         }
+
         this.setFixationType(fixationType);
     }
 
-    void setFeatureType(String featureType) {
+    private void setFeatureType(String featureType) {
         FeatureType enumtype = EYE;
         switch(featureType.toLowerCase()) {
             case "eye":
@@ -64,6 +68,44 @@ public class Fixations {
                 break;
         }
         this.featureType = enumtype;
+    }
+
+    FeatureType getFeatureType() {
+        return featureType;
+    }
+
+    void setLowColor(Color lowColor) {
+        this.lowColor = lowColor;
+    }
+
+    void setMedColor(Color medColor) {
+        this.medColor = medColor;
+    }
+
+    void setHighColor(Color highColor) {
+        this.highColor = highColor;
+    }
+
+    Color getLowColor() {
+        return lowColor;
+    }
+
+    Color getHighColor() {
+        return highColor;
+    }
+
+    Color getMedColor() {
+        return medColor;
+    }
+
+    void setColor(String level, Color color) {
+        if (Objects.equals(level, "low")) {
+            lowColor = color;
+        } else if (Objects.equals(level, "med")) {
+            medColor = color;
+        } else if (Objects.equals(level, "high")) {
+            highColor = color;
+        }
     }
 
     enum FeatureType {
@@ -130,7 +172,7 @@ public class Fixations {
     }
 
     @NotNull
-    public static ViewRecordingFrame translateCoords(ViewRecordingFrame frame) {
+    private static ViewRecordingFrame translateCoords(ViewRecordingFrame frame) {
 
 //        double downsample = TrackerUtils.calculateDownsample(frame.getImageBounds(), frame.getSize());
         Rectangle rectangle = frame.getImageBounds();
@@ -325,7 +367,7 @@ public class Fixations {
         return (xMaxSoFar - xMinSoFar) + (yMaxSoFar - yMinSoFar);
     }
 
-    Point2D getPosition(ViewRecordingFrame frame) {
+    private Point2D getPosition(ViewRecordingFrame frame) {
         Point2D point;
         if (this.featureType == EYE) {
             point = frame.getEyePosition();
@@ -357,9 +399,11 @@ public class Fixations {
 
     double calculateAverageZoom(ArrayList<ViewRecordingFrame> frames) {
         double sumzoom = 0;
-        for(int i = 0; i < frames.size(); i++) {
-            ViewRecordingFrame frame = frames.get(i);
-            sumzoom += TrackerUtils.calculateZoom(frame.getImageBounds(), frame.getSize(), trackerFeatures.getServer());
+        for (ViewRecordingFrame frame : frames) {
+            sumzoom += TrackerUtils.calculateZoom(
+                    frame.getImageBounds(),
+                    frame.getSize(),
+                    trackerFeatures.getServer());
         }
         return sumzoom / frames.size();
     }
@@ -490,7 +534,7 @@ public class Fixations {
         return durations;
     }
 
-    void setFixationType(FixationType fixationType) {
+    private void setFixationType(FixationType fixationType) {
         switch(fixationType) {
             case IDT:
                 centroids = IDTCentroids;
@@ -509,28 +553,26 @@ public class Fixations {
                 break;
             case ALL_POINTS:
                 centroids = trackerFeatures.getArray(this.featureType);
-                durations = new double[centroids.length];
-                fixations = new ArrayList<>(allFrames.length);
-                for (int i = 0; i < allFrames.length; i++) {
-                    ArrayList<ViewRecordingFrame> fix = new ArrayList<>(1);
-                    fix.add(allFrames[i]);
-                    fixations.add(fix);
-                }
+                durations = null;
+                fixations = null;
                 break;
         }
     }
 
     void setFixationType(String type) {
         FixationType enumtype;
-        switch(type) {
-            case "IDT":
+        switch(type.toLowerCase()) {
+            case "idt":
                 enumtype = IDT;
                 break;
-            case "IVT":
+            case "ivt":
                 enumtype = IVT;
                 break;
-            case "Eyetribe":
+            case "eyetribe":
                 enumtype = EYETRIBE;
+                break;
+            case "all points":
+                enumtype = ALL_POINTS;
                 break;
             default:
                 enumtype = EYETRIBE;

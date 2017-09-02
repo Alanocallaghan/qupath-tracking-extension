@@ -9,7 +9,7 @@ import javafx.stage.Stage;
  * @author Alan O'Callaghan
  * Created by Alan O'Callaghan on 11/03/17.
  */
-public class TrackerPaintStage extends Stage {
+class TrackerPaintStage extends Stage {
 
     TrackerFeatures features;
     private Parent root;
@@ -19,17 +19,19 @@ public class TrackerPaintStage extends Stage {
         this.features = features;
 
         try {
-            root = FXMLLoader.load(getClass().getClassLoader().getResource("FXML/TrackerScene.fxml"));
+            root = FXMLLoader.load(getClass().getClassLoader().getResource(
+                    "FXML/TrackerScene.fxml"));
         } catch (Exception e) {
             e.printStackTrace();
         }
         this.setTitle("Visualisation options");
-
-        Scene scene = new Scene(root, 400, 200);
-        this.setScene(scene);
+        if (root != null) {
+            Scene scene = new Scene(root, 500, 350);
+            this.setScene(scene);
+        }
     }
 
-    public static TrackerPaintStage getInstance(TrackerFeatures features) {
+    static TrackerPaintStage getInstance(TrackerFeatures features) {
         if (instance == null) {
             instance = new TrackerPaintStage(features);
         }
