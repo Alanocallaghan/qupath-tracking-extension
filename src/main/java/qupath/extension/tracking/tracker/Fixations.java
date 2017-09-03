@@ -184,7 +184,9 @@ public class Fixations {
     @NotNull
     private static ViewRecordingFrame translateCoords(ViewRecordingFrame frame) {
 
-//        double downsample = TrackerUtils.calculateDownsample(frame.getImageBounds(), frame.getSize());
+        double downsample = TrackerUtils.calculateDownsample(
+                frame.getImageBounds(),
+                frame.getSize());
         Rectangle rectangle = frame.getImageBounds();
         double X = rectangle.getX();
         double Y = rectangle.getY();
@@ -193,8 +195,8 @@ public class Fixations {
         if (epoint != null) {
             double eX = epoint.getX();
             double eY = epoint.getY();
-            double newX = (eX - X); // / downsample;
-            double newY = (eY - Y); // / downsample;
+            double newX = (eX - X) / downsample;
+            double newY = (eY - Y) / downsample;
             epoint = new Point2D.Double(newX, newY);
 
         }
@@ -202,22 +204,28 @@ public class Fixations {
         if (cpoint != null) {
             double cX = cpoint.getX();
             double cY = cpoint.getY();
-            double newX = (cX - X); // / downsample;
-            double newY = (cY - Y); // / downsample;
+            double newX = (cX - X) / downsample;
+            double newY = (cY - Y) / downsample;
             cpoint = new Point2D.Double(newX, newY);
 //            if(newX > 10000) {
 //                System.out.println(downsample);
 //            }
         }
 
-        return new ViewRecordingFrame(frame.getTimestamp(), frame.getImageShape(), frame.getSize(),
-                cpoint, epoint, frame.isEyeFixated());
+        return new ViewRecordingFrame(
+                frame.getTimestamp(),
+                frame.getImageShape(),
+                frame.getSize(),
+                cpoint,
+                epoint,
+                frame.isEyeFixated());
     }
 
     private ArrayList<ArrayList<ViewRecordingFrame>> calculateIDTFixations() {
 
         ArrayList<ArrayList<ViewRecordingFrame>> fixations = new ArrayList<>();
-        List<ViewRecordingFrame> allFramesForMethod = new ArrayList<>(Arrays.asList(this.allFrames));
+        List<ViewRecordingFrame> allFramesForMethod = new ArrayList<>(
+                Arrays.asList(this.allFrames));
 
         while (allFramesForMethod.size() > 0) {
 
@@ -233,12 +241,16 @@ public class Fixations {
             int timeOfWindow = 0;
             int j = 0;
 
-            long timeOfFirstFrame = allFramesForMethod.get(j).getTimestamp();
+//            long timeOfFirstFrame = allFramesForMethod.get(j).getTimestamp();
+            long timeOfPreviousFrame = allFramesForMethod.get(j).getTimestamp();
 
-            int durationThreshold = 200;
+            int durationThreshold = 250;
             while (timeOfWindow <= durationThreshold) {
                 if (++j < allFramesForMethod.size()) {
-                    timeOfWindow += (allFramesForMethod.get(j).getTimestamp() - timeOfFirstFrame);
+                    long timeOfFrame = allFramesForMethod.get(j).getTimestamp();
+                    timeOfWindow += (timeOfFrame -
+                            timeOfPreviousFrame);
+                    timeOfPreviousFrame = timeOfFrame;
                     windowPointsResized.add(translateCoords(allFramesForMethod.get(j)));
                     windowPoints.add(allFramesForMethod.get(j));
                 } else
@@ -246,8 +258,9 @@ public class Fixations {
             }
 
             int dispersionThreshold = 50;
-            if (calculateDispersion(windowPointsResized) <= dispersionThreshold) {
-                while (calculateDispersion(windowPointsResized) < dispersionThreshold) {
+            double dispersion = calculateDispersion(windowPointsResized);
+            if (dispersion <= dispersionThreshold) {
+                while (calculateDispersion(windowPointsResized) <= dispersionThreshold) {
 
                     if (++j < allFramesForMethod.size()) {
                         windowPointsResized.add(translateCoords(allFramesForMethod.get(j)));
@@ -356,7 +369,10 @@ public class Fixations {
     }
 
     private double calculateDispersion(ArrayList<ViewRecordingFrame> windowFrames) {
-        double xMaxSoFar = 0, xMinSoFar = 0, yMaxSoFar = 0, yMinSoFar = 0;
+        double xMaxSoFar = Double.MIN_VALUE,
+                xMinSoFar = Double.MAX_VALUE,
+                yMaxSoFar = Double.MIN_VALUE,
+                yMinSoFar = Double.MAX_VALUE;
 
         for (ViewRecordingFrame frame : windowFrames) {
             Point2D point = getPosition(frame);

@@ -2,7 +2,6 @@ package qupath.extension.tracking;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.SnapshotParameters;
-import javafx.scene.canvas.*;
 import javafx.scene.image.WritableImage;
 import qupath.lib.gui.viewer.QuPathViewer;
 import qupath.lib.gui.viewer.recording.ViewRecordingFrame;
@@ -49,10 +48,13 @@ public class TrackerUtils {
         return min;
     }
 
-    public static double calculateDownsample(double regionWidth, double regionHeight, double visibleWidth, double visibleHeight) {
-        if(regionWidth != 0) {
+    public static double calculateDownsample(double regionWidth,
+                                             double regionHeight,
+                                             double visibleWidth,
+                                             double visibleHeight) {
+        if (regionWidth != 0) {
             return (regionWidth / visibleWidth);
-        } else if(regionHeight != 0) {
+        } else if (regionHeight != 0) {
             return (regionHeight / visibleHeight);
         }
         return 0;
@@ -77,8 +79,6 @@ public class TrackerUtils {
             e.printStackTrace();
             return false;
         }
-//        com.itextpdf.text.Image  graph;
-//        graph = com.itextpdf.text.Image.getInstance( byteOutput.toByteArray() );
         return true;
     }
 
@@ -97,7 +97,11 @@ public class TrackerUtils {
     }
 
     public static double calculateDownsample(Rectangle regionSize, Dimension canvas) {
-        return calculateDownsample(regionSize.getWidth(), regionSize.getHeight(), canvas.getWidth(), canvas.getHeight());
+        return calculateDownsample(
+                regionSize.getWidth(),
+                regionSize.getHeight(),
+                canvas.getWidth(),
+                canvas.getHeight());
     }
 
     public  static ArrayList<ViewRecordingFrame> getFramesAsArrayList(ViewTracker tracker) {
