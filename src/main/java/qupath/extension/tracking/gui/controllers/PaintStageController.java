@@ -9,8 +9,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import qupath.extension.tracking.TrackerUtils;
+import qupath.extension.tracking.gui.TrackerPaintStage;
 import qupath.extension.tracking.overlay.HeatmapOverlay;
 import qupath.extension.tracking.overlay.TrackerFeatureOverlay;
+import qupath.extension.tracking.tracker.DefaultViewTrackerFactory;
 import qupath.extension.tracking.tracker.ExtendedViewTrackerControlPanel;
 import qupath.lib.gui.QuPathApp;
 import qupath.lib.gui.QuPathGUI;
@@ -34,12 +36,14 @@ import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 import static qupath.extension.tracking.TrackerUtils.*;
 
 /**
+ * @author Alan O'Callaghan
  * Created by alan on 03/09/17.
  */
 public class PaintStageController implements Initializable {
 
-    private HeatmapOverlay heatmapOverlay;
-    private TrackerFeatureOverlay trackerOverlay;
+
+    private HeatmapOverlay heatmapOverlay = new HeatmapOverlay(null);
+    private TrackerFeatureOverlay trackerOverlay = new TrackerFeatureOverlay(null);
     private ViewTracker tracker = null;
 
     public HeatmapOverlay getHeatmapOverlay() {
@@ -56,6 +60,26 @@ public class PaintStageController implements Initializable {
 
     public void setTrackerOverlay(TrackerFeatureOverlay trackerOverlay) {
         this.trackerOverlay = trackerOverlay;
+    }
+
+    void resetOptions() {
+        this.heatmapOverlay.setDoPaintBoundsHeatmap(bHCheck.isSelected());
+        this.heatmapOverlay.setDoPaintCursorHeatmap(cHCheck.isSelected());
+        this.heatmapOverlay.setDoPaintEyeHeatmap(eHCheck.isSelected());
+        this.trackerOverlay.setDoPaintBoundsTrail(bTCheck.isSelected());
+        this.trackerOverlay.setDoPaintCursorTrail(cTCheck.isSelected());
+        this.trackerOverlay.setDoPaintEyeTrail(eTCheck.isSelected());
+        this.trackerOverlay.setEyeThicknessScalar(eyeThicknessSlider.getValue());
+        this.trackerOverlay.setBoundsThicknessScalar(boundsThicknessSlider.getValue());
+        this.trackerOverlay.setCursorThicknessScalar(cursorThicknessSlider.getValue());
+        this.trackerOverlay.setEyeFixationType((String)eyeFixationTypes.getValue());
+        this.trackerOverlay.setCursorFixationType((String)cursorFixationTypes.getValue());
+        this.trackerOverlay.setCursorFixationColor("low", cursorLowPicker.getValue());
+        this.trackerOverlay.setCursorFixationColor("med", cursorMedPicker.getValue());
+        this.trackerOverlay.setCursorFixationColor("high", cursorHighPicker.getValue());
+        this.trackerOverlay.setEyeFixationColor("low", eyeLowPicker.getValue());
+        this.trackerOverlay.setEyeFixationColor("med", eyeMedPicker.getValue());
+        this.trackerOverlay.setEyeFixationColor("high", eyeHighPicker.getValue());
     }
 
     @Override
@@ -83,9 +107,7 @@ public class PaintStageController implements Initializable {
 
         });
 
-        LoadTracker.setOnAction(event -> {
-
-        });
+        LoadTracker.setOnAction(new LoadTrackerAction());
 
         SaveFeatures.setOnAction(event -> {
 
@@ -93,6 +115,9 @@ public class PaintStageController implements Initializable {
 
         LoadFeatures.setOnAction(event -> {
 
+        });
+        Close.setOnAction(event -> {
+            TrackerPaintStage.exit();
         });
 
 
@@ -169,7 +194,7 @@ public class PaintStageController implements Initializable {
     public MenuBar Menubar;
     public MenuItem SaveFeatures, LoadFeatures,
             LoadTracker, SaveTracker,
-            SaveImage;
+            SaveImage, Close;
     public BorderPane BorderPane;
     public TabPane TabPane;
     public Tab RecordingTab,

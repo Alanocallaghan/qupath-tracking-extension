@@ -57,7 +57,7 @@ public class QuPathTrackingExtension implements QuPathExtension {
 
 		QuPathGUI.addMenuItems(
 				qupath.getMenu("Extensions>Tracking", true),
-				QuPathGUI.createCommandAction(new TrackingQuPathLoadCommand(qupath), "Open CSV")
+				QuPathGUI.createCommandAction(new TrackingQuPathLoadCommand(qupath), "Tracking extension")
 				);
 
         // TODO: Open CSV tracking file

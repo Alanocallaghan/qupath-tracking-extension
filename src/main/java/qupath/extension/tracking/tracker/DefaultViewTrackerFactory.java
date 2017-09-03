@@ -22,7 +22,10 @@ public class DefaultViewTrackerFactory {
     public static DefaultViewTracker createViewTracker(File csvFile) {
         DefaultViewTracker tracker = new DefaultViewTracker(quPath);
         try {
-            tracker = (DefaultViewTracker)DefaultViewTracker.parseSummaryString(readFile(csvFile), null, tracker);
+            tracker = (DefaultViewTracker)DefaultViewTracker.parseSummaryString(
+                    readFile(csvFile),
+                    null,
+                    tracker);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -46,7 +49,7 @@ public class DefaultViewTrackerFactory {
         } catch (IOException ie) {
             ie.printStackTrace();
         } finally {
-            if(br!=null) {
+            if (br != null) {
                 try {
                     br.close();
                 } catch (IOException e) {

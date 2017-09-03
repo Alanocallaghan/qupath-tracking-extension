@@ -32,7 +32,7 @@ import qupath.extension.tracking.tracker.TrackerFeatures;
 import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.commands.interfaces.PathCommand;
 import qupath.lib.gui.helpers.dialogs.DialogHelperFX;
-import qupath.lib.gui.viewer.QuPathViewerPlus;
+import qupath.lib.gui.viewer.QuPathViewer;
 import qupath.lib.gui.viewer.recording.DefaultViewTracker;
 
 import java.io.File;
@@ -54,39 +54,7 @@ class TrackingQuPathLoadCommand implements PathCommand {
 	}
 
 	public void run() {
-        DialogHelperFX dfx = new DialogHelperFX(qupath.getStage());
-        QuPathViewerPlus viewer = qupath.getViewer();
-
-        File tmp = new File(
-                System.getProperty("user.home") +
-                        "/Documents/Tracking Folder/Consultants/Fri 31st 3rd");
-
-        File file = dfx.promptForFile("Open csv",
-                new File(
-                        System.getProperty("user.home") +
-                            "/Documents/Tracking Folder/Consultants/Fri 31st 3rd"),
-                "Text files",
-                "*.txt", "*.csv", "*.tsv");
-
-        if (viewer.getServer() != null) {
-            if (file != null) {
-                DefaultViewTracker tracker = DefaultViewTrackerFactory.createViewTracker(file);
-                TrackerFeatures features = new TrackerFeatures(tracker, viewer.getServer());
-                try {
-//                    Stage stage = TrackerFeatureStage.getInstance(features);
-                    TrackerPaintStage stage = TrackerPaintStage.getInstance(features);
-                    stage.show();
-                    viewer.addOverlay(stage.getHeatmapOverlay());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+        TrackerPaintStage stage = TrackerPaintStage.getInstance();
+        stage.show();
 	}
-
-    public static void main(String args[]) {
-
-    }
-
-
 }

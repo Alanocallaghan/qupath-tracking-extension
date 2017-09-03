@@ -8,6 +8,11 @@ import qupath.extension.tracking.gui.controllers.PaintStageController;
 import qupath.extension.tracking.overlay.HeatmapOverlay;
 import qupath.extension.tracking.overlay.TrackerFeatureOverlay;
 import qupath.extension.tracking.tracker.TrackerFeatures;
+import qupath.lib.gui.QuPathGUI;
+import qupath.lib.gui.viewer.QuPathViewer;
+import qupath.lib.gui.viewer.recording.DefaultViewTracker;
+import qupath.lib.gui.viewer.recording.ViewTracker;
+
 
 /**
  * @author Alan O'Callaghan
@@ -30,9 +35,9 @@ public class TrackerPaintStage extends Stage {
     HeatmapOverlay heatmapOverlay;
     TrackerFeatureOverlay trackerOverlay;
     PaintStageController paintStageController;
+    QuPathViewer viewer = QuPathGUI.getInstance().getViewer();
 
-    private TrackerPaintStage(TrackerFeatures trackerFeatures) {
-        this.features = trackerFeatures;
+    private TrackerPaintStage() {
 
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(
                 "FXML/TrackerPaintScene.fxml"));
@@ -47,24 +52,45 @@ public class TrackerPaintStage extends Stage {
             Scene scene = new Scene(root, 500, 350);
             this.setScene(scene);
         }
-        heatmapOverlay = new HeatmapOverlay(trackerFeatures);
-        trackerOverlay = new TrackerFeatureOverlay(trackerFeatures);
-        paintStageController.setHeatmapOverlay(heatmapOverlay);
-        paintStageController.setTrackerOverlay(trackerOverlay);
-        paintStageController.setTracker(trackerFeatures.getTracker());
+
     }
 
-    public static TrackerPaintStage getInstance(TrackerFeatures features) {
+    public static TrackerPaintStage getInstance() {
         if (instance == null) {
-            instance = new TrackerPaintStage(features);
+            instance = new TrackerPaintStage();
         }
         return instance;
     }
 
-    public void updateTracker(TrackerFeatures features) {
-        instance.features = features;
+    public static void exit() {
+        removeOverlays();
+        instance.close();
+        instance = null;
     }
 
+    public static void updateTracker(ViewTracker tracker) {
+        TrackerFeatures features = new TrackerFeatures(tracker, instance.viewer.getServer());
+        instance.features = features;
+        removeOverlays();
+        instance.heatmapOverlay = new HeatmapOverlay(features);
+        instance.trackerOverlay = new TrackerFeatureOverlay(features);
+        addOverlays();
+        instance.paintStageController.setHeatmapOverlay(instance.heatmapOverlay);
+        instance.paintStageController.setTrackerOverlay(instance.trackerOverlay);
+        instance.paintStageController.setTracker(tracker);
+    }
 
-    
+    private static void removeOverlays() {
+        instance.viewer.removeOverlay(instance.heatmapOverlay);
+        instance.viewer.removeOverlay(instance.trackerOverlay);
+    }
+
+    private static void addOverlays() {
+        instance.viewer.addOverlay(instance.heatmapOverlay);
+        instance.viewer.addOverlay(instance.trackerOverlay);
+    }
+
+    public PaintStageController getController() {
+        return paintStageController;
+    }
 }

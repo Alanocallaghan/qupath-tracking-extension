@@ -31,6 +31,7 @@
                 <MenuItem fx:id="SaveFeatures" text="Save features" />
                 <MenuItem fx:id="LoadFeatures" text="Load features" />
                 <MenuItem fx:id="SaveImage" text="Save snapshot (png)" />
+                <MenuItem fx:id="Close" text="Close extension" />
             </Menu>
         </MenuBar>
     </top>

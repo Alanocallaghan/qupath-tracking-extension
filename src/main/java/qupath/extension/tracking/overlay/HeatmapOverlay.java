@@ -8,7 +8,6 @@ import qupath.extension.tracking.tracker.TrackerFeatures;
 import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.viewer.QuPathViewer;
 import qupath.lib.gui.viewer.overlays.AbstractOverlay;
-import qupath.lib.gui.viewer.recording.ViewTracker;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,43 +26,41 @@ import qupath.lib.regions.ImageRegion;
  * Created by alan on 15/03/17.
  */
 public class HeatmapOverlay extends AbstractOverlay {
-    private final TrackerFeatures trackerDataFeatures;
+    private final TrackerFeatures trackerFeatures;
     private final double scalex, scaley;
     private boolean doPaintEyeHeatmap = false, doPaintCursorHeatmap = false,  doPaintBoundsHeatmap = false;
 
     private BufferedImage eyeHeatmap = null, cursorHeatmap = null, boundsHeatmap = null;
 
     private final QuPathViewer viewer;
-    private final ViewTracker tracker;
 
     private boolean boundsHeatmapIsCalculating = false,
             eyeHeatmapIsCalculating = false,
             cursorHeatmapIsCalculating = false;
 
-    public HeatmapOverlay(TrackerFeatures trackerDataFeatures) {
-        this.trackerDataFeatures = trackerDataFeatures;
+    public HeatmapOverlay(TrackerFeatures trackerFeatures) {
+        this.trackerFeatures = trackerFeatures;
         this.viewer = QuPathGUI.getInstance().getViewer();
-        viewer.addOverlay(this);
-
-        ImageServer server = trackerDataFeatures.getServer();
+        
+        ImageServer server = QuPathGUI.getInstance().getViewer().getServer();
 
         //have to cast to double otherwise this all does nothing!!!
         scalex = (double)viewer.getThumbnail().getWidth() / (double)server.getWidth();
         scaley = (double)viewer.getThumbnail().getHeight() / (double)server.getHeight();
-
-        this.tracker = trackerDataFeatures.getTracker();
     }
 
     @Override
     public void paintOverlay(Graphics2D g2d, ImageRegion imageRegion, double downsampleFactor, ImageObserver observer, boolean paintCompletely) {
-        if (doPaintBoundsHeatmap) {
-            paintBoundsHeatmap(g2d);
-        }
-        if (doPaintCursorHeatmap) {
-            paintCursorHeatmap(g2d);
-        }
-        if (doPaintEyeHeatmap) {
-            paintEyeHeatmap(g2d);
+        if (trackerFeatures != null) {
+            if (doPaintBoundsHeatmap) {
+                paintBoundsHeatmap(g2d);
+            }
+            if (doPaintCursorHeatmap) {
+                paintCursorHeatmap(g2d);
+            }
+            if (doPaintEyeHeatmap) {
+                paintEyeHeatmap(g2d);
+            }
         }
     }
 
@@ -73,7 +70,7 @@ public class HeatmapOverlay extends AbstractOverlay {
             g2d.drawImage(boundsHeatmap, 0, 0, viewer.getServerWidth(), viewer.getServerHeight(), null);
         } else {
             if (!boundsHeatmapIsCalculating) {
-                final ProgressBarFrame progressBarFrame = new ProgressBarFrame(tracker.nFrames());
+                final ProgressBarFrame progressBarFrame = new ProgressBarFrame(trackerFeatures.getTracker().nFrames());
                 HeatmapWorker boundsHeatmapWorker = new HeatmapWorker(HeatmapType.BOUNDS, progressBarFrame);
                 boundsHeatmapWorker.execute();
                 boundsHeatmapWorker.addPropertyChangeListener(progressBarFrame);
@@ -88,7 +85,7 @@ public class HeatmapOverlay extends AbstractOverlay {
             g2d.drawImage(cursorHeatmap, 0, 0, viewer.getServerWidth(), viewer.getServerHeight(), null);
         } else {
             if (!cursorHeatmapIsCalculating) {
-                final ProgressBarFrame progressBarFrame = new ProgressBarFrame(tracker.nFrames());
+                final ProgressBarFrame progressBarFrame = new ProgressBarFrame(trackerFeatures.getTracker().nFrames());
                 HeatmapWorker cursorHeatmapWorker = new HeatmapWorker(HeatmapType.CURSOR, progressBarFrame);
                 cursorHeatmapWorker.execute();
                 cursorHeatmapWorker.addPropertyChangeListener(progressBarFrame);
@@ -102,7 +99,7 @@ public class HeatmapOverlay extends AbstractOverlay {
             g2d.drawImage(eyeHeatmap, 0, 0, viewer.getServerWidth(), viewer.getServerHeight(), null);
         } else {
             if (!eyeHeatmapIsCalculating) {
-                final ProgressBarFrame progressBarFrame = new ProgressBarFrame(tracker.nFrames());
+                final ProgressBarFrame progressBarFrame = new ProgressBarFrame(trackerFeatures.getTracker().nFrames());
                 HeatmapWorker eyeHeatmapWorker = new HeatmapWorker(HeatmapType.EYE, progressBarFrame);
                 eyeHeatmapWorker.execute();
                 eyeHeatmapWorker.addPropertyChangeListener(progressBarFrame);
@@ -239,7 +236,7 @@ public class HeatmapOverlay extends AbstractOverlay {
             addPropertyChangeListener(progressBarFrame);
             progressBarFrame.toFront();
             progressBarFrame.setAlwaysOnTop(true);
-            totalTasks = tracker.nFrames();
+            totalTasks = trackerFeatures.getTracker().nFrames();
         }
 
         @Override
@@ -266,12 +263,12 @@ public class HeatmapOverlay extends AbstractOverlay {
             ImagePlus imp;
             Rectangle rect;
             FloatProcessor ip = new FloatProcessor(viewer.getThumbnail().getWidth(), viewer.getThumbnail().getHeight());
-            Rectangle[] boundsArray = trackerDataFeatures.getBoundsArray();
+            Rectangle[] boundsArray = trackerFeatures.getBoundsArray();
             for (int i = 0; i < boundsArray.length; i++) {
                 progressBarFrame.setCurrentFrame(i);
                 setProgress((int) ((double) (i * 100) / (double) totalTasks));
                 if (boundsArray[i] != null) {
-                    time = tracker.getFrame(i).getTimestamp() - time;
+                    time = trackerFeatures.getTracker().getFrame(i).getTimestamp() - time;
 
                     rect = rescaleRectangle(boundsArray[i], scalex, scaley);
 
@@ -290,16 +287,16 @@ public class HeatmapOverlay extends AbstractOverlay {
             boolean firstpoint = true;
 
             FloatProcessor ip = new FloatProcessor(viewer.getThumbnail().getWidth(), viewer.getThumbnail().getHeight());
-            Point2D[] cursorArray = trackerDataFeatures.getCursorArray();
+            Point2D[] cursorArray = trackerFeatures.getCursorArray();
             for (int i = 0; i < cursorArray.length; i++) {
                 progressBarFrame.setCurrentFrame(i);
                 setProgress((int) ((double) (i * 100) / (double)totalTasks));
 
                 if (cursorArray[i] != null) {
                     if (i == 0) {
-                        time = tracker.getFrame(i).getTimestamp();
+                        time = trackerFeatures.getTracker().getFrame(i).getTimestamp();
                     } else {
-                        time = tracker.getFrame(i).getTimestamp() - time;
+                        time = trackerFeatures.getTracker().getFrame(i).getTimestamp() - time;
                     }
                     int x = (int) (cursorArray[i].getX() * scalex);
                     int y = (int) (cursorArray[i].getY() * scaley);
@@ -322,15 +319,15 @@ public class HeatmapOverlay extends AbstractOverlay {
             ImagePlus imp;
             FloatProcessor ip = new FloatProcessor(viewer.getThumbnail().getWidth(), viewer.getThumbnail().getHeight());
 
-            Point2D[] eyeArray = trackerDataFeatures.getEyeArray();
+            Point2D[] eyeArray = trackerFeatures.getEyeArray();
             for (int i = 0; i < eyeArray.length; i++) {
                 progressBarFrame.setCurrentFrame(i);
                 setProgress((int) ((double) (i * 100) / (double)totalTasks));
                 if (eyeArray[i] != null) {
                     if (i == 0) {
-                        time = tracker.getFrame(i).getTimestamp();
+                        time = trackerFeatures.getTracker().getFrame(i).getTimestamp();
                     } else {
-                        time = tracker.getFrame(i).getTimestamp() - time;
+                        time = trackerFeatures.getTracker().getFrame(i).getTimestamp() - time;
                     }
 
                     int x = (int) (eyeArray[i].getX()*scalex);

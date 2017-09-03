@@ -8,6 +8,7 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.input.KeyCombination;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
+import qupath.extension.tracking.gui.controllers.LoadTrackerAction;
 import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.icons.PathIconFactory;
 import qupath.lib.gui.viewer.QuPathViewer;
@@ -100,7 +101,7 @@ public class ExtendedViewTrackerControlPanel {
                                 "Export")),
                 ActionUtils.createButton(
                         QuPathGUI.createCommandAction(
-                                new ViewTrackerExportCommand(viewer, this.tracker),
+                                new LoadTrackerAction(),
                                 "Import"))
         );
     }

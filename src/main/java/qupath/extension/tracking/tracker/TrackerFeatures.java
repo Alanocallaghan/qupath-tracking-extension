@@ -36,14 +36,15 @@ public class TrackerFeatures {
     public TrackerFeatures(ViewTracker tracker, ImageServer server) {
         this.server = server;
         this.tracker = tracker;
-        this.boundsArray = makeBounds();
-        this.cursorArray = makeCursor();
-
-        addEye();
-        generateBoundsArray();
-        generateEyeArray();
-        eyeFixations = new Fixations(this, "eye", "IVT");
-        cursorFixations = new Fixations(this, "cursor", "IVT");
+        if (tracker != null) {
+            this.boundsArray = makeBounds();
+            this.cursorArray = makeCursor();
+            addEye();
+            generateBoundsArray();
+            generateEyeArray();
+            eyeFixations = new Fixations(this, "eye", "IVT");
+            cursorFixations = new Fixations(this, "cursor", "IVT");
+        }
 
     }
 

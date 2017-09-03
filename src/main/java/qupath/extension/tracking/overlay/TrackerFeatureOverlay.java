@@ -36,7 +36,6 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
     public TrackerFeatureOverlay(TrackerFeatures trackerFeatures) {
         this.viewer = QuPathGUI.getInstance().getViewer();
         this.trackerFeatures = trackerFeatures;
-        viewer.addOverlay(this);
     }
 
 //    private void drawCursorTrail(Graphics2D g2d, double downsampleFactor, Rectangle clippingRectangle) {
@@ -130,36 +129,38 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
     @Override
     public void paintOverlay(Graphics2D g2d, ImageRegion imageRegion, double downsampleFactor, ImageObserver observer, boolean paintCompletely) {
         Rectangle clippingRectangle = new Rectangle(imageRegion.getX(),imageRegion.getY(),imageRegion.getWidth(),imageRegion.getHeight());
-        if (doPaintBoundsTrail) {
-            if (trackerFeatures.getBoundsArray() != null) {
-                drawBoundsTrail(g2d, downsampleFactor, clippingRectangle);
+        if (trackerFeatures != null) {
+            if (doPaintBoundsTrail) {
+                if (trackerFeatures.getBoundsArray() != null) {
+                    drawBoundsTrail(g2d, downsampleFactor, clippingRectangle);
+                }
             }
-        }
-        if (doPaintCursorTrail) {
-            if (trackerFeatures.getCursorFixations() != null) {
-                drawTrail(g2d, downsampleFactor, clippingRectangle,
-                        trackerFeatures.getCursorFixations());
+            if (doPaintCursorTrail) {
+                if (trackerFeatures.getCursorFixations() != null) {
+                    drawTrail(g2d, downsampleFactor, clippingRectangle,
+                            trackerFeatures.getCursorFixations());
+                }
             }
-        }
-        if (doPaintEyeTrail) {
-            if (trackerFeatures.getEyeFixations() != null) {
-                drawTrail(g2d, downsampleFactor, clippingRectangle,
-                        trackerFeatures.getEyeFixations());
+            if (doPaintEyeTrail) {
+                if (trackerFeatures.getEyeFixations() != null) {
+                    drawTrail(g2d, downsampleFactor, clippingRectangle,
+                            trackerFeatures.getEyeFixations());
+                }
             }
-        }
-        if (doPaintZoomPeaks) {
-            if (trackerFeatures.getBoundsArray() != null) {
-//                drawBoundsTrail(g2d, downsampleFactor, clippingRectangle);
+            if (doPaintZoomPeaks) {
+                if (trackerFeatures.getBoundsArray() != null) {
+                    //                drawBoundsTrail(g2d, downsampleFactor, clippingRectangle);
+                }
             }
-        }
-        if (doPaintSlowPans) {
-            if (trackerFeatures.getCursorArray() != null) {
-//                drawCursorTrail(g2d, downsampleFactor, clippingRectangle);
+            if (doPaintSlowPans) {
+                if (trackerFeatures.getCursorArray() != null) {
+                    //                drawCursorTrail(g2d, downsampleFactor, clippingRectangle);
+                }
             }
-        }
-        if (doPaintBoundFixations) {
-            if (trackerFeatures.getBoundsArray() != null) {
-//                drawEyeTrail(g2d, downsampleFactor, clippingRectangle);
+            if (doPaintBoundFixations) {
+                if (trackerFeatures.getBoundsArray() != null) {
+                    //                drawEyeTrail(g2d, downsampleFactor, clippingRectangle);
+                }
             }
         }
     }
