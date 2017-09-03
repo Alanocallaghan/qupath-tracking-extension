@@ -1,9 +1,10 @@
-package qupath.extension.tracking;
+package qupath.extension.tracking.overlay;
 
 import ij.IJ;
 import ij.ImagePlus;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
+import qupath.extension.tracking.tracker.TrackerFeatures;
 import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.viewer.QuPathViewer;
 import qupath.lib.gui.viewer.overlays.AbstractOverlay;
@@ -39,7 +40,7 @@ public class HeatmapOverlay extends AbstractOverlay {
             eyeHeatmapIsCalculating = false,
             cursorHeatmapIsCalculating = false;
 
-    HeatmapOverlay(TrackerFeatures trackerDataFeatures) {
+    public HeatmapOverlay(TrackerFeatures trackerDataFeatures) {
         this.trackerDataFeatures = trackerDataFeatures;
         this.viewer = QuPathGUI.getInstance().getViewer();
         viewer.addOverlay(this);
@@ -163,17 +164,17 @@ public class HeatmapOverlay extends AbstractOverlay {
         }
     }
 
-    void setDoPaintBoundsHeatmap(boolean doPaintBoundsHeatmap) {
+    public void setDoPaintBoundsHeatmap(boolean doPaintBoundsHeatmap) {
         this.doPaintBoundsHeatmap = doPaintBoundsHeatmap;
         this.viewer.repaint();
     }
 
-    void setDoPaintCursorHeatmap(boolean doPaintCursorHeatmap) {
+    public void setDoPaintCursorHeatmap(boolean doPaintCursorHeatmap) {
         this.doPaintCursorHeatmap = doPaintCursorHeatmap;
         this.viewer.repaint();
     }
 
-    void setDoPaintEyeHeatmap(boolean doPaintEyeHeatmap) {
+    public void setDoPaintEyeHeatmap(boolean doPaintEyeHeatmap) {
         this.doPaintEyeHeatmap = doPaintEyeHeatmap;
         this.viewer.repaint();
     }

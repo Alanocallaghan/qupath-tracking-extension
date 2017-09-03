@@ -1,4 +1,4 @@
-package qupath.extension.tracking;
+package qupath.extension.tracking.tracker;
 
 import qupath.lib.gui.viewer.recording.ViewTracker;
 

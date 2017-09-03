@@ -1,7 +1,8 @@
-package qupath.extension.tracking;
+package qupath.extension.tracking.tracker;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import qupath.extension.tracking.TrackerUtils;
 import qupath.lib.gui.viewer.recording.ViewRecordingFrame;
 
 import java.awt.*;
@@ -10,8 +11,8 @@ import java.awt.geom.Point2D;
 import java.util.*;
 import java.util.List;
 
-import static qupath.extension.tracking.Fixations.FeatureType.EYE;
-import static qupath.extension.tracking.Fixations.FixationType.*;
+import static qupath.extension.tracking.tracker.Fixations.FeatureType.EYE;
+import static qupath.extension.tracking.tracker.Fixations.FixationType.*;
 import static qupath.extension.tracking.TrackerUtils.colorFXtoAWT;
 
 
@@ -40,6 +41,15 @@ public class Fixations {
     private Color highColor = colorFXtoAWT(javafx.scene.paint.Color.RED),
             medColor = colorFXtoAWT(javafx.scene.paint.Color.LIME),
             lowColor = colorFXtoAWT(javafx.scene.paint.Color.BLUE);
+
+    public double getThicknessScalar() {
+        return thicknessScalar;
+    }
+
+    public void setThicknessScalar(double thicknessScalar) {
+        this.thicknessScalar = thicknessScalar;
+    }
+
     double thicknessScalar = 1;
 
     // todo: check correlation between this method and EyeTribe method using real tracking data
@@ -70,7 +80,7 @@ public class Fixations {
         this.featureType = enumtype;
     }
 
-    FeatureType getFeatureType() {
+    public FeatureType getFeatureType() {
         return featureType;
     }
 
@@ -86,19 +96,19 @@ public class Fixations {
         this.highColor = highColor;
     }
 
-    Color getLowColor() {
+    public Color getLowColor() {
         return lowColor;
     }
 
-    Color getHighColor() {
+    public Color getHighColor() {
         return highColor;
     }
 
-    Color getMedColor() {
+    public Color getMedColor() {
         return medColor;
     }
 
-    void setColor(String level, Color color) {
+    public void setColor(String level, Color color) {
         if (Objects.equals(level, "low")) {
             lowColor = color;
         } else if (Objects.equals(level, "med")) {
@@ -108,7 +118,7 @@ public class Fixations {
         }
     }
 
-    enum FeatureType {
+    public enum FeatureType {
         EYE, CURSOR;
 
         @Override
@@ -397,7 +407,7 @@ public class Fixations {
         return(new Point2D.Double(meanX, meanY));
     }
 
-    double calculateAverageZoom(ArrayList<ViewRecordingFrame> frames) {
+    public double calculateAverageZoom(ArrayList<ViewRecordingFrame> frames) {
         double sumzoom = 0;
         for (ViewRecordingFrame frame : frames) {
             sumzoom += TrackerUtils.calculateZoom(
@@ -522,15 +532,15 @@ public class Fixations {
 //        return durations;
 //    }
 
-    ArrayList<ArrayList<ViewRecordingFrame>> getFixations() {
+    public ArrayList<ArrayList<ViewRecordingFrame>> getFixations() {
         return fixations;
     }
 
-    Point2D[] getCentroids() {
+    public Point2D[] getCentroids() {
         return centroids;
     }
 
-    double[] getDurations() {
+    public double[] getDurations() {
         return durations;
     }
 
@@ -559,7 +569,7 @@ public class Fixations {
         }
     }
 
-    void setFixationType(String type) {
+    public void setFixationType(String type) {
         FixationType enumtype;
         switch(type.toLowerCase()) {
             case "idt":

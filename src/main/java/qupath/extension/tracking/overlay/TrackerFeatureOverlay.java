@@ -1,5 +1,8 @@
-package qupath.extension.tracking;
+package qupath.extension.tracking.overlay;
 
+import qupath.extension.tracking.tracker.Fixations;
+import qupath.extension.tracking.tracker.TrackerFeatures;
+import qupath.extension.tracking.TrackerUtils;
 import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.viewer.QuPathViewer;
 import qupath.lib.gui.viewer.overlays.AbstractOverlay;
@@ -15,7 +18,7 @@ import java.awt.image.ImageObserver;
  * @author Alan O'Callaghan
  * Created by alan on 15/03/17.
  */
-class TrackerFeatureOverlay extends AbstractOverlay {
+public class TrackerFeatureOverlay extends AbstractOverlay {
 
 //    TODO: Singleton class like heatmapoverlay
 //    TODO: Separate class for bounds features?
@@ -30,7 +33,7 @@ class TrackerFeatureOverlay extends AbstractOverlay {
     private int lowZoomThreshold = 5, medZoomThreshold = 1;
     private double boundsThicknessScalar;
 
-    TrackerFeatureOverlay(TrackerFeatures trackerFeatures) {
+    public TrackerFeatureOverlay(TrackerFeatures trackerFeatures) {
         this.viewer = QuPathGUI.getInstance().getViewer();
         this.trackerFeatures = trackerFeatures;
         viewer.addOverlay(this);
@@ -133,13 +136,15 @@ class TrackerFeatureOverlay extends AbstractOverlay {
             }
         }
         if (doPaintCursorTrail) {
-            if (trackerFeatures.cursorFixations != null) {
-                drawTrail(g2d, downsampleFactor, clippingRectangle, trackerFeatures.cursorFixations);
+            if (trackerFeatures.getCursorFixations() != null) {
+                drawTrail(g2d, downsampleFactor, clippingRectangle,
+                        trackerFeatures.getCursorFixations());
             }
         }
         if (doPaintEyeTrail) {
-            if (trackerFeatures.eyeFixations != null) {
-                drawTrail(g2d, downsampleFactor, clippingRectangle, trackerFeatures.eyeFixations);
+            if (trackerFeatures.getEyeFixations() != null) {
+                drawTrail(g2d, downsampleFactor, clippingRectangle,
+                        trackerFeatures.getEyeFixations());
             }
         }
         if (doPaintZoomPeaks) {
@@ -218,7 +223,7 @@ class TrackerFeatureOverlay extends AbstractOverlay {
                     } else if (zoomLevel[i] < medZoomThreshold) {
                         g2d.setColor(highColor);
                     }
-                    g2d.setStroke(new BasicStroke((float) (downsampleFactor * fixations.thicknessScalar)));
+                    g2d.setStroke(new BasicStroke((float) (downsampleFactor * fixations.getThicknessScalar())));
 
                     if (previousPoint != null) {
                         g2d.drawLine(
@@ -256,30 +261,30 @@ class TrackerFeatureOverlay extends AbstractOverlay {
         }
     }
 
-    void setDoPaintCursorTrail(boolean paintCursorTrail) {
+    public void setDoPaintCursorTrail(boolean paintCursorTrail) {
         this.doPaintCursorTrail = paintCursorTrail;
         this.viewer.repaint();
     }
 
-    void setDoPaintEyeTrail(boolean paintEyeTrail) {
+    public void setDoPaintEyeTrail(boolean paintEyeTrail) {
         this.doPaintEyeTrail = paintEyeTrail;
         this.viewer.repaint();
     }
 
-    void setDoPaintBoundsTrail(boolean paintBoundsTrail) {
+    public void setDoPaintBoundsTrail(boolean paintBoundsTrail) {
         this.doPaintBoundsTrail = paintBoundsTrail;
         this.viewer.repaint();
     }
 
-    void setEyeFixationType(String fixationType) {
+    public void setEyeFixationType(String fixationType) {
         if (fixationType == null) fixationType = "Eyetribe";
-        this.trackerFeatures.eyeFixations.setFixationType(fixationType);
+        this.trackerFeatures.getEyeFixations().setFixationType(fixationType);
         this.viewer.repaint();
     }
 
-    void setCursorFixationType(String fixationType) {
+    public void setCursorFixationType(String fixationType) {
         if (fixationType == null) fixationType = "IDT";
-        this.trackerFeatures.cursorFixations.setFixationType(fixationType);
+        this.trackerFeatures.getCursorFixations().setFixationType(fixationType);
         this.viewer.repaint();
     }
 //
@@ -305,24 +310,24 @@ class TrackerFeatureOverlay extends AbstractOverlay {
 //    }
 
     public void setEyeFixationColor(String level, javafx.scene.paint.Color color) {
-        this.trackerFeatures.eyeFixations.setColor(level,
+        this.trackerFeatures.getEyeFixations().setColor(level,
                 TrackerUtils.colorFXtoAWT(color));
         this.viewer.repaint();
     }
 
     public void setCursorFixationColor(String level, javafx.scene.paint.Color color) {
-        this.trackerFeatures.cursorFixations.setColor(level,
+        this.trackerFeatures.getCursorFixations().setColor(level,
                 TrackerUtils.colorFXtoAWT(color));
         this.viewer.repaint();
     }
 
     public void setEyeThicknessScalar(Number eyeThicknessScalar) {
-        this.trackerFeatures.eyeFixations.thicknessScalar = eyeThicknessScalar.doubleValue();
+        this.trackerFeatures.getEyeFixations().setThicknessScalar(eyeThicknessScalar.doubleValue());
         this.viewer.repaint();
     }
 
     public void setCursorThicknessScalar(Number cursorThicknessScalar) {
-        this.trackerFeatures.cursorFixations.thicknessScalar = cursorThicknessScalar.doubleValue();
+        this.trackerFeatures.getCursorFixations().setThicknessScalar(cursorThicknessScalar.doubleValue());
         this.viewer.repaint();
     }
 

@@ -23,10 +23,12 @@
 
 package qupath.extension.tracking;
 
-import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import qupath.extension.tracking.gui.TrackerPaintStage;
+import qupath.extension.tracking.tracker.DefaultViewTrackerFactory;
+import qupath.extension.tracking.tracker.TrackerFeatures;
 import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.commands.interfaces.PathCommand;
 import qupath.lib.gui.helpers.dialogs.DialogHelperFX;
@@ -55,8 +57,14 @@ class TrackingQuPathLoadCommand implements PathCommand {
         DialogHelperFX dfx = new DialogHelperFX(qupath.getStage());
         QuPathViewerPlus viewer = qupath.getViewer();
 
+        File tmp = new File(
+                System.getProperty("user.home") +
+                        "/Documents/Tracking Folder/Consultants/Fri 31st 3rd");
+
         File file = dfx.promptForFile("Open csv",
-                new File(System.getProperty("user.home") + "/Documents/Tracking Folder/Consultants/Fri 31st 3rd"),
+                new File(
+                        System.getProperty("user.home") +
+                            "/Documents/Tracking Folder/Consultants/Fri 31st 3rd"),
                 "Text files",
                 "*.txt", "*.csv", "*.tsv");
 
@@ -65,12 +73,13 @@ class TrackingQuPathLoadCommand implements PathCommand {
                 DefaultViewTracker tracker = DefaultViewTrackerFactory.createViewTracker(file);
                 TrackerFeatures features = new TrackerFeatures(tracker, viewer.getServer());
                 try {
-                    Stage stage = TrackerPaintStage.getInstance(features);
+//                    Stage stage = TrackerFeatureStage.getInstance(features);
+                    TrackerPaintStage stage = TrackerPaintStage.getInstance(features);
                     stage.show();
+                    viewer.addOverlay(stage.getHeatmapOverlay());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                viewer.addOverlay(features.hOverlay);
             }
         }
 	}

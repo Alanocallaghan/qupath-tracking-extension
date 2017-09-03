@@ -31,7 +31,7 @@ import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.commands.OpenWebpageCommand;
 import qupath.lib.gui.extensions.QuPathExtension;
 
-import static qupath.extension.tracking.DefaultViewTrackerFactory.initDefaultViewTrackerFactory;
+import static qupath.extension.tracking.tracker.DefaultViewTrackerFactory.initDefaultViewTrackerFactory;
 
 
 /**
@@ -61,9 +61,6 @@ public class QuPathTrackingExtension implements QuPathExtension {
 				);
 
         // TODO: Open CSV tracking file
-        // TODO: Generate heatmaps
-        // TODO: Generate tracking visualisations
-        // TODO: Cursor fixation algorithms
         // TODO: Use md5 sum to tie tracking instance to image (using MessageDigest) http://stackoverflow.com/questions/4187111/how-to-get-the-md5sum-of-a-file-in-java
 
 	}

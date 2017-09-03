@@ -1,5 +1,6 @@
-package qupath.extension.tracking;
+package qupath.extension.tracking.tracker;
 
+import qupath.extension.tracking.TrackerUtils;
 import qupath.lib.gui.viewer.recording.ViewRecordingFrame;
 import qupath.lib.gui.viewer.recording.ViewTracker;
 import qupath.lib.images.servers.ImageServer;
@@ -12,20 +13,27 @@ import java.util.Arrays;
  * @author Alan O'Callaghan
  * Created by Alan O'Callaghan on 15/03/17.
  */
-class TrackerFeatures {
+public class TrackerFeatures {
 
     private final ImageServer server;
     private final ViewTracker tracker;
     private Rectangle[] boundsArray;
     private Point2D[] eyeArray;
     private Point2D[] cursorArray;
-    HeatmapOverlay hOverlay;
-    TrackerFeatureOverlay tOverlay;
     private double[] eyeSpeedArray, zoomArray;
+
+    public Fixations getEyeFixations() {
+        return eyeFixations;
+    }
+
+    public Fixations getCursorFixations() {
+        return cursorFixations;
+    }
+
     Fixations eyeFixations;
     Fixations cursorFixations;
 
-    TrackerFeatures(ViewTracker tracker, ImageServer server) {
+    public TrackerFeatures(ViewTracker tracker, ImageServer server) {
         this.server = server;
         this.tracker = tracker;
         this.boundsArray = makeBounds();
@@ -36,8 +44,7 @@ class TrackerFeatures {
         generateEyeArray();
         eyeFixations = new Fixations(this, "eye", "IVT");
         cursorFixations = new Fixations(this, "cursor", "IVT");
-        hOverlay = new HeatmapOverlay(this);
-        tOverlay = new TrackerFeatureOverlay(this);
+
     }
 
     private void addEye() {
@@ -153,31 +160,31 @@ class TrackerFeatures {
         return rects;
     }
 
-    double[] getEyeSpeedArray() { return Arrays.copyOf(eyeSpeedArray, eyeSpeedArray.length);}
+    public double[] getEyeSpeedArray() { return Arrays.copyOf(eyeSpeedArray, eyeSpeedArray.length);}
 
-    double[] getZoomArray() { return Arrays.copyOf(zoomArray, zoomArray.length); }
+    public double[] getZoomArray() { return Arrays.copyOf(zoomArray, zoomArray.length); }
 
-    ViewTracker getTracker() {
+    public ViewTracker getTracker() {
         return this.tracker;
     }
 
-    ImageServer getServer() {
+    public ImageServer getServer() {
         return this.server;
     }
 
-    Point2D[] getCursorArray() {
+    public Point2D[] getCursorArray() {
         return this.cursorArray;
     }
 
-    Rectangle[] getBoundsArray() {
+    public Rectangle[] getBoundsArray() {
         return this.boundsArray;
     }
 
-    Point2D[] getEyeArray() {
+    public Point2D[] getEyeArray() {
         return this.eyeArray;
     }
 
-    Point2D[] getArray(Fixations.FeatureType featureType) {
+    public Point2D[] getArray(Fixations.FeatureType featureType) {
         Point2D[] array;
         if (featureType == Fixations.FeatureType.CURSOR) {
             array = getCursorArray();

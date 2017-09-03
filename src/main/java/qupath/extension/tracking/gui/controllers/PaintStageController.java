@@ -1,0 +1,196 @@
+package qupath.extension.tracking.gui.controllers;
+
+import javafx.event.ActionEvent;
+import javafx.event.EventType;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
+import qupath.extension.tracking.TrackerUtils;
+import qupath.extension.tracking.overlay.HeatmapOverlay;
+import qupath.extension.tracking.overlay.TrackerFeatureOverlay;
+import qupath.extension.tracking.tracker.ExtendedViewTrackerControlPanel;
+import qupath.lib.gui.QuPathApp;
+import qupath.lib.gui.QuPathGUI;
+import qupath.lib.gui.helpers.dialogs.DialogHelperFX;
+import qupath.lib.gui.viewer.QuPathViewer;
+import qupath.lib.gui.viewer.recording.DefaultViewTracker;
+import qupath.lib.gui.viewer.recording.ViewTracker;
+import qupath.lib.gui.viewer.recording.ViewTrackerControlPanel;
+
+import java.beans.EventHandler;
+import java.io.File;
+import java.net.URL;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.ResourceBundle;
+
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+import static qupath.extension.tracking.TrackerUtils.*;
+
+/**
+ * Created by alan on 03/09/17.
+ */
+public class PaintStageController implements Initializable {
+
+    private HeatmapOverlay heatmapOverlay;
+    private TrackerFeatureOverlay trackerOverlay;
+    private ViewTracker tracker = null;
+
+    public HeatmapOverlay getHeatmapOverlay() {
+        return heatmapOverlay;
+    }
+
+    public void setHeatmapOverlay(HeatmapOverlay heatmapOverlay) {
+        this.heatmapOverlay = heatmapOverlay;
+    }
+
+    public TrackerFeatureOverlay getTrackerOverlay() {
+        return trackerOverlay;
+    }
+
+    public void setTrackerOverlay(TrackerFeatureOverlay trackerOverlay) {
+        this.trackerOverlay = trackerOverlay;
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+
+//        Menus
+        SaveImage.setOnAction(event -> {
+            QuPathGUI gui = QuPathGUI.getInstance();
+            DialogHelperFX dfx = new DialogHelperFX(gui.getStage());
+
+            String date = LocalDateTime.now().format(ISO_LOCAL_DATE_TIME);
+
+            File file = dfx.promptToSaveFile("Save snapshot",
+                    new File(System.getProperty("user.home")),
+                    "QuPath_snapshot_" + date + ".png",
+                    "png",
+                    "*.png"
+            );
+            if (file != null) {
+                saveSnapshot(gui.getViewer(), file);
+            }
+        });
+
+        SaveTracker.setOnAction(event -> {
+
+        });
+
+        LoadTracker.setOnAction(event -> {
+
+        });
+
+        SaveFeatures.setOnAction(event -> {
+
+        });
+
+        LoadFeatures.setOnAction(event -> {
+
+        });
+
+
+//      Toggles for visualisations
+        bHCheck.setOnAction(event ->
+                this.heatmapOverlay.setDoPaintBoundsHeatmap(bHCheck.isSelected()));
+        cHCheck.setOnAction(event ->
+                this.heatmapOverlay.setDoPaintCursorHeatmap(cHCheck.isSelected()));
+        eHCheck.setOnAction(event ->
+                this.heatmapOverlay.setDoPaintEyeHeatmap(eHCheck.isSelected()));
+        bTCheck.setOnAction(event ->
+                this.trackerOverlay.setDoPaintBoundsTrail(bTCheck.isSelected()));
+        cTCheck.setOnAction(event ->
+                this.trackerOverlay.setDoPaintCursorTrail(cTCheck.isSelected()));
+        eTCheck.setOnAction(event ->
+                this.trackerOverlay.setDoPaintEyeTrail(eTCheck.isSelected()));
+
+//        spCheck.setOnAction(event ->
+//                this.features.trackerOverlay.setDoPaintSlowPans(spCheck.isSelected()));
+//        bfCheck.setOnAction(event ->
+//                this.features.trackerOverlay.setDoPaintBoundFixations(bfCheck.isSelected()));
+//        zpCheck.setOnAction(event ->
+//                this.features.trackerOverlay.setDoPaintZoomPeaks(zpCheck.isSelected()));
+
+
+
+//      Visualisation options
+        eyeThicknessSlider.valueProperty().addListener(
+                (observable, oldValue, newValue) -> this.
+                        trackerOverlay.setEyeThicknessScalar(newValue));
+        boundsThicknessSlider.valueProperty().addListener(
+                (observable, oldValue, newValue) -> this.
+                        trackerOverlay.setBoundsThicknessScalar(newValue));
+        cursorThicknessSlider.valueProperty().addListener(
+                (observable, oldValue, newValue) -> this.
+                        trackerOverlay.setCursorThicknessScalar(newValue));
+
+        eyeFixationTypes.valueProperty().addListener((observable, oldValue, newValue) ->
+                this.trackerOverlay.setEyeFixationType((String)newValue));
+        cursorFixationTypes.valueProperty().addListener((observable, oldValue, newValue) ->
+                this.trackerOverlay.setCursorFixationType((String)newValue));
+
+        cursorLowPicker.setOnAction(event -> this.
+                trackerOverlay.setCursorFixationColor("low", cursorLowPicker.getValue()));
+        cursorLowPicker.setValue(Color.BLUE);
+
+        cursorMedPicker.setOnAction(event -> this.
+                trackerOverlay.setCursorFixationColor("med", cursorMedPicker.getValue()));
+        cursorMedPicker.setValue(Color.LIME);
+
+        cursorHighPicker.setOnAction(event -> this.
+                trackerOverlay.setCursorFixationColor("high", cursorHighPicker.getValue()));
+        cursorHighPicker.setValue(Color.RED);
+
+        eyeLowPicker.setOnAction(event -> this.
+                trackerOverlay.setEyeFixationColor("low", eyeLowPicker.getValue()));
+        eyeLowPicker.setValue(Color.BLUE);
+
+        eyeMedPicker.setOnAction(event -> this.
+                trackerOverlay.setEyeFixationColor("med", eyeMedPicker.getValue()));
+        eyeMedPicker.setValue(Color.LIME);
+
+        eyeHighPicker.setOnAction(event -> this.
+                trackerOverlay.setEyeFixationColor("high", eyeHighPicker.getValue()));
+        eyeHighPicker.setValue(Color.RED);
+
+        ExtendedViewTrackerControlPanel panel = new ExtendedViewTrackerControlPanel(
+                QuPathGUI.getInstance().getViewer(), tracker);
+        RecordingTab.setContent(panel.getNode());
+    }
+
+    @FXML
+    public Menu FileMenu;
+    public MenuBar Menubar;
+    public MenuItem SaveFeatures, LoadFeatures,
+            LoadTracker, SaveTracker,
+            SaveImage;
+    public BorderPane BorderPane;
+    public TabPane TabPane;
+    public Tab RecordingTab,
+            VisualisationTab,
+            VisualisationOptionTab,
+            FeatureOptionsTab;
+    public GridPane VisualisatonTogglePane, VisualisationOptionPane;
+    public Slider boundsThicknessSlider,
+        cursorThicknessSlider,
+        eyeThicknessSlider;
+    public Label cursorLabel, eyeLabel,
+            BoundThicknessLabel, CursorThicknessLabel, EyeThicknessLabel,
+            cursorColorLabel, eyeColorLabel;
+    public ComboBox cursorFixationTypes, eyeFixationTypes;
+    public ColorPicker cursorLowPicker, cursorMedPicker, cursorHighPicker,
+        eyeHighPicker, eyeMedPicker, eyeLowPicker;
+    public CheckBox bHCheck, eHCheck, cHCheck,
+            bTCheck, cTCheck, eTCheck;
+
+    public void setTracker(ViewTracker tracker) {
+        this.tracker = tracker;
+    }
+    // zpCheck, bfCheck, spCheck;
+}

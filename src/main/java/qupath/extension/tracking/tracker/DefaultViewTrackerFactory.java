@@ -1,5 +1,8 @@
-package qupath.extension.tracking;
+package qupath.extension.tracking.tracker;
 
+import javafx.scene.SnapshotParameters;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.image.WritableImage;
 import qupath.lib.gui.viewer.QuPathViewer;
 import qupath.lib.gui.viewer.recording.DefaultViewTracker;
 
@@ -9,7 +12,7 @@ import java.io.*;
  * @author Alan O'Callaghan
  * Created by Alan O'Callaghan on 11/03/17.
  */
-class DefaultViewTrackerFactory {
+public class DefaultViewTrackerFactory {
     private static QuPathViewer quPath;
 
     public static void initDefaultViewTrackerFactory(QuPathViewer quPathGUI) {

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<BorderPane fx:id="BorderPane" maxHeight="-Infinity" maxWidth="-Infinity"
+            minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0"
+            prefWidth="500.0" xmlns="http://javafx.com/javafx/8.0.131" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="qupath.extension.tracking.gui.controllers.PaintStageController">
+
+
+    <top>
+        <MenuBar fx:id="Menubar">
+            <Menu fx:id="FileMenu" text="File">
+                <MenuItem fx:id="LoadTracker" text="Load CSV" />
+                <MenuItem fx:id="SaveTracker" text="Save CSV" />
+                <MenuItem fx:id="SaveFeatures" text="Save features" />
+                <MenuItem fx:id="LoadFeatures" text="Load features" />
+                <MenuItem fx:id="SaveImage" text="Save snapshot (png)" />
+            </Menu>
+        </MenuBar>
+    </top>
+
+
+    <center>
+        <TabPane fx:id="TabPane" prefHeight="500.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE">
+
+            <Tab fx:id="RecordingTab" text="Recording">
+                <GridPane>
+
+                </GridPane>
+            </Tab>
+
+            <Tab fx:id="VisualisationTab" text="Visualisation tab">
+                <GridPane fx:id="VisualisatonTogglePane">
+
+                    <CheckBox fx:id="bHCheck" mnemonicParsing="false" text="Bounds Heatmap" />
+                    <CheckBox fx:id="cHCheck" mnemonicParsing="false" text="Cursor Heatmap"
+                              GridPane.columnIndex="1" />
+                    <CheckBox fx:id="eHCheck" mnemonicParsing="false" text="Eye Heatmap"
+                              GridPane.columnIndex="2" />
+                    <CheckBox fx:id="bTCheck" mnemonicParsing="false" text="Bounds Features"
+                              GridPane.rowIndex="1" />
+                    <CheckBox fx:id="cTCheck" mnemonicParsing="false" text="Cursor trail"
+                              GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                    <CheckBox fx:id="eTCheck" mnemonicParsing="false" text="Eye trail"
+                              GridPane.columnIndex="2" GridPane.rowIndex="1" />
+               <columnConstraints>
+                  <ColumnConstraints percentWidth="33.0" />
+                  <ColumnConstraints percentWidth="34.0" />
+                  <ColumnConstraints percentWidth="33.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints percentHeight="25.0" />
+                  <RowConstraints percentHeight="25.0" />
+               </rowConstraints>
+
+                </GridPane>
+            </Tab>
+
+
+            <Tab fx:id="VisualisationOptionTab" text="Visualisation options">
+                <GridPane fx:id="VisualisationOptionPane">
+
+                    <Label fx:id="BoundThicknessLabel" text="Cursor fixation type"
+                           GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <Slider fx:id="boundsThicknessSlider" max="3" min="0.5" value="1"
+                            GridPane.columnIndex="0" GridPane.rowIndex="1" />
+
+                    <Label fx:id="CursorThicknessLabel" text="Cursor trail thickness"
+                           GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                    <Slider fx:id="cursorThicknessSlider" max="3" min="0.5" value="1"
+                            GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                    <Label fx:id="EyeThicknessLabel" text="Eye trail thickness"
+                           GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                    <Slider fx:id="eyeThicknessSlider" max="3" min="0.5" value="1"
+                            GridPane.columnIndex="2" GridPane.rowIndex="1" />
+
+
+                    <Label fx:id="cursorLabel" text="Cursor fixation type"
+                           GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                    <ComboBox fx:id="cursorFixationTypes" prefHeight="21.0" prefWidth="105.0"
+                              value="IVT"
+                              GridPane.columnIndex="1" GridPane.rowIndex="3">
+                        <items>
+                            <FXCollections fx:factory="observableArrayList">
+                                <String fx:value="IDT" />
+                                <String fx:value="IVT" />
+                                <String fx:value="All points" />
+                            </FXCollections>
+                        </items>
+                    </ComboBox>
+
+
+                    <Label fx:id="eyeLabel" text="Eye fixation type"
+                           GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                    <ComboBox fx:id="eyeFixationTypes"
+                              prefHeight="21.0" prefWidth="105.0"
+                              value="IVT"
+                              GridPane.columnIndex="2" GridPane.rowIndex="3">
+                        <items>
+                            <FXCollections fx:factory="observableArrayList">
+                                <String fx:value="Eyetribe" />
+                                <String fx:value="IDT" />
+                                <String fx:value="IVT" />
+                                <String fx:value="All points" />
+                            </FXCollections>
+                        </items>
+                    </ComboBox>
+
+
+                    <Label fx:id="cursorColorLabel" text="Cursor trail colors"
+                           GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                    <ColorPicker fx:id="cursorLowPicker"
+                                 GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                    <ColorPicker fx:id="cursorMedPicker"
+                                 GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                    <ColorPicker fx:id="cursorHighPicker"
+                                 GridPane.columnIndex="1" GridPane.rowIndex="7" />
+
+                    <Label fx:id="eyeColorLabel" text="Eye trail colors"
+                           GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                    <ColorPicker fx:id="eyeLowPicker"
+                                 GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                    <ColorPicker fx:id="eyeMedPicker"
+                                 GridPane.columnIndex="2" GridPane.rowIndex="6" />
+                    <ColorPicker fx:id="eyeHighPicker"
+                                 GridPane.columnIndex="2" GridPane.rowIndex="7" />
+               <columnConstraints>
+                  <ColumnConstraints percentWidth="33.0" />
+                  <ColumnConstraints percentWidth="34.0" />
+                  <ColumnConstraints percentWidth="33.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+               </rowConstraints>
+
+
+                </GridPane>
+            </Tab>
+
+
+            <Tab fx:id="FeatureOptionsTab" text="Feature options">
+                <GridPane>
+
+                </GridPane>
+            </Tab>
+
+        </TabPane>
+    </center>
+</BorderPane>
