@@ -23,19 +23,8 @@
 
 package qupath.extension.tracking;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import qupath.extension.tracking.gui.TrackerPaintStage;
-import qupath.extension.tracking.tracker.DefaultViewTrackerFactory;
-import qupath.extension.tracking.tracker.TrackerFeatures;
-import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.commands.interfaces.PathCommand;
-import qupath.lib.gui.helpers.dialogs.DialogHelperFX;
-import qupath.lib.gui.viewer.QuPathViewer;
-import qupath.lib.gui.viewer.recording.DefaultViewTracker;
-
-import java.io.File;
 
 /**
  * Command to help with the setup of QuPath and MATLAB integration.
@@ -44,15 +33,6 @@ import java.io.File;
  *
  */
 class TrackingQuPathLoadCommand implements PathCommand {
-	
-	private final static Logger logger = LoggerFactory.getLogger(TrackingQuPathLoadCommand.class);
-	
-	private QuPathGUI qupath;
-	
-	public TrackingQuPathLoadCommand(final QuPathGUI qupath) {
-		this.qupath = qupath;
-	}
-
 	public void run() {
         TrackerPaintStage stage = TrackerPaintStage.getInstance();
         stage.show();

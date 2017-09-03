@@ -6,9 +6,6 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.stage.*;
 import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,10 +38,10 @@ public class ExtendedViewTrackerPlayback {
         this.timeline = new Timeline(
                 new KeyFrame(Duration.ZERO,
                         actionEvent -> qupath.extension.tracking.tracker.ExtendedViewTrackerPlayback.this.handleUpdate(),
-                        new KeyValue[0]), new KeyFrame(Duration.millis(50.0D), new KeyValue[0]));
+                        new KeyValue[0]), new KeyFrame(Duration.millis(50.0D)));
         this.timeline.setCycleCount(-1);
         this.playing.addListener((v, o, n) -> {
-            if(n.booleanValue()) {
+            if (n) {
                 this.doStartPlayback();
             } else {
                 this.doStopPlayback();

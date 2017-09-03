@@ -1,6 +1,5 @@
 package qupath.extension.tracking.gui.controllers;
 
-import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import qupath.extension.tracking.gui.TrackerPaintStage;

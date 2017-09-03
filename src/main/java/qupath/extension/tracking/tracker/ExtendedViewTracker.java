@@ -5,10 +5,6 @@ import qupath.lib.gui.viewer.QuPathViewer;
 import qupath.lib.gui.viewer.recording.DefaultViewTracker;
 import qupath.lib.gui.viewer.recording.ViewRecordingFrame;
 
-import java.awt.*;
-import java.awt.geom.Point2D;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**

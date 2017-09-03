@@ -9,7 +9,6 @@ import qupath.lib.gui.viewer.overlays.AbstractOverlay;
 import qupath.lib.regions.ImageRegion;
 
 import java.awt.*;
-import java.awt.Color;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Point2D;
 import java.awt.image.ImageObserver;

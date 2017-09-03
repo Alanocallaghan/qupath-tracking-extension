@@ -10,7 +10,6 @@ import qupath.extension.tracking.overlay.TrackerFeatureOverlay;
 import qupath.extension.tracking.tracker.TrackerFeatures;
 import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.viewer.QuPathViewer;
-import qupath.lib.gui.viewer.recording.DefaultViewTracker;
 import qupath.lib.gui.viewer.recording.ViewTracker;
 
 

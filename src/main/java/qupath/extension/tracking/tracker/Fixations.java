@@ -6,7 +6,6 @@ import qupath.extension.tracking.TrackerUtils;
 import qupath.lib.gui.viewer.recording.ViewRecordingFrame;
 
 import java.awt.*;
-import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.util.*;
 import java.util.List;

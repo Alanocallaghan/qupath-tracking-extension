@@ -1,37 +1,24 @@
 package qupath.extension.tracking.gui.controllers;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
-import qupath.extension.tracking.TrackerUtils;
 import qupath.extension.tracking.gui.TrackerPaintStage;
 import qupath.extension.tracking.overlay.HeatmapOverlay;
 import qupath.extension.tracking.overlay.TrackerFeatureOverlay;
-import qupath.extension.tracking.tracker.DefaultViewTrackerFactory;
 import qupath.extension.tracking.tracker.ExtendedViewTrackerControlPanel;
-import qupath.lib.gui.QuPathApp;
 import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.helpers.dialogs.DialogHelperFX;
-import qupath.lib.gui.viewer.QuPathViewer;
-import qupath.lib.gui.viewer.recording.DefaultViewTracker;
 import qupath.lib.gui.viewer.recording.ViewTracker;
-import qupath.lib.gui.viewer.recording.ViewTrackerControlPanel;
 
-import java.beans.EventHandler;
 import java.io.File;
 import java.net.URL;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.ResourceBundle;
 
-import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 import static qupath.extension.tracking.TrackerUtils.*;
 
@@ -116,9 +103,7 @@ public class PaintStageController implements Initializable {
         LoadFeatures.setOnAction(event -> {
 
         });
-        Close.setOnAction(event -> {
-            TrackerPaintStage.exit();
-        });
+        Close.setOnAction(event -> TrackerPaintStage.exit());
 
 
 //      Toggles for visualisations
