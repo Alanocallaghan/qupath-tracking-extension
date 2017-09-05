@@ -188,7 +188,6 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
     //todo: handle all points (no fixations/centroids/durations)
     private void drawTrail(Graphics2D g2d, double downsampleFactor, Rectangle clippingRectangle, Fixations fixations) {
         g2d.setStroke(new BasicStroke((downsampleFactor > 1) ? (float) downsampleFactor : 1));
-
         double[] zoomArray = trackerFeatures.getZoomArray();
 
         double[] zoomLevel;
@@ -233,7 +232,6 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
 
                     if (fixations.getFixations() != null) {
                         g2d.setStroke(new BasicStroke((float) downsampleFactor));
-
                         double circleSizeCoef = (downsampleFactor * fixations.getDurations()[i] / 30);
 
                         g2d.fillOval(
@@ -263,11 +261,13 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
 
     public void setDoPaintCursorTrail(boolean paintCursorTrail) {
         this.doPaintCursorTrail = paintCursorTrail;
+        this.trackerFeatures.getCursorFixations().recalculateFixations();
         this.viewer.repaint();
     }
 
     public void setDoPaintEyeTrail(boolean paintEyeTrail) {
         this.doPaintEyeTrail = paintEyeTrail;
+        this.trackerFeatures.getEyeFixations().recalculateFixations();
         this.viewer.repaint();
     }
 
@@ -283,7 +283,7 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
     }
 
     public void setCursorFixationType(String fixationType) {
-        if (fixationType == null) fixationType = "IDT";
+        if (fixationType == null) fixationType = "IVT";
         this.trackerFeatures.getCursorFixations().setFixationType(fixationType);
         this.viewer.repaint();
     }
@@ -323,6 +323,36 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
 
     public void setEyeThicknessScalar(Number eyeThicknessScalar) {
         this.trackerFeatures.getEyeFixations().setThicknessScalar(eyeThicknessScalar.doubleValue());
+        this.viewer.repaint();
+    }
+
+    public void setEyeIVTSpeedThreshold(Number IVTSpeedThreshold) {
+        this.trackerFeatures.getEyeFixations().setIVTSpeedThreshold(IVTSpeedThreshold.doubleValue());
+        this.viewer.repaint();
+    }
+
+    public void setEyeIDTDurationThreshold(Number IDTDurationThreshold) {
+        this.trackerFeatures.getEyeFixations().setIDTDurationThreshold(IDTDurationThreshold.doubleValue());
+        this.viewer.repaint();
+    }
+
+    public void setEyeIDTDispersionThreshold(Number IDTDispersionThreshold) {
+        this.trackerFeatures.getEyeFixations().setIDTDispersionThreshold(IDTDispersionThreshold.doubleValue());
+        this.viewer.repaint();
+    }
+
+    public void setCursorIVTSpeedThreshold(Number IVTSpeedThreshold) {
+        this.trackerFeatures.getCursorFixations().setIVTSpeedThreshold(IVTSpeedThreshold.doubleValue());
+        this.viewer.repaint();
+    }
+
+    public void setCursorIDTDurationThreshold(Number IDTDurationThreshold) {
+        this.trackerFeatures.getCursorFixations().setIDTDurationThreshold(IDTDurationThreshold.doubleValue());
+        this.viewer.repaint();
+    }
+
+    public void setCursorIDTDispersionThreshold(Number IDTDispersionThreshold) {
+        this.trackerFeatures.getCursorFixations().setIDTDispersionThreshold(IDTDispersionThreshold.doubleValue());
         this.viewer.repaint();
     }
 

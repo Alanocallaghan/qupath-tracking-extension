@@ -164,7 +164,42 @@
 
 
             <Tab fx:id="FeatureOptionsTab" text="Feature options">
-                <GridPane>
+                <GridPane fx:id="FeatureOptionPane">
+
+
+                    <Label fx:id="EyeIVTSpeedLabel" text="Eye IVT speed threshold"
+                           GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <Slider fx:id="EyeIVTSpeedSlider" min="10" max="1000" value="100"
+                            GridPane.columnIndex="0" GridPane.rowIndex="1" />
+
+                    <Label fx:id="EyeIDTDurationLabel" text="Eye IDT duration threshold"
+                           GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                    <Slider fx:id="EyeIDTDurationSlider" min="10" max="1000" value="250"
+                            GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                    <Label fx:id="EyeIDTDispersionLabel" text="Eye IDT dispersion threshold"
+                           GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                    <Slider fx:id="EyeIDTDispersionSlider" min="5" max="1000" value="50"
+                            GridPane.columnIndex="2" GridPane.rowIndex="1" />
+
+
+
+
+                    <Label fx:id="CursorIVTSpeedLabel" text="Cursor IVT speed threshold"
+                    GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                    <Slider fx:id="CursorIVTSpeedSlider" min="10" max="1000" value="100"
+                    GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                    <Label fx:id="CursorIDTDurationLabel" text="Cursor IDT duration threshold"
+                           GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                    <Slider fx:id="CursorIDTDurationSlider" min="10" max="1000" value="250"
+                            GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                    <Label fx:id="CursorIDTDispersionLabel" text="Cursor IDT dispersion threshold"
+                           GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                    <Slider fx:id="CursorIDTDispersionSlider" min="5" max="1000" value="50"
+                            GridPane.columnIndex="2" GridPane.rowIndex="3" />
+
+
 
                 </GridPane>
             </Tab>

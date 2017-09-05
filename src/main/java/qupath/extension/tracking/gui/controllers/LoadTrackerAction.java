@@ -2,6 +2,7 @@ package qupath.extension.tracking.gui.controllers;
 
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.stage.Stage;
 import qupath.extension.tracking.gui.TrackerPaintStage;
 import qupath.extension.tracking.tracker.DefaultViewTrackerFactory;
 import qupath.lib.gui.QuPathGUI;
@@ -16,6 +17,13 @@ import java.io.File;
  * Created by alan on 03/09/17.
  */
 public class LoadTrackerAction implements EventHandler, PathCommand {
+//
+//    private final Stage stage;
+//
+//    LoadTrackerAction(Stage stage) {
+//        this.stage = stage;
+//    }
+
     @Override
     public void handle(Event event) {
         QuPathGUI gui = QuPathGUI.getInstance();
@@ -36,6 +44,7 @@ public class LoadTrackerAction implements EventHandler, PathCommand {
             }
         }
         TrackerPaintStage.getInstance().getController().resetOptions();
+        TrackerPaintStage.getInstance().toFront();
     }
 
     @Override

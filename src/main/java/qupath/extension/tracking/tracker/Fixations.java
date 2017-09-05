@@ -28,9 +28,15 @@ public class Fixations {
     private double[] durations;
     private Point2D[] centroids;
 
-    private ArrayList<ArrayList<ViewRecordingFrame>> IVTFixations, IDTFixations, eyeTribeFixations = null;
-    private double[] IVTDurations, IDTDurations, eyeTribeDurations;
-    private Point2D[] IVTCentroids, IDTCentroids, eyeTribeCentroids;
+    private ArrayList<ArrayList<ViewRecordingFrame>> IVTFixations,
+            IDTFixations,
+            eyeTribeFixations = null;
+    private double[] IVTDurations,
+            IDTDurations,
+            eyeTribeDurations;
+    private Point2D[] IVTCentroids,
+            IDTCentroids,
+            eyeTribeCentroids;
 
     private final TrackerFeatures trackerFeatures;
 
@@ -40,6 +46,28 @@ public class Fixations {
     private Color highColor = colorFXtoAWT(javafx.scene.paint.Color.RED),
             medColor = colorFXtoAWT(javafx.scene.paint.Color.LIME),
             lowColor = colorFXtoAWT(javafx.scene.paint.Color.BLUE);
+    private FixationType fixationType;
+
+    public void setIVTSpeedThreshold(double IVTSpeedThreshold) {
+        this.IVTSpeedThreshold = IVTSpeedThreshold;
+        recalculateFixations();
+    }
+
+    private double IVTSpeedThreshold;
+
+    public void setIDTDurationThreshold(double IDTDurationThreshold) {
+        this.IDTDurationThreshold = IDTDurationThreshold;
+        recalculateFixations();
+    }
+
+    private double IDTDurationThreshold;
+
+    public void setIDTDispersionThreshold(double IDTDispersionThreshold) {
+        this.IDTDispersionThreshold = IDTDispersionThreshold;
+        recalculateFixations();
+    }
+
+    private double IDTDispersionThreshold;
 
     public double getThicknessScalar() {
         return thicknessScalar;
@@ -51,16 +79,33 @@ public class Fixations {
 
     double thicknessScalar = 1;
 
+    public void recalculateFixations() {
+        switch(fixationType) {
+            case IDT:
+                calculateIDTFixations();
+                break;
+            case IVT:
+                calculateIVTFixations();
+                break;
+            case EYETRIBE:
+                findEyeTribeFixations();
+                break;
+            case ALL_POINTS:
+                break;
+        }
+        this.setFixationType(fixationType);
+    }
+
     // todo: check correlation between this method and EyeTribe method using real tracking data
     Fixations(TrackerFeatures trackerFeatures, String featureType, String fixationType) {
         this.trackerFeatures = trackerFeatures;
         this.setFeatureType(featureType);
         allFrames = TrackerUtils.getFramesAsArray(trackerFeatures.getTracker());
-        IDTFixations = calculateIDTFixations();
-        IVTFixations = calculateIVTFixations();
+        calculateIDTFixations();
+        calculateIVTFixations();
 
         if (this.featureType == EYE) {
-            eyeTribeFixations = findEyeTribeFixations();
+            findEyeTribeFixations();
         }
 
         this.setFixationType(fixationType);
@@ -220,7 +265,7 @@ public class Fixations {
                 frame.isEyeFixated());
     }
 
-    private ArrayList<ArrayList<ViewRecordingFrame>> calculateIDTFixations() {
+    private void calculateIDTFixations() {
 
         ArrayList<ArrayList<ViewRecordingFrame>> fixations = new ArrayList<>();
         List<ViewRecordingFrame> allFramesForMethod = new ArrayList<>(
@@ -243,8 +288,7 @@ public class Fixations {
 //            long timeOfFirstFrame = allFramesForMethod.get(j).getTimestamp();
             long timeOfPreviousFrame = allFramesForMethod.get(j).getTimestamp();
 
-            int durationThreshold = 250;
-            while (timeOfWindow <= durationThreshold) {
+            while (timeOfWindow <= IDTDurationThreshold) {
                 if (++j < allFramesForMethod.size()) {
                     long timeOfFrame = allFramesForMethod.get(j).getTimestamp();
                     timeOfWindow += (timeOfFrame -
@@ -256,10 +300,9 @@ public class Fixations {
                     break;
             }
 
-            int dispersionThreshold = 50;
             double dispersion = calculateDispersion(windowPointsResized);
-            if (dispersion <= dispersionThreshold) {
-                while (calculateDispersion(windowPointsResized) <= dispersionThreshold) {
+            if (dispersion <= IDTDispersionThreshold) {
+                while (calculateDispersion(windowPointsResized) <= IDTDispersionThreshold) {
 
                     if (++j < allFramesForMethod.size()) {
                         windowPointsResized.add(translateCoords(allFramesForMethod.get(j)));
@@ -276,12 +319,12 @@ public class Fixations {
         }
         IDTCentroids = calculateCentroids(fixations);
         IDTDurations = calculateDurations(fixations);
-        return fixations;
+        IDTFixations = fixations;
     }
 
     //    todo: meaningful threshold!!!
 //    todo: downsample?
-    private ArrayList<ArrayList<ViewRecordingFrame>> calculateIVTFixations() {
+    private void calculateIVTFixations() {
 
         ViewRecordingFrame[] allFramesForMethod = this.allFrames;
         double[] eyeSpeedArray = trackerFeatures.getEyeSpeedArray();
@@ -290,11 +333,10 @@ public class Fixations {
         ArrayList<ArrayList<ViewRecordingFrame>> fixations = new ArrayList<>();
 
         for (int i = 0; i < eyeSpeedArray.length; i++) {
-            double fixationSpeedThreshold = 100;
-            isFixated[i] = eyeSpeedArray[i] < fixationSpeedThreshold;
+            isFixated[i] = eyeSpeedArray[i] < IVTSpeedThreshold;
         }
 
-        int i=0;
+        int i = 0;
         boolean previousBool = false;
         ArrayList<ViewRecordingFrame> currentFixation = new ArrayList<>();
         for (boolean bool : isFixated) {
@@ -312,9 +354,7 @@ public class Fixations {
 
         IVTCentroids = calculateCentroids(fixations);
         IVTDurations = calculateDurations(fixations);
-
-        return fixations;
-
+        IVTFixations = fixations;
     }
 
     private double[] calculateDurations(ArrayList<ArrayList<ViewRecordingFrame>> arrayListOfFixationArrayLists) {
@@ -341,7 +381,7 @@ public class Fixations {
         return centroids;
     }
 
-    private ArrayList<ArrayList<ViewRecordingFrame>> findEyeTribeFixations() {
+    private void findEyeTribeFixations() {
         ArrayList<ArrayList<ViewRecordingFrame>> fixations = new ArrayList<>();
         ArrayList<ViewRecordingFrame> currentFixation = new ArrayList<>();
 
@@ -364,7 +404,7 @@ public class Fixations {
         }
         eyeTribeCentroids = calculateCentroids(fixations);
         eyeTribeDurations = calculateDurations(fixations);
-        return fixations;
+        this.eyeTribeFixations = fixations;
     }
 
     private double calculateDispersion(ArrayList<ViewRecordingFrame> windowFrames) {
@@ -560,6 +600,7 @@ public class Fixations {
     }
 
     private void setFixationType(FixationType fixationType) {
+        this.fixationType = fixationType;
         switch(fixationType) {
             case IDT:
                 centroids = IDTCentroids;

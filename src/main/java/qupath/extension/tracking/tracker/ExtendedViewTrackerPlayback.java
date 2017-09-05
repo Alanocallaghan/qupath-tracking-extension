@@ -67,7 +67,7 @@ public class ExtendedViewTrackerPlayback {
     }
 
     static void resizeViewer(QuPathViewer viewer, Dimension newSize) {
-        if(!viewer.getSize().equals(newSize)) {
+        if (!viewer.getSize().equals(newSize)) {
             int dw = newSize.width - viewer.getWidth();
             int dh = newSize.height - viewer.getHeight();
             javafx.stage.Window window = viewer.getView().getScene().getWindow();
@@ -86,7 +86,7 @@ public class ExtendedViewTrackerPlayback {
     }
 
     void handleUpdate() {
-        if(!this.tracker.isEmpty()) {
+        if (!this.tracker.isEmpty()) {
             long timestamp = System.currentTimeMillis();
             long timestampOfFirstFrame = this.tracker.nFrames() > 0?this.tracker.getFrame(0).getTimestamp():0L;
             ViewRecordingFrame frame = this.tracker.getFrameForTime(timestamp - this.startTimestamp + timestampOfFirstFrame);
@@ -120,14 +120,19 @@ public class ExtendedViewTrackerPlayback {
         double downsampleY = (double)imageBounds.height / (double)canvasSize.height;
         double downsample = 0.5D * (downsampleX + downsampleY);
         viewer.setDownsampleFactor(downsample);
-        viewer.setCenterPixelLocation((double)imageBounds.x + (double)imageBounds.width * 0.5D, (double)imageBounds.y + (double)imageBounds.height * 0.5D);
+        viewer.setCenterPixelLocation(
+                (double)imageBounds.x + (double)imageBounds.width * 0.5D,
+                (double)imageBounds.y + (double)imageBounds.height * 0.5D);
         Point2D p2d;
-        if(frame.hasCursorPosition()) {
-            p2d = viewer.imagePointToComponentPoint(frame.getCursorPosition(), (Point2D)null, false);
+        if (frame.hasCursorPosition()) {
+            p2d = viewer.imagePointToComponentPoint(
+                    frame.getCursorPosition(),
+                    null,
+                    false);
             new Point((int)(p2d.getX() + 0.5D), (int)(p2d.getY() + 0.5D));
         }
 
-        if(frame.hasEyePosition()) {
+        if (frame.hasEyePosition()) {
             p2d = frame.getEyePosition();
             PointsROI point = new PointsROI(p2d.getX(), p2d.getY());
             PathObject pathObject = new PathAnnotationObject(point);

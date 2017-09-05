@@ -28,6 +28,32 @@ import static qupath.extension.tracking.TrackerUtils.*;
  */
 public class PaintStageController implements Initializable {
 
+    @FXML
+    public GridPane FeatureOptionPane;
+    @FXML
+    public Label EyeIVTSpeedLabel;
+    @FXML
+    public Slider EyeIVTSpeedSlider;
+    @FXML
+    public Label EyeIDTDurationLabel;
+    @FXML
+    public Slider EyeIDTDurationSlider;
+    @FXML
+    public Label EyeIDTDispersionLabel;
+    @FXML
+    public Slider EyeIDTDispersionSlider;
+    @FXML
+    public Label CursorIVTSpeedLabel;
+    @FXML
+    public Slider CursorIVTSpeedSlider;
+    @FXML
+    public Label CursorIDTDurationLabel;
+    @FXML
+    public Slider CursorIDTDurationSlider;
+    @FXML
+    public Label CursorIDTDispersionLabel;
+    @FXML
+    public Slider CursorIDTDispersionSlider;
 
     private HeatmapOverlay heatmapOverlay = new HeatmapOverlay(null);
     private TrackerFeatureOverlay trackerOverlay = new TrackerFeatureOverlay(null);
@@ -67,6 +93,12 @@ public class PaintStageController implements Initializable {
         this.trackerOverlay.setEyeFixationColor("low", eyeLowPicker.getValue());
         this.trackerOverlay.setEyeFixationColor("med", eyeMedPicker.getValue());
         this.trackerOverlay.setEyeFixationColor("high", eyeHighPicker.getValue());
+        this.trackerOverlay.setEyeIVTSpeedThreshold(EyeIVTSpeedSlider.getValue());
+        this.trackerOverlay.setEyeIDTDispersionThreshold(EyeIDTDispersionSlider.getValue());
+        this.trackerOverlay.setEyeIDTDurationThreshold(EyeIDTDurationSlider.getValue());
+        this.trackerOverlay.setCursorIVTSpeedThreshold(CursorIVTSpeedSlider.getValue());
+        this.trackerOverlay.setCursorIDTDispersionThreshold(CursorIDTDispersionSlider.getValue());
+        this.trackerOverlay.setCursorIDTDurationThreshold(CursorIDTDurationSlider.getValue());
     }
 
     @Override
@@ -81,9 +113,9 @@ public class PaintStageController implements Initializable {
 
             File file = dfx.promptToSaveFile("Save snapshot",
                     new File(System.getProperty("user.home")),
-                    "QuPath_snapshot_" + date + ".png",
+                    "QuPath_snapshot_" + date,
                     "png",
-                    "*.png"
+                    ".png"
             );
             if (file != null) {
                 saveSnapshot(gui.getViewer(), file);
@@ -168,6 +200,33 @@ public class PaintStageController implements Initializable {
         eyeHighPicker.setOnAction(event -> this.
                 trackerOverlay.setEyeFixationColor("high", eyeHighPicker.getValue()));
         eyeHighPicker.setValue(Color.RED);
+
+
+
+
+
+//      Feature options
+        EyeIVTSpeedSlider.valueProperty().addListener(
+                (observable, oldValue, newValue) -> this.
+                        trackerOverlay.setEyeIVTSpeedThreshold(newValue));
+        EyeIDTDispersionSlider.valueProperty().addListener(
+                (observable, oldValue, newValue) -> this.
+                        trackerOverlay.setEyeIDTDispersionThreshold(newValue));
+        EyeIDTDurationSlider.valueProperty().addListener(
+                (observable, oldValue, newValue) -> this.
+                        trackerOverlay.setEyeIDTDurationThreshold(newValue));
+        CursorIVTSpeedSlider.valueProperty().addListener(
+                (observable, oldValue, newValue) -> this.
+                        trackerOverlay.setCursorIVTSpeedThreshold(newValue));
+        CursorIDTDispersionSlider.valueProperty().addListener(
+                (observable, oldValue, newValue) -> this.
+                        trackerOverlay.setCursorIDTDispersionThreshold(newValue));
+        CursorIDTDurationSlider.valueProperty().addListener(
+                (observable, oldValue, newValue) -> this.
+                        trackerOverlay.setCursorIDTDurationThreshold(newValue));
+
+
+//      Recording/Playback
 
         ExtendedViewTrackerControlPanel panel = new ExtendedViewTrackerControlPanel(
                 QuPathGUI.getInstance().getViewer(), tracker);

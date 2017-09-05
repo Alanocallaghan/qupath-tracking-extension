@@ -57,10 +57,9 @@ public class QuPathTrackingExtension implements QuPathExtension {
 
 		QuPathGUI.addMenuItems(
 				qupath.getMenu("Extensions>Tracking", true),
-				QuPathGUI.createCommandAction(new TrackingQuPathLoadCommand(qupath), "Tracking extension")
+				QuPathGUI.createCommandAction(new TrackingQuPathLoadCommand(), "Tracking extension")
 				);
 
-        // TODO: Open CSV tracking file
         // TODO: Use md5 sum to tie tracking instance to image (using MessageDigest) http://stackoverflow.com/questions/4187111/how-to-get-the-md5sum-of-a-file-in-java
 
 	}

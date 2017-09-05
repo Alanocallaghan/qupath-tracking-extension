@@ -30,8 +30,8 @@ public class TrackerFeatures {
         return cursorFixations;
     }
 
-    Fixations eyeFixations;
-    Fixations cursorFixations;
+    private Fixations eyeFixations;
+    private Fixations cursorFixations;
 
     public TrackerFeatures(ViewTracker tracker, ImageServer server) {
         this.server = server;
