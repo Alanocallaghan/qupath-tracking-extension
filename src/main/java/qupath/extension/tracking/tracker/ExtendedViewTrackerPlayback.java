@@ -25,10 +25,10 @@ import java.awt.geom.Point2D;
 public class ExtendedViewTrackerPlayback {
 
     private static final Logger logger = LoggerFactory.getLogger(qupath.extension.tracking.tracker.ExtendedViewTrackerPlayback.class);
-    private QuPathViewer viewer;
-    private ViewTracker tracker;
-    private BooleanProperty playing;
-    private Timeline timeline;
+    private final QuPathViewer viewer;
+    private final ViewTracker tracker;
+    private final BooleanProperty playing;
+    private final Timeline timeline;
     private long startTimestamp;
 
     public ExtendedViewTrackerPlayback(ViewTracker tracker, QuPathViewer viewer) {
@@ -50,7 +50,7 @@ public class ExtendedViewTrackerPlayback {
         });
     }
 
-    boolean doStartPlayback() {
+    private boolean doStartPlayback() {
         if(this.tracker.isEmpty()) {
             return false;
         } else {
@@ -66,7 +66,7 @@ public class ExtendedViewTrackerPlayback {
         }
     }
 
-    static void resizeViewer(QuPathViewer viewer, Dimension newSize) {
+    private static void resizeViewer(QuPathViewer viewer, Dimension newSize) {
         if (!viewer.getSize().equals(newSize)) {
             int dw = newSize.width - viewer.getWidth();
             int dh = newSize.height - viewer.getHeight();
@@ -76,16 +76,16 @@ public class ExtendedViewTrackerPlayback {
         }
     }
 
-    public boolean isPlaying() {
+    private boolean isPlaying() {
         return this.timeline.getStatus() == Animation.Status.RUNNING;
     }
 
-    void doStopPlayback() {
+    private void doStopPlayback() {
         this.timeline.stop();
         this.playing.set(false);
     }
 
-    void handleUpdate() {
+    private void handleUpdate() {
         if (!this.tracker.isEmpty()) {
             long timestamp = System.currentTimeMillis();
             long timestampOfFirstFrame = this.tracker.nFrames() > 0?this.tracker.getFrame(0).getTimestamp():0L;
@@ -112,7 +112,7 @@ public class ExtendedViewTrackerPlayback {
         }
     }
 
-    public static void setViewerForFrame(QuPathViewer viewer, ViewRecordingFrame frame) {
+    private static void setViewerForFrame(QuPathViewer viewer, ViewRecordingFrame frame) {
         resizeViewer(viewer, frame.getSize());
         Rectangle imageBounds = frame.getImageBounds();
         Dimension canvasSize = frame.getSize();

@@ -28,8 +28,9 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
 
     private final QuPathViewer viewer;
 
-    private boolean doPaintNumbers = false;
-    private int lowZoomThreshold = 5, medZoomThreshold = 1;
+    private final boolean doPaintNumbers = false;
+    private final int lowZoomThreshold = 5;
+    private final int medZoomThreshold = 1;
     private double boundsThicknessScalar;
 
     public TrackerFeatureOverlay(TrackerFeatures trackerFeatures) {

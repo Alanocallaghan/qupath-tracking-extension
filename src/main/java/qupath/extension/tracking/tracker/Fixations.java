@@ -77,7 +77,7 @@ public class Fixations {
         this.thicknessScalar = thicknessScalar;
     }
 
-    double thicknessScalar = 1;
+    private double thicknessScalar = 1;
 
     public void recalculateFixations() {
         switch(fixationType) {

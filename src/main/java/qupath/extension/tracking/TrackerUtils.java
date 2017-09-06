@@ -48,10 +48,10 @@ public class TrackerUtils {
         return min;
     }
 
-    public static double calculateDownsample(double regionWidth,
-                                             double regionHeight,
-                                             double visibleWidth,
-                                             double visibleHeight) {
+    private static double calculateDownsample(double regionWidth,
+                                              double regionHeight,
+                                              double visibleWidth,
+                                              double visibleHeight) {
         if (regionWidth != 0) {
             return (regionWidth / visibleWidth);
         } else if (regionHeight != 0) {
@@ -104,7 +104,7 @@ public class TrackerUtils {
                 canvas.getHeight());
     }
 
-    public  static ArrayList<ViewRecordingFrame> getFramesAsArrayList(ViewTracker tracker) {
+    private static ArrayList<ViewRecordingFrame> getFramesAsArrayList(ViewTracker tracker) {
         ArrayList<ViewRecordingFrame> frames = new ArrayList<>(tracker.nFrames());
         for (int i = 0; i < tracker.nFrames(); i++) {
             frames.add(i, tracker.getFrame(i));
@@ -126,11 +126,11 @@ public class TrackerUtils {
     }
 
 
-    public static double calculateEuclideanDistance(double x1, double y1, double x2, double y2) {
+    private static double calculateEuclideanDistance(double x1, double y1, double x2, double y2) {
         return (sqrt(pow(x1 - y1, 2) + pow(x2 - y2, 2)));
     }
 
-    public static double calculateEuclideanDistance(Point2D point1, Point2D point2) {
+    private static double calculateEuclideanDistance(Point2D point1, Point2D point2) {
         return calculateEuclideanDistance(point1.getX(), point1.getY(), point2.getX(), point2.getY());
     }
 

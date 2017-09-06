@@ -1,11 +1,9 @@
 package qupath.extension.tracking.gui;
 
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import qupath.extension.tracking.gui.controllers.PaintStageController;
 import qupath.extension.tracking.overlay.HeatmapOverlay;
 import qupath.extension.tracking.overlay.TrackerFeatureOverlay;
@@ -20,7 +18,7 @@ import qupath.lib.gui.viewer.recording.ViewTracker;
  */
 public class TrackerPaintStage extends Stage {
 
-    static TrackerFeatures features;
+    private static TrackerFeatures features;
     private Parent root;
     private static TrackerPaintStage instance = null;
     private static ViewTracker tracker;
@@ -28,7 +26,7 @@ public class TrackerPaintStage extends Stage {
     private static HeatmapOverlay heatmapOverlay = null;
     private static TrackerFeatureOverlay trackerOverlay = null;
     private PaintStageController paintStageController;
-    private static QuPathViewer viewer = QuPathGUI.getInstance().getViewer();
+    private static final QuPathViewer viewer = QuPathGUI.getInstance().getViewer();
 
     private TrackerPaintStage() {
         FXMLLoader loader = new FXMLLoader(
@@ -51,7 +49,7 @@ public class TrackerPaintStage extends Stage {
         if (instance == null) {
             instance = new TrackerPaintStage();
         }
-        instance.setOnCloseRequest(event -> {instance.close();});
+        instance.setOnCloseRequest(event -> instance.close());
         return instance;
     }
 
@@ -81,8 +79,8 @@ public class TrackerPaintStage extends Stage {
     }
 
     private static void removeOverlays() {
-        viewer.removeOverlay(instance.heatmapOverlay);
-        viewer.removeOverlay(instance.trackerOverlay);
+        viewer.removeOverlay(heatmapOverlay);
+        viewer.removeOverlay(trackerOverlay);
     }
 
     private static void addOverlays() {
@@ -94,11 +92,11 @@ public class TrackerPaintStage extends Stage {
         return paintStageController;
     }
 
-    public static void setTrackerOverlay(TrackerFeatureOverlay trackerOverlay) {
+    private static void setTrackerOverlay(TrackerFeatureOverlay trackerOverlay) {
         TrackerPaintStage.trackerOverlay = trackerOverlay;
     }
 
-    public static void setHeatmapOverlay(HeatmapOverlay heatmapOverlay) {
+    private static void setHeatmapOverlay(HeatmapOverlay heatmapOverlay) {
         TrackerPaintStage.heatmapOverlay = heatmapOverlay;
     }
 

@@ -184,12 +184,12 @@ public class HeatmapOverlay extends AbstractOverlay {
 
     class ProgressBarFrame extends JFrame implements PropertyChangeListener {
 
-        final JProgressBar progressBar;
-        final JTextArea textArea = new JTextArea();
-        final int totalTasks;
+        private final JProgressBar progressBar;
+        private final JTextArea textArea = new JTextArea();
+        private final int totalTasks;
         private int currentFrame = 0;
 
-        ProgressBarFrame(int totalTasks) {
+        private ProgressBarFrame(int totalTasks) {
             super("Calculating Heatmap...");
             this.totalTasks = totalTasks;
             JPanel panel = new JPanel(new BorderLayout());
@@ -229,13 +229,13 @@ public class HeatmapOverlay extends AbstractOverlay {
         BOUNDS, CURSOR, EYE
     }
 
-    class HeatmapWorker extends SwingWorker {
+    private class HeatmapWorker extends SwingWorker {
 
         private final HeatmapType type;
         private final ProgressBarFrame progressBarFrame;
         private final int totalTasks;
 
-        public HeatmapWorker(HeatmapType type, ProgressBarFrame progressBarFrame) {
+        private HeatmapWorker(HeatmapType type, ProgressBarFrame progressBarFrame) {
             super();
             this.type = type;
             this.progressBarFrame = progressBarFrame;

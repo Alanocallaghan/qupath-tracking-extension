@@ -10,11 +10,11 @@ import java.util.List;
 /**
  * Created by alan on 03/09/17.
  */
-public class ExtendedViewTracker extends DefaultViewTracker {
+class ExtendedViewTracker extends DefaultViewTracker {
 
     private List<ViewRecordingFrame> extendedFrames;
 
-    public ExtendedViewTracker(QuPathViewer viewer) {
+    private ExtendedViewTracker(QuPathViewer viewer) {
         super(viewer);
     }
 

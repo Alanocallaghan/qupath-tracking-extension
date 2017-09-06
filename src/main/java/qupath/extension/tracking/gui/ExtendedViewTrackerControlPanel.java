@@ -8,8 +8,6 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.input.KeyCombination;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
-import qupath.extension.tracking.TrackerUtils;
-import qupath.extension.tracking.gui.TrackerPaintStage;
 import qupath.extension.tracking.gui.controllers.LoadTrackerAction;
 import qupath.extension.tracking.gui.controllers.ResetTrackerAction;
 import qupath.extension.tracking.gui.controllers.SaveTrackerAction;
@@ -37,7 +35,7 @@ public class ExtendedViewTrackerControlPanel {
         return toolbar;
     }
 
-    private ToolBar toolbar = new ToolBar();
+    private final ToolBar toolbar = new ToolBar();
 
     static {
         iconRecord = PathIconFactory.createNode(

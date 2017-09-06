@@ -12,7 +12,7 @@ import java.util.*;
  */
 public class ExtendedViewRecordingFrame extends ViewRecordingFrame {
 
-    private static DecimalFormat df = new DecimalFormat("#.##");
+    private static final DecimalFormat df = new DecimalFormat("#.##");
 
 
     public ExtendedViewRecordingFrame(long timestamp,
