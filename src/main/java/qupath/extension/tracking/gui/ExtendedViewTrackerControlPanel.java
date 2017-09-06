@@ -1,4 +1,4 @@
-package qupath.extension.tracking.tracker;
+package qupath.extension.tracking.gui;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -8,7 +8,12 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.input.KeyCombination;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
+import qupath.extension.tracking.TrackerUtils;
+import qupath.extension.tracking.gui.TrackerPaintStage;
 import qupath.extension.tracking.gui.controllers.LoadTrackerAction;
+import qupath.extension.tracking.gui.controllers.ResetTrackerAction;
+import qupath.extension.tracking.gui.controllers.SaveTrackerAction;
+import qupath.extension.tracking.tracker.ExtendedViewTrackerPlayback;
 import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.icons.PathIconFactory;
 import qupath.lib.gui.viewer.QuPathViewer;
@@ -27,6 +32,11 @@ public class ExtendedViewTrackerControlPanel {
     private static final Node iconPlay;
     private static final Node iconPlayStop;
     private ViewTracker tracker = null;
+
+    public ToolBar getToolbar() {
+        return toolbar;
+    }
+
     private ToolBar toolbar = new ToolBar();
 
     static {
@@ -50,7 +60,6 @@ public class ExtendedViewTrackerControlPanel {
 
     public ExtendedViewTrackerControlPanel(QuPathViewer viewer,
                                            ViewTracker tracker) {
-
         if (tracker == null) {
             this.tracker = new DefaultViewTracker(viewer);
         } else {
@@ -80,15 +89,16 @@ public class ExtendedViewTrackerControlPanel {
                 actionRecord.setText("Start recording");
                 actionPlayback.setDisabled(this.tracker.isEmpty());
             }
-
         });
         BooleanProperty playing = playback.playingProperty();
         actionPlayback.graphicProperty().bind(
                 Bindings.createObjectBinding(() ->
-                    playing.get() ? iconPlayStop : iconPlay, playing));
+                    playing.get() ? iconPlayStop : iconPlay,
+                        playing));
         actionPlayback.textProperty().bind(
                 Bindings.createStringBinding(() ->
-                    playing.get() ? "Stop" : "Play", playing));
+                    playing.get() ? "Stop" : "Play",
+                        playing));
         this.toolbar.getItems().addAll(
                 ActionUtils.createToggleButton(actionRecord,
                         ActionUtils.ActionTextBehavior.HIDE),
@@ -97,12 +107,16 @@ public class ExtendedViewTrackerControlPanel {
                 new Separator(),
                 ActionUtils.createButton(
                         QuPathGUI.createCommandAction(
-                            new ViewTrackerExportCommand(viewer, this.tracker),
+                                new SaveTrackerAction(),
                                 "Export")),
                 ActionUtils.createButton(
                         QuPathGUI.createCommandAction(
                                 new LoadTrackerAction(),
-                                "Import"))
+                                "Import")),
+                ActionUtils.createButton(
+                        QuPathGUI.createCommandAction(
+                                new ResetTrackerAction(),
+                                "Reset"))
         );
     }
 

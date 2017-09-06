@@ -34,6 +34,12 @@ public class ExtendedViewTracker extends DefaultViewTracker {
         return (ExtendedViewRecordingFrame)this.extendedFrames.get(index);
     }
 
+    @Override
+    public void doStartRecording() {
+        super.doStartRecording();
+        System.out.println(nFrames());
+    }
+
     public int getNColumns() {
         int[] nColumns = new int[nFrames()];
         for (int i = 0; i < nFrames(); i++) {

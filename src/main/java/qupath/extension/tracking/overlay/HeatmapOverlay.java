@@ -44,9 +44,15 @@ public class HeatmapOverlay extends AbstractOverlay {
         
         ImageServer server = QuPathGUI.getInstance().getViewer().getServer();
 
-        //have to cast to double otherwise this all does nothing!!!
-        scalex = (double)viewer.getThumbnail().getWidth() / (double)server.getWidth();
-        scaley = (double)viewer.getThumbnail().getHeight() / (double)server.getHeight();
+//      thumbnail is null if no image loaded
+        if (viewer.getThumbnail() != null) {
+            //have to cast to double otherwise this all does nothing!!!
+            scalex = (double)viewer.getThumbnail().getWidth() / (double)server.getWidth();
+            scaley = (double)viewer.getThumbnail().getHeight() / (double)server.getHeight();
+        } else {
+            scalex = 0;
+            scaley = 0;
+        }
     }
 
     @Override

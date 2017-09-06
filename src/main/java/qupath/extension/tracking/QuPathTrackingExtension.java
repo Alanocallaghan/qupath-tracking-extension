@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.commands.OpenWebpageCommand;
 import qupath.lib.gui.extensions.QuPathExtension;
+import qupath.lib.gui.helpers.DisplayHelpers;
 
 import static qupath.extension.tracking.tracker.DefaultViewTrackerFactory.initDefaultViewTrackerFactory;
 
@@ -47,13 +48,19 @@ public class QuPathTrackingExtension implements QuPathExtension {
 	public void installExtension(QuPathGUI qupath) {
 		initDefaultViewTrackerFactory(qupath.getViewer());
 
-        QuPathGUI.addMenuItems(
-				qupath.getMenu("Extensions>Tracking", true),
-				QuPathGUI.createCommandAction(
-						new OpenWebpageCommand(qupath,
-							"http://github.com/Alanocallaghan/qupath-tracking-extension/issues"),
+		if (System.getProperty("os.name").toLowerCase().contains("linux")) {
+			DisplayHelpers.showInfoNotification("Tracking extension issue reporting",
+					"Bug reports and feature requests can be logged at:\n" +
+					"http://github.com/Alanocallaghan/qupath-tracking-extension");
+		} else {
+			QuPathGUI.addMenuItems(
+					qupath.getMenu("Extensions>Tracking", true),
+					QuPathGUI.createCommandAction(
+							new OpenWebpageCommand(qupath,
+									"http://github.com/Alanocallaghan/qupath-tracking-extension/issues"),
 							"Bug reports/issues")
-				);
+			);
+		}
 
 		QuPathGUI.addMenuItems(
 				qupath.getMenu("Extensions>Tracking", true),

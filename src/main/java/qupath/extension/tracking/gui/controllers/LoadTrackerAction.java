@@ -2,11 +2,11 @@ package qupath.extension.tracking.gui.controllers;
 
 import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.stage.Stage;
 import qupath.extension.tracking.gui.TrackerPaintStage;
 import qupath.extension.tracking.tracker.DefaultViewTrackerFactory;
 import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.commands.interfaces.PathCommand;
+import qupath.lib.gui.helpers.DisplayHelpers;
 import qupath.lib.gui.helpers.dialogs.DialogHelperFX;
 import qupath.lib.gui.viewer.QuPathViewer;
 import qupath.lib.gui.viewer.recording.DefaultViewTracker;
@@ -17,12 +17,6 @@ import java.io.File;
  * Created by alan on 03/09/17.
  */
 public class LoadTrackerAction implements EventHandler, PathCommand {
-//
-//    private final Stage stage;
-//
-//    LoadTrackerAction(Stage stage) {
-//        this.stage = stage;
-//    }
 
     @Override
     public void handle(Event event) {
@@ -40,11 +34,14 @@ public class LoadTrackerAction implements EventHandler, PathCommand {
         if (viewer.getServer() != null) {
             if (file != null) {
                 DefaultViewTracker tracker = DefaultViewTrackerFactory.createViewTracker(file);
-                TrackerPaintStage.updateTracker(tracker);
+                TrackerPaintStage.setTracker(tracker);
+                TrackerPaintStage.getInstance().getController().resetOptions();
             }
+            TrackerPaintStage.getInstance().toFront();
+        } else {
+            DisplayHelpers.showErrorMessage("No image open!",
+                    "Cannot open tracking data when no image is open.");
         }
-        TrackerPaintStage.getInstance().getController().resetOptions();
-        TrackerPaintStage.getInstance().toFront();
     }
 
     @Override

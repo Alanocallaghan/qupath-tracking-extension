@@ -20,7 +20,7 @@ public class TrackerFeatures {
     private Rectangle[] boundsArray;
     private Point2D[] eyeArray;
     private Point2D[] cursorArray;
-    private double[] eyeSpeedArray, zoomArray;
+    private double[] eyeSpeedArray = new double[0], zoomArray = new double[0];
 
     public Fixations getEyeFixations() {
         return eyeFixations;
