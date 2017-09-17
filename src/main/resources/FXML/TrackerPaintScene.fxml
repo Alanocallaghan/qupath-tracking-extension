@@ -44,14 +44,19 @@
                     <CheckBox fx:id="bTCheck" mnemonicParsing="false" text="Bounds Features" GridPane.rowIndex="1" />
                     <CheckBox fx:id="cTCheck" mnemonicParsing="false" text="Cursor trail" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                     <CheckBox fx:id="eTCheck" mnemonicParsing="false" text="Eye trail" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+
+                    <CheckBox fx:id="spCheck" mnemonicParsing="false" text="Slow pans" GridPane.rowIndex="2" />
+                    <CheckBox fx:id="bfCheck" mnemonicParsing="false" text="Bounds fixations" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                    <CheckBox fx:id="zpCheck" mnemonicParsing="false" text="Zoom peaks" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                <columnConstraints>
                   <ColumnConstraints percentWidth="33.0" />
                   <ColumnConstraints percentWidth="34.0" />
                   <ColumnConstraints percentWidth="33.0" />
                </columnConstraints>
                <rowConstraints>
-                  <RowConstraints percentHeight="25.0" />
-                  <RowConstraints percentHeight="25.0" />
+                   <RowConstraints percentHeight="20.0" />
+                   <RowConstraints percentHeight="20.0" />
+                   <RowConstraints percentHeight="20.0" />
                </rowConstraints>
 
                 </GridPane>
@@ -155,10 +160,10 @@
                   <ColumnConstraints />
                </columnConstraints>
                <rowConstraints>
-                  <RowConstraints />
-                  <RowConstraints />
-                  <RowConstraints />
-                  <RowConstraints />
+                   <RowConstraints percentHeight="10.0" />
+                   <RowConstraints percentHeight="10.0" />
+                   <RowConstraints percentHeight="10.0" />
+                   <RowConstraints percentHeight="10.0" />
                </rowConstraints>
 
 

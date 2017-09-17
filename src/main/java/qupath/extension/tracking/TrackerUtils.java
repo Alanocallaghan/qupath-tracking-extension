@@ -48,6 +48,7 @@ public class TrackerUtils {
         return min;
     }
 
+
     private static double calculateDownsample(double regionWidth,
                                               double regionHeight,
                                               double visibleWidth,
@@ -58,6 +59,24 @@ public class TrackerUtils {
             return (regionHeight / visibleHeight);
         }
         return 0;
+    }
+
+    public static double calculateArrayMean(double[] array) {
+        double sum = 0;
+        for (double x: array) {
+            sum += x;
+        }
+        return sum / array.length;
+    }
+
+    public static double[] convertDoubles(Double[] doubles) {
+        double[] ret = new double[doubles.length];
+        int i = 0;
+        while(i < doubles.length) {
+            ret[i] = doubles[i];
+            i++;
+        }
+        return ret;
     }
 
     public static boolean saveSnapshot(QuPathViewer viewer, File file) {
