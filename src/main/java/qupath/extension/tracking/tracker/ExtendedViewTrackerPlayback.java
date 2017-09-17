@@ -6,9 +6,19 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.util.Callback;
 import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import qupath.extension.tracking.TrackerUtils;
+import qupath.extension.tracking.gui.TrackerPaintStage;
 import qupath.lib.gui.viewer.QuPathViewer;
 import qupath.lib.gui.viewer.recording.ViewRecordingFrame;
 import qupath.lib.gui.viewer.recording.ViewTracker;
@@ -24,20 +34,18 @@ import java.awt.geom.Point2D;
  */
 public class ExtendedViewTrackerPlayback {
 
-    private static final Logger logger = LoggerFactory.getLogger(qupath.extension.tracking.tracker.ExtendedViewTrackerPlayback.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExtendedViewTrackerPlayback.class);
     private final QuPathViewer viewer;
-    private final ViewTracker tracker;
     private final BooleanProperty playing;
     private final Timeline timeline;
     private long startTimestamp;
 
-    public ExtendedViewTrackerPlayback(ViewTracker tracker, QuPathViewer viewer) {
-        this.tracker = tracker;
+    public ExtendedViewTrackerPlayback(QuPathViewer viewer) {
         this.viewer = viewer;
         this.playing = new SimpleBooleanProperty(false);
         this.timeline = new Timeline(
                 new KeyFrame(Duration.ZERO,
-                        actionEvent -> qupath.extension.tracking.tracker.ExtendedViewTrackerPlayback.this.handleUpdate(),
+                        actionEvent -> ExtendedViewTrackerPlayback.this.handleUpdate(),
                         new KeyValue[0]), new KeyFrame(Duration.millis(50.0D)));
         this.timeline.setCycleCount(-1);
         this.playing.addListener((v, o, n) -> {
@@ -51,7 +59,7 @@ public class ExtendedViewTrackerPlayback {
     }
 
     private boolean doStartPlayback() {
-        if(this.tracker.isEmpty()) {
+        if (TrackerPaintStage.getTracker().isEmpty()) {
             return false;
         } else {
             this.startTimestamp = System.currentTimeMillis();
@@ -86,19 +94,19 @@ public class ExtendedViewTrackerPlayback {
     }
 
     private void handleUpdate() {
-        if (!this.tracker.isEmpty()) {
+        if (!TrackerPaintStage.getTracker().isEmpty()) {
             long timestamp = System.currentTimeMillis();
-            long timestampOfFirstFrame = this.tracker.nFrames() > 0?this.tracker.getFrame(0).getTimestamp():0L;
-            ViewRecordingFrame frame = this.tracker.getFrameForTime(timestamp - this.startTimestamp + timestampOfFirstFrame);
+            long timestampOfFirstFrame = TrackerPaintStage.getTracker().nFrames() > 0 ? TrackerPaintStage.getTracker().getFrame(0).getTimestamp(): 0L;
+            ViewRecordingFrame frame = TrackerPaintStage.getTracker().getFrameForTime(timestamp - this.startTimestamp + timestampOfFirstFrame);
             boolean requestStop;
-            if(frame == null) {
+            if (frame == null) {
                 requestStop = true;
             } else {
                 setViewerForFrame(this.viewer, frame);
-                requestStop = this.tracker.isLastFrame(frame);
+                requestStop = TrackerPaintStage.getTracker().isLastFrame(frame);
             }
 
-            if(requestStop) {
+            if (requestStop) {
                 this.timeline.stop();
                 this.playing.set(false);
             }
@@ -107,7 +115,7 @@ public class ExtendedViewTrackerPlayback {
     }
 
     public void setPlaying(boolean playing) {
-        if(this.isPlaying() != playing) {
+        if (this.isPlaying() != playing) {
             this.playing.set(playing);
         }
     }
@@ -140,11 +148,114 @@ public class ExtendedViewTrackerPlayback {
             viewer.setSelectedObject(pathObject);
             logger.debug("Eye position: " + p2d);
         }
+    }
 
+
+
+    public static TableView<ViewRecordingFrame> makeTable(QuPathViewer viewer, ViewTracker tracker) {
+
+        TableView<ViewRecordingFrame> table = new TableView();
+
+        for (int i = 0; i < nCols(tracker); ++i) {
+            TableColumn<ViewRecordingFrame, Object> column = new TableColumn(getColumnName(i));
+            final int j = i;
+            column.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ViewRecordingFrame, Object>, ObservableValue<Object>>() {
+                public ObservableValue<Object> call(TableColumn.CellDataFeatures<ViewRecordingFrame, Object> frame) {
+                    return new SimpleObjectProperty(getColumnValue((ViewRecordingFrame)frame.getValue(), j));
+                }
+            });
+            table.getColumns().add(column);
+        }
+
+        table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        table.getSelectionModel().selectedItemProperty().addListener((v, o, frame) -> {
+            if (frame != null) {
+                setViewerForFrame(viewer, frame);
+            }
+        });
+        ObservableList<ViewRecordingFrame> frameList = (ObservableList<ViewRecordingFrame>)
+                FXCollections.observableArrayList(TrackerUtils.getFramesAsArrayList(tracker));
+
+        table.setItems(frameList);
+        return table;
     }
 
     public BooleanProperty playingProperty() {
         return this.playing;
     }
+
+
+    static Object getColumnValue(ViewRecordingFrame frame, int col) {
+        switch (col) {
+            case 0:
+                return frame.getTimestamp();
+            case 1:
+                return frame.getImageBounds().x;
+            case 2:
+                return frame.getImageBounds().y;
+            case 3:
+                return frame.getImageBounds().width;
+            case 4:
+                return frame.getImageBounds().height;
+            case 5:
+                return frame.getSize().width;
+            case 6:
+                return frame.getSize().height;
+            case 7:
+                return frame.getCursorPosition() == null ? "" : frame.getCursorPosition().getX();
+            case 8:
+                return frame.getCursorPosition() == null ? "" : frame.getCursorPosition().getY();
+            case 9:
+                return frame.getEyePosition() == null ? "" : frame.getEyePosition().getX();
+            case 10:
+                return frame.getEyePosition() == null ? "" : frame.getEyePosition().getY();
+            case 11:
+                return frame.isEyeFixated() == null ? "" : frame.isEyeFixated();
+            default:
+                return null;
+        }
+    }
+
+    static String getColumnName(int col) {
+        switch(col) {
+            case 0:
+                return "Timestamp (ms)";
+            case 1:
+                return "X";
+            case 2:
+                return "Y";
+            case 3:
+                return "Width";
+            case 4:
+                return "Height";
+            case 5:
+                return "Canvas width";
+            case 6:
+                return "Canvas height";
+            case 7:
+                return "Cursor X";
+            case 8:
+                return "Cursor Y";
+            case 9:
+                return "Eye X";
+            case 10:
+                return "Eye Y";
+            case 11:
+                return "Fixated";
+            default:
+                return null;
+        }
+    }
+
+    static int nCols(ViewTracker tracker) {
+        if (tracker == null) {
+            return 0;
+        } else {
+            return tracker.hasEyeTrackingData() ? 12 : 9;
+        }
+    }
+
+
+
 }
 

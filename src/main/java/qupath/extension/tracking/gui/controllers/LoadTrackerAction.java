@@ -13,6 +13,8 @@ import qupath.lib.gui.viewer.recording.DefaultViewTracker;
 
 import java.io.File;
 
+import static qupath.extension.tracking.tracker.ExtendedViewTrackerPlayback.makeTable;
+
 /**
  * Created by alan on 03/09/17.
  */
@@ -36,6 +38,9 @@ public class LoadTrackerAction implements EventHandler, PathCommand {
                 DefaultViewTracker tracker = DefaultViewTrackerFactory.createViewTracker(file);
                 TrackerPaintStage.setTracker(tracker);
                 TrackerPaintStage.getInstance().getController().resetOptions();
+                TrackerPaintStage.getInstance().getController().TrackerBorderPane.setCenter(
+                        makeTable(viewer, tracker));
+                TrackerPaintStage.getInstance().getController().actionPlayback.setDisabled(false);
             }
             TrackerPaintStage.getInstance().toFront();
         } else {

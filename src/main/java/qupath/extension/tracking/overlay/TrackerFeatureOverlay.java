@@ -1,6 +1,8 @@
 package qupath.extension.tracking.overlay;
 
 import qupath.extension.tracking.tracker.Fixations;
+import qupath.extension.tracking.tracker.TrackerFeature;
+import qupath.extension.tracking.tracker.TrackerFeatureList;
 import qupath.extension.tracking.tracker.TrackerFeatures;
 import qupath.extension.tracking.TrackerUtils;
 import qupath.lib.gui.QuPathGUI;
@@ -10,6 +12,7 @@ import qupath.lib.regions.ImageRegion;
 
 import java.awt.*;
 import java.awt.font.GlyphVector;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.image.ImageObserver;
 
@@ -32,6 +35,8 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
     private final int lowZoomThreshold = 5;
     private final int medZoomThreshold = 1;
     private double boundsThicknessScalar;
+    private Number boundsFixationTimeThreshold;
+
 
     public TrackerFeatureOverlay(TrackerFeatures trackerFeatures) {
         this.viewer = QuPathGUI.getInstance().getViewer();
@@ -149,21 +154,22 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
             }
             if (doPaintZoomPeaks) {
                 if (trackerFeatures.getBoundsArray() != null) {
-                    //                drawBoundsTrail(g2d, downsampleFactor, clippingRectangle);
+                    drawZoomPeaks(g2d, downsampleFactor, clippingRectangle);
                 }
             }
             if (doPaintSlowPans) {
                 if (trackerFeatures.getCursorArray() != null) {
-                    //                drawCursorTrail(g2d, downsampleFactor, clippingRectangle);
+                    drawSlowPans(g2d, downsampleFactor, clippingRectangle);
                 }
             }
             if (doPaintBoundFixations) {
                 if (trackerFeatures.getBoundsArray() != null) {
-                    //                drawEyeTrail(g2d, downsampleFactor, clippingRectangle);
+                    drawBoundsFixations(g2d, downsampleFactor, clippingRectangle);
                 }
             }
         }
     }
+
 
     private void drawBoundsTrail(Graphics2D g2d, double downsampleFactor, Rectangle clippingRectangle) {
         g2d.setStroke(new BasicStroke((downsampleFactor > 1) ? (float) downsampleFactor : 1));
@@ -186,7 +192,20 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
         }
     }
 
-    //todo: handle all points (no fixations/centroids/durations)
+    private void drawZoomPeaks(Graphics2D g2d, double downsampleFactor, Rectangle clippingRectangle) {
+        g2d.setColor(Color.CYAN);
+        g2d.setStroke(new BasicStroke((downsampleFactor > 1) ? (float) downsampleFactor : 1));
+        Rectangle rect;
+        for (int i = 0; i < trackerFeatures.getZoomPeaks().size(); i++) {
+
+            rect = trackerFeatures.getZoomPeaks().get(i).get(0).getImageBounds();
+            if (rect.intersects(clippingRectangle)) {
+                g2d.draw(rect);
+            }
+        }
+    }
+
+
     private void drawTrail(Graphics2D g2d, double downsampleFactor, Rectangle clippingRectangle, Fixations fixations) {
         g2d.setStroke(new BasicStroke((downsampleFactor > 1) ? (float) downsampleFactor : 1));
         double[] zoomArray = trackerFeatures.getZoomArray();
@@ -260,6 +279,54 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
         }
     }
 
+    private void drawSlowPans(Graphics2D g2d, double downsampleFactor, Rectangle clippingRectangle) {
+        g2d.setStroke(new BasicStroke((downsampleFactor > 1) ? (float) downsampleFactor : 1));
+        g2d.setColor(Color.BLUE);
+
+        TrackerFeatureList slowPans = trackerFeatures.getSlowPans();
+
+        for (int i = 0; i < slowPans.size(); i ++) {
+            TrackerFeature slowPan = slowPans.get(i);
+            Rectangle startRect = slowPan.get(0).getImageBounds();
+            Rectangle endRect = slowPan.get(slowPan.size() - 1).getImageBounds();
+            g2d.setColor(Color.MAGENTA);
+            if (startRect.intersects(clippingRectangle))
+                g2d.draw(startRect);
+            g2d.setColor(Color.GREEN);
+            if (endRect.intersects(clippingRectangle))
+                g2d.draw(endRect);
+            g2d.setStroke(new BasicStroke((downsampleFactor > 1) ? (float) downsampleFactor : 1));
+            g2d.setColor(Color.RED);
+
+            for (Line2D line : makeSlowPanLines(startRect, endRect)) {
+                if(line.intersects(clippingRectangle)) {
+                    g2d.draw(line);
+                }
+            }
+        }
+    }
+
+
+    private static Line2D[] makeSlowPanLines(Rectangle currentRect, Rectangle previousRect) {
+        return new Line2D[]{
+                new Line2D.Double(currentRect.getX(), currentRect.getY(), previousRect.getX(), previousRect.getY()),
+                new Line2D.Double(currentRect.getX() + currentRect.getWidth(), currentRect.getY(), previousRect.getX() + previousRect.getWidth(), previousRect.getY()),
+                new Line2D.Double(currentRect.getX(), currentRect.getY() + currentRect.getHeight(), previousRect.getX(), previousRect.getY() + previousRect.getHeight()),
+                new Line2D.Double(currentRect.getX() + currentRect.getWidth(), currentRect.getY() + currentRect.getHeight(), previousRect.getX() + previousRect.getWidth(), previousRect.getY() + previousRect.getHeight())};
+    }
+
+    private void drawBoundsFixations(Graphics2D g2d, double downsampleFactor, Rectangle clippingRectangle) {
+        g2d.setColor(Color.BLUE);
+        g2d.setStroke(new BasicStroke((downsampleFactor > 2) ? (float) (downsampleFactor*2) : 2));
+        Rectangle rectangle;
+        for (int i = 0; i < trackerFeatures.getBoundsFixations().size(); i++) {
+            rectangle = trackerFeatures.getBoundsFixations().get(i).get(0).getImageBounds();
+            if(rectangle.intersects(clippingRectangle)) {
+                g2d.draw(rectangle);
+            }
+        }
+    }
+
     public void setDoPaintCursorTrail(boolean paintCursorTrail) {
         this.doPaintCursorTrail = paintCursorTrail;
         this.trackerFeatures.getCursorFixations().recalculateFixations();
@@ -288,23 +355,23 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
         this.trackerFeatures.getCursorFixations().setFixationType(fixationType);
         this.viewer.repaint();
     }
-//
-//    void setDoPaintBoundFixations(boolean doPaintBoundFixations) {
-//        this.doPaintBoundFixations = doPaintBoundFixations;
-//        this.viewer.repaint();
-//    }
-//
-//    void setDoPaintZoomPeaks(boolean doPaintZoomPeaks) {
-//        this.doPaintZoomPeaks = doPaintZoomPeaks;
-//        this.viewer.repaint();
-//    }
-//
-//    void setDoPaintSlowPans(boolean doPaintSlowPans) {
-//        this.doPaintSlowPans = doPaintSlowPans;
-//        this.viewer.repaint();
-//    }
-//
-//
+
+    public void setDoPaintBoundFixations(boolean doPaintBoundFixations) {
+        this.doPaintBoundFixations = doPaintBoundFixations;
+        this.viewer.repaint();
+    }
+
+    public void setDoPaintZoomPeaks(boolean doPaintZoomPeaks) {
+        this.doPaintZoomPeaks = doPaintZoomPeaks;
+        this.viewer.repaint();
+    }
+
+    public void setDoPaintSlowPans(boolean doPaintSlowPans) {
+        this.doPaintSlowPans = doPaintSlowPans;
+        this.viewer.repaint();
+    }
+
+//    TODO: Cursor and eye numbers
 //    public void setDoPaintNumbers(boolean doPaintNumbers) {
 //        this.doPaintNumbers = doPaintNumbers;
 //        this.viewer.repaint();
@@ -364,6 +431,26 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
 
     public void setBoundsThicknessScalar(Number boundsThicknessScalar) {
         this.boundsThicknessScalar = boundsThicknessScalar.doubleValue();
+        this.viewer.repaint();
+    }
+
+    public void setSlowPanTimeThreshold(Number slowPanTimeThreshold) {
+        this.trackerFeatures.setSlowPanTimeThreshold(slowPanTimeThreshold.doubleValue());
+        this.viewer.repaint();
+    }
+
+    public void setSlowPanSpeedThreshold(Number slowPanSpeedThreshold) {
+        this.trackerFeatures.setSlowPanSpeedThreshold(slowPanSpeedThreshold.doubleValue());
+        this.viewer.repaint();
+    }
+
+    public void setBoundsFixationTimeThreshold(Number boundsFixationTimeThreshold) {
+        this.trackerFeatures.setBoundsFixationThreshold(boundsFixationTimeThreshold.longValue());
+        this.viewer.repaint();
+    }
+
+    public void setZoomPeakThreshold(Number zoomPeakThreshold) {
+        this.trackerFeatures.setZoomPeakThreshold(zoomPeakThreshold.intValue());
         this.viewer.repaint();
     }
 }

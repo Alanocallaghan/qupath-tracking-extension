@@ -251,6 +251,7 @@ public class Fixations {
             double newX = (cX - X) / downsample;
             double newY = (cY - Y) / downsample;
             cpoint = new Point2D.Double(newX, newY);
+//            todo: why?
 //            if(newX > 10000) {
 //                System.out.println(downsample);
 //            }
@@ -325,7 +326,6 @@ public class Fixations {
     //    todo: meaningful threshold!!!
 //    todo: downsample?
     private void calculateIVTFixations() {
-
         ViewRecordingFrame[] allFramesForMethod = this.allFrames;
         double[] eyeSpeedArray = trackerFeatures.getEyeSpeedArray();
         boolean[] isFixated = new boolean[allFramesForMethod.length];

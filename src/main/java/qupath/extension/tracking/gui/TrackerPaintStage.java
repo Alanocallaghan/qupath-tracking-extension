@@ -53,7 +53,6 @@ public class TrackerPaintStage extends Stage {
         return instance;
     }
 
-
     @Override
     public void close() {
         removeOverlays();
@@ -64,18 +63,14 @@ public class TrackerPaintStage extends Stage {
         instance = null;
     }
 
-
-
     public static void setTracker(ViewTracker tracker) {
+        TrackerPaintStage.tracker = tracker;
         TrackerFeatures features = new TrackerFeatures(tracker, viewer.getServer());
         TrackerPaintStage.features = features;
         removeOverlays();
         TrackerPaintStage.heatmapOverlay = new HeatmapOverlay(features);
         TrackerPaintStage.trackerOverlay = new TrackerFeatureOverlay(features);
         addOverlays();
-        setHeatmapOverlay(heatmapOverlay);
-        setTrackerOverlay(trackerOverlay);
-        TrackerPaintStage.tracker = tracker;
     }
 
     private static void removeOverlays() {
@@ -90,14 +85,6 @@ public class TrackerPaintStage extends Stage {
 
     public PaintStageController getController() {
         return paintStageController;
-    }
-
-    private static void setTrackerOverlay(TrackerFeatureOverlay trackerOverlay) {
-        TrackerPaintStage.trackerOverlay = trackerOverlay;
-    }
-
-    private static void setHeatmapOverlay(HeatmapOverlay heatmapOverlay) {
-        TrackerPaintStage.heatmapOverlay = heatmapOverlay;
     }
 
     public static ViewTracker getTracker() {

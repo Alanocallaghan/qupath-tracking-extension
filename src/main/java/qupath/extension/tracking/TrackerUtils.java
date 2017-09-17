@@ -123,7 +123,7 @@ public class TrackerUtils {
                 canvas.getHeight());
     }
 
-    private static ArrayList<ViewRecordingFrame> getFramesAsArrayList(ViewTracker tracker) {
+    public static ArrayList<ViewRecordingFrame> getFramesAsArrayList(ViewTracker tracker) {
         ArrayList<ViewRecordingFrame> frames = new ArrayList<>(tracker.nFrames());
         for (int i = 0; i < tracker.nFrames(); i++) {
             frames.add(i, tracker.getFrame(i));

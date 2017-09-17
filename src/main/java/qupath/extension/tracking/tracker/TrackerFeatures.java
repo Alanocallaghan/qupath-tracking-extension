@@ -1,5 +1,6 @@
 package qupath.extension.tracking.tracker;
 
+import ij.plugin.filter.MaximumFinder;
 import qupath.extension.tracking.TrackerUtils;
 import qupath.lib.gui.viewer.recording.ViewRecordingFrame;
 import qupath.lib.gui.viewer.recording.ViewTracker;
@@ -10,6 +11,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static java.lang.Double.NaN;
 import static qupath.extension.tracking.TrackerUtils.calculateDownsample;
 import static qupath.extension.tracking.TrackerUtils.getSpeed;
 
@@ -21,18 +23,21 @@ public class TrackerFeatures {
 
     private final ImageServer server;
     private final ViewTracker tracker;
-    private TrackerFeatureList boundsFixations;
     private Rectangle[] boundsArray;
     private Point2D[] eyeArray;
     private Point2D[] cursorArray;
     private double[] eyeSpeedArray = new double[0], zoomArray = new double[0];
     private double[] boundsSpeedArray;
-    private static double slowPanSpeedThreshold = 100;
-    static private double slowPanTimeThreshold = 100;
-    private static int boundsFixationThreshold = 1000;
     private TrackerFeatureList slowPans;
     private TrackerFeatureList zoomPeaks;
+    private TrackerFeatureList boundsFixations;
+    private double slowPanSpeedThreshold;
+    private double slowPanTimeThreshold;
+    private long boundsFixationThreshold;
+    private int zoomPeakThreshold;
 
+    private Fixations eyeFixations;
+    private Fixations cursorFixations;
 
     public Fixations getEyeFixations() {
         return eyeFixations;
@@ -42,9 +47,6 @@ public class TrackerFeatures {
         return cursorFixations;
     }
 
-    private Fixations eyeFixations;
-    private Fixations cursorFixations;
-
     public TrackerFeatures(ViewTracker tracker, ImageServer server) {
         this.server = server;
         this.tracker = tracker;
@@ -52,8 +54,7 @@ public class TrackerFeatures {
             this.boundsArray = makeBounds();
             this.boundsSpeedArray = calculateBoundsSpeedArray();
             this.cursorArray = makeCursor();
-            addEye();
-            generateBoundsArray();
+            this.zoomArray = generateBoundsZoomArray();
             this.zoomPeaks = findZoomPeaks();
             this.slowPans = findSlowPans();
             this.boundsFixations = findBoundsFixations();
@@ -64,38 +65,6 @@ public class TrackerFeatures {
 
     }
 
-    private void addEye() {
-        if (!tracker.hasEyeTrackingData()) {
-            return;
-        }
-        ViewRecordingFrame currentFrame;
-        ViewRecordingFrame previousFrame = null;
-
-        Point2D previousEye = null;
-        Point2D currentEye;
-        int nFrames = tracker.nFrames();
-        Point2D[] point2Ds = new Point2D[nFrames];
-
-
-        double[] eyeSpeedArray = new double[nFrames];
-
-        for (int i = 0; i < nFrames; i++) {
-            currentFrame = tracker.getFrame(i);
-            currentEye = tracker.getFrame(i).getEyePosition();
-            if (currentEye != null && previousEye != null && previousFrame!=null) {
-                eyeSpeedArray[i] = getSpeed(currentFrame, previousFrame, TrackerUtils.SpeedType.EYE)
-                        / 
-                        calculateDownsample(currentFrame.getImageBounds(), currentFrame.getSize());
-            }
-            if (currentEye != null && !(currentEye.getX() == 0 && currentEye.getY() == 0)) {
-                point2Ds[i] = currentEye;
-            }
-            previousEye = currentEye;
-            previousFrame = currentFrame;
-        }
-        this.eyeSpeedArray = eyeSpeedArray;
-        this.eyeArray = point2Ds;
-    }
 
     private Point2D[] makeCursor() {
         int nFrames = tracker.nFrames();
@@ -113,24 +82,18 @@ public class TrackerFeatures {
         return point2Ds;
     }
 
-    private void generateBoundsArray() {
+    private double[] generateBoundsZoomArray() {
         int nFrames = tracker.nFrames();
-
-        Rectangle rect;
         ViewRecordingFrame currentFrame;
-
-        this.zoomArray = new double[nFrames];
-
+        double[] zoomArray = new double[nFrames];
         Dimension imageVisible;
         for (int i = 0; i < nFrames; i++) {
             currentFrame = tracker.getFrame(i);
-            rect = currentFrame.getImageBounds();
-
-            imageVisible = currentFrame.getSize();
-
-            double currentZoom = TrackerUtils.calculateZoom(rect, imageVisible, this.getServer());
+//            double currentZoom = TrackerUtils.calculateZoom(currentFrame.getImageBounds(), currentFrame.getSize(), this.getServer());
+            double currentZoom = calculateDownsample(currentFrame.getImageBounds(), currentFrame.getSize());
             zoomArray[i] = currentZoom;
         }
+        return zoomArray;
     }
 
     private void generateEyeArray() {
@@ -237,47 +200,69 @@ public class TrackerFeatures {
      *
      * @return void
      */
-    private TrackerFeatureList findZoomPeaks() {
-        TrackerFeatureList zoomPeaks = new TrackerFeatureList();
-        TrackerFeature zoomPeak = new TrackerFeature();
+    public TrackerFeatureList findZoomPeaks() {
+
+        ArrayList<Integer> inds = new ArrayList<>();
+        ArrayList<ArrayList> indList = new ArrayList<>();
 
 //        NB: ZOOM HERE IS AREA SO LOCAL MINIMA ARE REQUIRED, NOT MAXIMA!!!!
-        double lastdx = 0;
-        for (int i = 1; i < boundsArray.length - 1; i++) {
-            double dx = zoomArray[i] - zoomArray[i - 1];
-//          if decreasing or flat
-            if ((dx > 0 || dx == 0) && lastdx < 0) {
+        for (int iteration = 0; iteration < zoomPeakThreshold; iteration ++) {
+            int[] candidates;
+            if (iteration == 0) {
+                candidates = java.util.stream.IntStream.range(0, tracker.nFrames() - 1).toArray();
+            } else {
+                candidates = new int[indList.size()];
+                for (int i = 0; i < indList.size(); i ++) {
+                    candidates[i] = (int)(indList.get(i).get(0));
+                }
+                indList = new ArrayList<>();
+            }
 
-//              if flat
-                if (dx == 0) {
-                    zoomPeak.add(tracker.getFrame(i));
-//              if last nonzero slope was positive, then it's a peak
-                } else if (dx > 0) {
-                    if (zoomArray[i - 2] - zoomArray[i - 1] < 0) {
-                        zoomPeak.add(tracker.getFrame(i - 1));
-
-                        if (!zoomPeak.isEmpty()) {
-                            zoomPeaks.add(zoomPeak);
-                        }
-                    } else if (lastdx < 0) {
-                        zoomPeak.add(tracker.getFrame(i));
-
-                        if (!zoomPeak.isEmpty()) {
-                            zoomPeaks.add(zoomPeak);
-                        }
+            double lastdx = -1;
+            for (int counter = 0; counter < candidates.length; counter ++) {
+                double dx;
+                if (counter > 0) {
+                    dx = zoomArray[candidates[counter]] - zoomArray[candidates[counter - 1]];
+                } else {
+                    dx = 0;
+                }
+//          if downsample is increasing (zooming out)
+//                and previously, it was increasing (zooming in),
+//                then it was a peak
+//                If it's flat and was increasing, it might be
+                if (dx == 0 && lastdx < 0) {
+                    inds.add(candidates[counter]);
+                } else if (dx > 0 || counter == candidates.length - 1) {
+                    if (inds.indexOf(candidates[counter - 1]) != -1) {
+                        inds.add(candidates[counter - 1]);
                     }
-                    zoomPeak = new TrackerFeature();
+                    if (!inds.isEmpty() && lastdx < 0) {
+                        indList.add(inds);
+                    }
+                }
+                if (dx > 0) {
+                    inds = new ArrayList<>();
+                }
+
+                if (dx != 0) {
+                    lastdx = dx;
                 }
             }
-            if (dx != 0) {
-                lastdx = dx;
-            }
         }
-
+        TrackerFeatureList zoomPeaks = new TrackerFeatureList();
+        for (ArrayList<Integer> list: indList) {
+            TrackerFeature zoomPeak = new TrackerFeature();
+            for (int i: list) {
+                ViewRecordingFrame frame = tracker.getFrame(i);
+                System.out.println(i + ": " + calculateDownsample(frame.getImageBounds(), frame.getSize()));
+                zoomPeak.add(tracker.getFrame(i));
+            }
+            zoomPeaks.add(zoomPeak);
+        }
         return zoomPeaks;
     }
 
-    private TrackerFeatureList findSlowPans() {
+    public TrackerFeatureList findSlowPans() {
         ArrayList<ArrayList> slowPanInds = new ArrayList<>(0);
         TrackerFeatureList slowPans = new TrackerFeatureList();
         TrackerFeature feature = new TrackerFeature();
@@ -285,11 +270,11 @@ public class TrackerFeatures {
 
         for (int i = 1; i < zoomArray.length; i++) {
             if (zoomArray[i] == zoomArray[i - 1]) {
-                if (boundsSpeedArray[i] < slowPanSpeedThreshold) {
+                if (boundsSpeedArray[i] < (double)slowPanSpeedThreshold) {
                     feature.add(tracker.getFrame(i));
                 } else {
                     if (feature.size() != 0) {
-                        if (feature.get(feature.size() - 1).getTimestamp() - feature.get(0).getTimestamp() > slowPanTimeThreshold) {
+                        if (feature.get(feature.size() - 1).getTimestamp() - feature.get(0).getTimestamp() > (double)slowPanTimeThreshold) {
                             slowPans.add(feature);
                             feature = new TrackerFeature();
                         }
@@ -297,7 +282,7 @@ public class TrackerFeatures {
                 }
             } else {
                 if (feature.size() != 0) {
-                    if (feature.get(feature.size() - 1).getTimestamp() - feature.get(0).getTimestamp() > slowPanTimeThreshold) {
+                    if (feature.get(feature.size() - 1).getTimestamp() - feature.get(0).getTimestamp() > (double)slowPanTimeThreshold) {
                         slowPans.add(feature);
                         feature = new TrackerFeature();
                     }
@@ -307,7 +292,7 @@ public class TrackerFeatures {
         return slowPans;
     }
 
-    private TrackerFeatureList findBoundsFixations() {
+    public TrackerFeatureList findBoundsFixations() {
         TrackerFeatureList fixations = new TrackerFeatureList();
         ViewRecordingFrame currentFrame, previousFrame = null;
         TrackerFeature thisFixation = new TrackerFeature();
@@ -344,5 +329,25 @@ public class TrackerFeatures {
 
     public TrackerFeatureList getBoundsFixations() {
         return boundsFixations;
+    }
+
+    public void setSlowPanTimeThreshold(double slowPanTimeThreshold) {
+        this.slowPanTimeThreshold = slowPanTimeThreshold;
+        this.slowPans = findSlowPans();
+    }
+
+    public void setSlowPanSpeedThreshold(double slowPanSpeedThreshold) {
+        this.slowPanSpeedThreshold = slowPanSpeedThreshold;
+        this.slowPans = findSlowPans();
+    }
+
+    public void setBoundsFixationThreshold(long boundsFixationThreshold) {
+        this.boundsFixationThreshold = boundsFixationThreshold;
+        this.boundsFixations = findBoundsFixations();
+    }
+
+    public void setZoomPeakThreshold(int zoomPeakThreshold) {
+        this.zoomPeakThreshold = zoomPeakThreshold;
+        this.zoomPeaks = findZoomPeaks();
     }
 }
