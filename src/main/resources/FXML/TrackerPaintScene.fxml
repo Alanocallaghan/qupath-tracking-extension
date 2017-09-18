@@ -164,7 +164,7 @@
                     <Slider fx:id="BoundsFixationSlider" max="2000" min="10" value="1000" GridPane.columnIndex="1" GridPane.rowIndex="5" />
 
                     <Label fx:id="ZoomPeakLabel" text="Zoom peak threshold" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-                    <Slider fx:id="ZoomPeakSlider" max="10" min="1" value="1"
+                    <Slider fx:id="ZoomPeakSlider" max="5" min="1" value="1"
                             snapToTicks="true" majorTickUnit="1" showTickMarks="true" showTickLabels="true" minorTickCount="-1"
                             GridPane.columnIndex="2" GridPane.rowIndex="5" />
 

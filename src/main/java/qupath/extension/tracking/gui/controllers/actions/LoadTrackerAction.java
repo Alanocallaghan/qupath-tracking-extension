@@ -1,4 +1,4 @@
-package qupath.extension.tracking.gui.controllers;
+package qupath.extension.tracking.gui.controllers.actions;
 
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -18,7 +18,7 @@ import static qupath.extension.tracking.tracker.ExtendedViewTrackerPlayback.make
 /**
  * Created by alan on 03/09/17.
  */
-class LoadTrackerAction implements EventHandler, PathCommand {
+public class LoadTrackerAction implements EventHandler, PathCommand {
 
     @Override
     public void handle(Event event) {

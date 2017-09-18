@@ -1,4 +1,4 @@
-package qupath.extension.tracking.gui.controllers;
+package qupath.extension.tracking.gui.controllers.actions;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -15,7 +15,7 @@ import java.io.PrintWriter;
 /**
  * Created by alan on 06/09/17.
  */
-class SaveTrackerAction implements EventHandler<ActionEvent>, PathCommand {
+public class SaveTrackerAction implements EventHandler<ActionEvent>, PathCommand {
 
     @Override
     public void handle(ActionEvent event) {

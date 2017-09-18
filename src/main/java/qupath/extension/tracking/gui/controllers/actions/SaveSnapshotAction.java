@@ -1,4 +1,4 @@
-package qupath.extension.tracking.gui.controllers;
+package qupath.extension.tracking.gui.controllers.actions;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -14,7 +14,7 @@ import static qupath.extension.tracking.TrackerUtils.saveSnapshot;
 /**
  * Created by alan on 06/09/17.
  */
-class SaveSnapshotAction implements EventHandler<ActionEvent> {
+public class SaveSnapshotAction implements EventHandler<ActionEvent> {
     @Override
     public void handle(ActionEvent event) {
         QuPathGUI gui = QuPathGUI.getInstance();

@@ -13,6 +13,10 @@ import javafx.scene.paint.Color;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
 import qupath.extension.tracking.gui.TrackerPaintStage;
+import qupath.extension.tracking.gui.controllers.actions.LoadTrackerAction;
+import qupath.extension.tracking.gui.controllers.actions.ResetTrackerAction;
+import qupath.extension.tracking.gui.controllers.actions.SaveSnapshotAction;
+import qupath.extension.tracking.gui.controllers.actions.SaveTrackerAction;
 import qupath.extension.tracking.tracker.ExtendedViewTrackerPlayback;
 import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.icons.PathIconFactory;
@@ -33,7 +37,7 @@ public class PaintStageController implements Initializable {
     public Action actionPlayback;
     private ExtendedViewTrackerPlayback playback;
 
-    void resetOptions() {
+    public void resetOptions() {
         TrackerPaintStage.getHeatmapOverlay().setDoPaintBoundsHeatmap(bHCheck.isSelected());
         TrackerPaintStage.getHeatmapOverlay().setDoPaintCursorHeatmap(cHCheck.isSelected());
         TrackerPaintStage.getHeatmapOverlay().setDoPaintEyeHeatmap(eHCheck.isSelected());
@@ -258,6 +262,10 @@ public class PaintStageController implements Initializable {
                 actionRecord.setGraphic(iconRecord);
                 actionRecord.setText("Start recording");
                 actionPlayback.setDisabled(TrackerPaintStage.getTracker().isEmpty());
+                if (!TrackerPaintStage.getTracker().isEmpty()) {
+                    this.TrackerBorderPane.setCenter(ExtendedViewTrackerPlayback.makeTable(
+                            viewer, TrackerPaintStage.getTracker()));
+                }
             }
         });
 
