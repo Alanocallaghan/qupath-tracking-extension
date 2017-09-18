@@ -18,7 +18,7 @@ import static qupath.extension.tracking.tracker.ExtendedViewTrackerPlayback.make
 /**
  * Created by alan on 03/09/17.
  */
-public class LoadTrackerAction implements EventHandler, PathCommand {
+class LoadTrackerAction implements EventHandler, PathCommand {
 
     @Override
     public void handle(Event event) {

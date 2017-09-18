@@ -8,7 +8,7 @@ import qupath.lib.gui.viewer.recording.DefaultViewTracker;
 /**
  * Created by alan on 06/09/17.
  */
-public class ResetTrackerAction implements PathCommand {
+class ResetTrackerAction implements PathCommand {
 
     @Override
     public void run() {

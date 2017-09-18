@@ -285,8 +285,7 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
 
         TrackerFeatureList slowPans = trackerFeatures.getSlowPans();
 
-        for (int i = 0; i < slowPans.size(); i ++) {
-            TrackerFeature slowPan = slowPans.get(i);
+        for (TrackerFeature slowPan : slowPans) {
             Rectangle startRect = slowPan.get(0).getImageBounds();
             Rectangle endRect = slowPan.get(slowPan.size() - 1).getImageBounds();
             g2d.setColor(Color.MAGENTA);
@@ -299,7 +298,7 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
             g2d.setColor(Color.RED);
 
             for (Line2D line : makeSlowPanLines(startRect, endRect)) {
-                if(line.intersects(clippingRectangle)) {
+                if (line.intersects(clippingRectangle)) {
                     g2d.draw(line);
                 }
             }

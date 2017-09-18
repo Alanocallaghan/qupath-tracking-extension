@@ -120,7 +120,7 @@ public class ExtendedViewTrackerPlayback {
         }
     }
 
-    public static void setViewerForFrame(QuPathViewer viewer, ViewRecordingFrame frame) {
+    private static void setViewerForFrame(QuPathViewer viewer, ViewRecordingFrame frame) {
         resizeViewer(viewer, frame.getSize());
         Rectangle imageBounds = frame.getImageBounds();
         Dimension canvasSize = frame.getSize();
@@ -159,11 +159,7 @@ public class ExtendedViewTrackerPlayback {
         for (int i = 0; i < nCols(tracker); ++i) {
             TableColumn<ViewRecordingFrame, Object> column = new TableColumn(getColumnName(i));
             final int j = i;
-            column.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ViewRecordingFrame, Object>, ObservableValue<Object>>() {
-                public ObservableValue<Object> call(TableColumn.CellDataFeatures<ViewRecordingFrame, Object> frame) {
-                    return new SimpleObjectProperty(getColumnValue((ViewRecordingFrame)frame.getValue(), j));
-                }
-            });
+            column.setCellValueFactory(frame -> new SimpleObjectProperty(getColumnValue((ViewRecordingFrame)frame.getValue(), j)));
             table.getColumns().add(column);
         }
 
@@ -173,8 +169,7 @@ public class ExtendedViewTrackerPlayback {
                 setViewerForFrame(viewer, frame);
             }
         });
-        ObservableList<ViewRecordingFrame> frameList = (ObservableList<ViewRecordingFrame>)
-                FXCollections.observableArrayList(TrackerUtils.getFramesAsArrayList(tracker));
+        ObservableList<ViewRecordingFrame> frameList = FXCollections.observableArrayList(TrackerUtils.getFramesAsArrayList(tracker));
 
         table.setItems(frameList);
         return table;
@@ -185,7 +180,7 @@ public class ExtendedViewTrackerPlayback {
     }
 
 
-    static Object getColumnValue(ViewRecordingFrame frame, int col) {
+    private static Object getColumnValue(ViewRecordingFrame frame, int col) {
         switch (col) {
             case 0:
                 return frame.getTimestamp();
@@ -216,7 +211,7 @@ public class ExtendedViewTrackerPlayback {
         }
     }
 
-    static String getColumnName(int col) {
+    private static String getColumnName(int col) {
         switch(col) {
             case 0:
                 return "Timestamp (ms)";
@@ -247,7 +242,7 @@ public class ExtendedViewTrackerPlayback {
         }
     }
 
-    static int nCols(ViewTracker tracker) {
+    private static int nCols(ViewTracker tracker) {
         if (tracker == null) {
             return 0;
         } else {

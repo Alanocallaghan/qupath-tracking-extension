@@ -29,8 +29,9 @@ import java.util.ResourceBundle;
  */
 public class PaintStageController implements Initializable {
 
-    public Action actionRecord, actionPlayback;
-    public ExtendedViewTrackerPlayback playback;
+    private Action actionRecord;
+    public Action actionPlayback;
+    private ExtendedViewTrackerPlayback playback;
 
     void resetOptions() {
         TrackerPaintStage.getHeatmapOverlay().setDoPaintBoundsHeatmap(bHCheck.isSelected());
@@ -355,6 +356,11 @@ public class PaintStageController implements Initializable {
     private Slider EyeIVTSpeedSlider, EyeIDTDurationSlider, EyeIDTDispersionSlider,
             CursorIVTSpeedSlider, CursorIDTDurationSlider, CursorIDTDispersionSlider;
     @FXML
-    public Slider SlowPanTimeSlider, SlowPanSpeedSlider,
-            BoundsFixationSlider, ZoomPeakSlider;
+    private Slider SlowPanTimeSlider;
+    @FXML
+    private Slider SlowPanSpeedSlider;
+    @FXML
+    private Slider BoundsFixationSlider;
+    @FXML
+    private Slider ZoomPeakSlider;
 }

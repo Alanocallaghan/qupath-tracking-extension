@@ -15,7 +15,7 @@ import java.io.PrintWriter;
 /**
  * Created by alan on 06/09/17.
  */
-public class SaveTrackerAction implements EventHandler<ActionEvent>, PathCommand {
+class SaveTrackerAction implements EventHandler<ActionEvent>, PathCommand {
 
     @Override
     public void handle(ActionEvent event) {

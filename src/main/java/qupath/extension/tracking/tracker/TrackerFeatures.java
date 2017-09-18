@@ -1,9 +1,6 @@
 package qupath.extension.tracking.tracker;
 
-import ij.plugin.filter.MaximumFinder;
 import qupath.extension.tracking.TrackerUtils;
-import qupath.lib.gui.QuPathGUI;
-import qupath.lib.gui.viewer.QuPathViewer;
 import qupath.lib.gui.viewer.recording.ViewRecordingFrame;
 import qupath.lib.gui.viewer.recording.ViewTracker;
 import qupath.lib.images.servers.ImageServer;
@@ -13,7 +10,6 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static java.lang.Double.NaN;
 import static qupath.extension.tracking.TrackerUtils.calculateDownsample;
 import static qupath.extension.tracking.TrackerUtils.getSpeed;
 
@@ -202,7 +198,7 @@ public class TrackerFeatures {
      *
      * @return void
      */
-    public TrackerFeatureList findZoomPeaks() {
+    private TrackerFeatureList findZoomPeaks() {
 
         ArrayList<Integer> inds = new ArrayList<>();
         ArrayList<ArrayList> indList = new ArrayList<>();
@@ -263,7 +259,7 @@ public class TrackerFeatures {
 
 
 
-    public TrackerFeatureList findSlowPans() {
+    private TrackerFeatureList findSlowPans() {
         ArrayList<ArrayList> slowPanInds = new ArrayList<>(0);
         TrackerFeatureList slowPans = new TrackerFeatureList();
         TrackerFeature feature = new TrackerFeature();
@@ -271,11 +267,11 @@ public class TrackerFeatures {
 
         for (int i = 1; i < zoomArray.length; i++) {
             if (zoomArray[i] == zoomArray[i - 1]) {
-                if (boundsSpeedArray[i] < (double)slowPanSpeedThreshold) {
+                if (boundsSpeedArray[i] < slowPanSpeedThreshold) {
                     feature.add(tracker.getFrame(i));
                 } else {
                     if (feature.size() != 0) {
-                        if (feature.get(feature.size() - 1).getTimestamp() - feature.get(0).getTimestamp() > (double)slowPanTimeThreshold) {
+                        if (feature.get(feature.size() - 1).getTimestamp() - feature.get(0).getTimestamp() > slowPanTimeThreshold) {
                             slowPans.add(feature);
                             feature = new TrackerFeature();
                         }
@@ -283,7 +279,7 @@ public class TrackerFeatures {
                 }
             } else {
                 if (feature.size() != 0) {
-                    if (feature.get(feature.size() - 1).getTimestamp() - feature.get(0).getTimestamp() > (double)slowPanTimeThreshold) {
+                    if (feature.get(feature.size() - 1).getTimestamp() - feature.get(0).getTimestamp() > slowPanTimeThreshold) {
                         slowPans.add(feature);
                         feature = new TrackerFeature();
                     }
@@ -293,7 +289,7 @@ public class TrackerFeatures {
         return slowPans;
     }
 
-    public TrackerFeatureList findBoundsFixations() {
+    private TrackerFeatureList findBoundsFixations() {
         TrackerFeatureList fixations = new TrackerFeatureList();
         ViewRecordingFrame currentFrame, previousFrame = null;
         TrackerFeature thisFixation = new TrackerFeature();
