@@ -24,6 +24,9 @@
 package qupath.extension.tracking;
 
 
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +67,8 @@ public class QuPathTrackingExtension implements QuPathExtension {
 
 		QuPathGUI.addMenuItems(
 				qupath.getMenu("Extensions>Tracking", true),
-				QuPathGUI.createCommandAction(new TrackingQuPathLoadCommand(), "Tracking extension")
+				QuPathGUI.createCommandAction(new TrackingQuPathLoadCommand(), "Tracking extension"),
+				new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN)
 				);
 
         // TODO: Use md5 sum to tie tracking instance to image (using MessageDigest) http://stackoverflow.com/questions/4187111/how-to-get-the-md5sum-of-a-file-in-java

@@ -120,7 +120,7 @@ public class ExtendedViewTrackerPlayback {
         }
     }
 
-    private static void setViewerForFrame(QuPathViewer viewer, ViewRecordingFrame frame) {
+    public static void setViewerForFrame(QuPathViewer viewer, ViewRecordingFrame frame) {
         resizeViewer(viewer, frame.getSize());
         Rectangle imageBounds = frame.getImageBounds();
         Dimension canvasSize = frame.getSize();

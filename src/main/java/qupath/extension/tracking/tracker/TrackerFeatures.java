@@ -2,6 +2,8 @@ package qupath.extension.tracking.tracker;
 
 import ij.plugin.filter.MaximumFinder;
 import qupath.extension.tracking.TrackerUtils;
+import qupath.lib.gui.QuPathGUI;
+import qupath.lib.gui.viewer.QuPathViewer;
 import qupath.lib.gui.viewer.recording.ViewRecordingFrame;
 import qupath.lib.gui.viewer.recording.ViewTracker;
 import qupath.lib.images.servers.ImageServer;
@@ -219,29 +221,26 @@ public class TrackerFeatures {
             }
 
             double lastdx = -1;
+            double dx;
+
             for (int counter = 0; counter < candidates.length; counter ++) {
-                double dx;
                 if (counter > 0) {
                     dx = zoomArray[candidates[counter]] - zoomArray[candidates[counter - 1]];
                 } else {
                     dx = 0;
                 }
-//          if downsample is increasing (zooming out)
-//                and previously, it was increasing (zooming in),
-//                then it was a peak
-//                If it's flat and was increasing, it might be
-                if (dx == 0 && lastdx < 0) {
-                    inds.add(candidates[counter]);
-                } else if (dx > 0 || counter == candidates.length - 1) {
-                    if (inds.indexOf(candidates[counter - 1]) != -1) {
+
+                if (dx > 0) {
+                    if (lastdx < 0 || counter == (candidates.length - 1)) {
                         inds.add(candidates[counter - 1]);
-                    }
-                    if (!inds.isEmpty() && lastdx < 0) {
                         indList.add(inds);
                     }
-                }
-                if (dx > 0) {
                     inds = new ArrayList<>();
+                } else if (dx == 0) {
+                    inds.add(candidates[counter]);
+                } else if (dx < 0) {
+                    inds = new ArrayList<>();
+                    inds.add(candidates[counter]);
                 }
 
                 if (dx != 0) {
@@ -253,14 +252,16 @@ public class TrackerFeatures {
         for (ArrayList<Integer> list: indList) {
             TrackerFeature zoomPeak = new TrackerFeature();
             for (int i: list) {
-                ViewRecordingFrame frame = tracker.getFrame(i);
-                System.out.println(i + ": " + calculateDownsample(frame.getImageBounds(), frame.getSize()));
                 zoomPeak.add(tracker.getFrame(i));
             }
             zoomPeaks.add(zoomPeak);
         }
         return zoomPeaks;
     }
+
+
+
+
 
     public TrackerFeatureList findSlowPans() {
         ArrayList<ArrayList> slowPanInds = new ArrayList<>(0);
