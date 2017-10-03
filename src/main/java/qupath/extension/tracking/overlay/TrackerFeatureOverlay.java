@@ -43,93 +43,6 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
         this.trackerFeatures = trackerFeatures;
     }
 
-//    private void drawCursorTrail(Graphics2D g2d, double downsampleFactor, Rectangle clippingRectangle) {
-//        g2d.setStroke(new BasicStroke((downsampleFactor > 1) ? (float) downsampleFactor : 1));
-//
-//        double[] zoomArray = trackerFeatures.getZoomArray();
-//
-//        Point2D[] cursorArray = trackerFeatures.getCursorArray();
-//        for (int i = 0; i < cursorArray.length; i++) {
-//            if (i > 0 && cursorArray[i] != null && cursorArray[i - 1] != null) {
-//
-//                if(zoomArray[i] < lowZoomThreshold) {
-//                    g2d.setColor(Color.GREEN);
-//                    if (zoomArray[i] < medZoomThreshold) {
-//                        g2d.setColor(Color.RED);
-//                    }
-//                } else {
-//                    g2d.setColor(Color.BLUE);
-//                }
-//
-//                Line2D line2D = new Line2D.Double( cursorArray[i].getX(), cursorArray[i].getY(),
-//                        cursorArray[i - 1].getX(), cursorArray[i - 1].getY());
-//                if(line2D.intersects(clippingRectangle)) {
-//                    g2d.draw(line2D);
-//                }
-//            }
-//        }
-//    }
-
-//    private void drawEyeTrail(Graphics2D g2d, double downsampleFactor, Rectangle clippingRectangle) {
-//        g2d.setColor(Color.CYAN);
-//        g2d.setStroke(new BasicStroke((downsampleFactor > 1) ? (float) downsampleFactor : 1));
-//
-//        double[] zoomArray = trackerFeatures.getZoomArray();
-//
-//        double[] zoomLevel;
-//        if (trackerFeatures.eyeFixations == null) {
-//            zoomLevel = zoomArray;
-//        } else {
-//            zoomLevel = new double[trackerFeatures.eyeFixations.getFixations().size()];
-//            int j = 0;
-//            for (ArrayList<ViewRecordingFrame> frames : trackerFeatures.eyeFixations.getFixations()) {
-//                zoomLevel[j] = trackerFeatures.eyeFixations.calculateAverageZoom(trackerFeatures.eyeFixations.getFixations().get(j++));
-//            }
-//        }
-//        Point2D previousPoint = null;
-//        for(int i = 0; i < trackerFeatures.eyeFixations.getCentroids().length; i++) {
-//            Point2D point = trackerFeatures.eyeFixations.getCentroids()[i];
-//            if(point!=null) {
-//                if (clippingRectangle.contains(point)) {
-//
-//                    g2d.setStroke(new BasicStroke((float) downsampleFactor));
-//
-//                    g2d.setColor(Color.BLUE);
-//                    if (zoomLevel[i] < lowZoomThreshold) {
-//                        g2d.setColor(Color.GREEN);
-//                    }
-//                    if (zoomLevel[i] < medZoomThreshold) {
-//                        g2d.setColor(Color.RED);
-//                    }
-//
-//                    double circleSizeCoef = (downsampleFactor * trackerFeatures.eyeFixations.getDurations()[i] / 30);
-//
-//                    g2d.fillOval((int) point.getX() - (int) (circleSizeCoef / 2), (int) point.getY() - (int) (circleSizeCoef / 2),
-//                            (int) circleSizeCoef, (int) circleSizeCoef);
-//                    if (previousPoint != null) {
-//                        g2d.drawLine((int) point.getX(), (int) point.getY(), (int) previousPoint.getX(), (int) previousPoint.getY());
-//                    }
-//                    if(trackerFeatures.eyeFixations.getFixations() != null && doPaintNumbers) {
-//
-//                        Font font = new Font("Impact", Font.BOLD, (int) (30 * downsampleFactor));
-//                        g2d.setFont(font);
-//                        String str = Integer.toString(i + 1);
-//                        g2d.setColor(Color.WHITE);
-//
-//                        g2d.drawString(str, (int)point.getX(), (int)point.getY());
-//
-//                        GlyphVector gv = font.createGlyphVector(g2d.getFontRenderContext(), str);
-//                        Shape s = gv.getOutline((int)point.getX(),(int) point.getY());
-//                        g2d.setColor(Color.BLACK);
-//
-//                        g2d.draw(s);
-//                    }
-//                }
-//                previousPoint = point;
-//            }
-//        }
-//    }
-
 
     @Override
     public void paintOverlay(Graphics2D g2d, ImageRegion imageRegion, double downsampleFactor, ImageObserver observer, boolean paintCompletely) {
@@ -196,9 +109,9 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
         g2d.setColor(Color.CYAN);
         g2d.setStroke(new BasicStroke((downsampleFactor > 1) ? (float) downsampleFactor : 1));
         Rectangle rect;
-        for (int i = 0; i < trackerFeatures.getZoomPeaks().size(); i++) {
+        for (int i = 0; i < trackerFeatures.getBoundsFeatures().getZoomPeaks().size(); i++) {
 
-            rect = trackerFeatures.getZoomPeaks().get(i).get(0).getImageBounds();
+            rect = trackerFeatures.getBoundsFeatures().getZoomPeaks().get(i).getFrameAtFeatureIndex(0).getImageBounds();
             if (rect.intersects(clippingRectangle)) {
                 g2d.draw(rect);
             }
@@ -283,11 +196,11 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
         g2d.setStroke(new BasicStroke((downsampleFactor > 1) ? (float) downsampleFactor : 1));
         g2d.setColor(Color.BLUE);
 
-        TrackerFeatureList slowPans = trackerFeatures.getSlowPans();
+        TrackerFeatureList slowPans = trackerFeatures.getBoundsFeatures().getSlowPans();
 
         for (TrackerFeature slowPan : slowPans) {
-            Rectangle startRect = slowPan.get(0).getImageBounds();
-            Rectangle endRect = slowPan.get(slowPan.size() - 1).getImageBounds();
+            Rectangle startRect = slowPan.getFrameAtFeatureIndex(0).getImageBounds();
+            Rectangle endRect = slowPan.getFrameAtFeatureIndex(slowPan.size() - 1).getImageBounds();
             g2d.setColor(Color.MAGENTA);
             if (startRect.intersects(clippingRectangle))
                 g2d.draw(startRect);
@@ -318,8 +231,8 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
         g2d.setColor(Color.BLUE);
         g2d.setStroke(new BasicStroke((downsampleFactor > 2) ? (float) (downsampleFactor*2) : 2));
         Rectangle rectangle;
-        for (int i = 0; i < trackerFeatures.getBoundsFixations().size(); i++) {
-            rectangle = trackerFeatures.getBoundsFixations().get(i).get(0).getImageBounds();
+        for (int i = 0; i < trackerFeatures.getBoundsFeatures().getBoundsFixations().size(); i++) {
+            rectangle = trackerFeatures.getBoundsFeatures().getBoundsFixations().get(i).getFrameAtFeatureIndex(0).getImageBounds();
             if(rectangle.intersects(clippingRectangle)) {
                 g2d.draw(rectangle);
             }

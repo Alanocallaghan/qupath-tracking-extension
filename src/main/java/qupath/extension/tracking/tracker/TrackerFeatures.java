@@ -1,10 +1,12 @@
 package qupath.extension.tracking.tracker;
 
+import com.google.gson.JsonObject;
 import qupath.extension.tracking.TrackerUtils;
 import qupath.lib.gui.viewer.recording.ViewRecordingFrame;
 import qupath.lib.gui.viewer.recording.ViewTracker;
 import qupath.lib.images.servers.ImageServer;
 
+import javax.swing.text.View;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -25,25 +27,12 @@ public class TrackerFeatures {
     private Point2D[] eyeArray;
     private Point2D[] cursorArray;
     private double[] eyeSpeedArray = new double[0], zoomArray = new double[0];
-    private double[] boundsSpeedArray;
-    private TrackerFeatureList slowPans;
-    private TrackerFeatureList zoomPeaks;
-    private TrackerFeatureList boundsFixations;
-    private double slowPanSpeedThreshold;
-    private double slowPanTimeThreshold;
-    private long boundsFixationThreshold;
-    private int zoomPeakThreshold;
 
+    private double[] boundsSpeedArray;
     private Fixations eyeFixations;
     private Fixations cursorFixations;
 
-    public Fixations getEyeFixations() {
-        return eyeFixations;
-    }
-
-    public Fixations getCursorFixations() {
-        return cursorFixations;
-    }
+    private BoundsFeatures boundsFeatures;
 
     public TrackerFeatures(ViewTracker tracker, ImageServer server) {
         this.server = server;
@@ -53,9 +42,9 @@ public class TrackerFeatures {
             this.boundsSpeedArray = calculateBoundsSpeedArray();
             this.cursorArray = makeCursor();
             this.zoomArray = generateBoundsZoomArray();
-            this.zoomPeaks = findZoomPeaks();
-            this.slowPans = findSlowPans();
-            this.boundsFixations = findBoundsFixations();
+
+            boundsFeatures = new BoundsFeatures(this);
+
             generateEyeArray();
             eyeFixations = new Fixations(this, "eye", "IVT");
             cursorFixations = new Fixations(this, "cursor", "IVT");
@@ -84,10 +73,8 @@ public class TrackerFeatures {
         int nFrames = tracker.nFrames();
         ViewRecordingFrame currentFrame;
         double[] zoomArray = new double[nFrames];
-        Dimension imageVisible;
         for (int i = 0; i < nFrames; i++) {
             currentFrame = tracker.getFrame(i);
-//            double currentZoom = TrackerUtils.calculateZoom(currentFrame.getImageBounds(), currentFrame.getSize(), this.getServer());
             double currentZoom = calculateDownsample(currentFrame.getImageBounds(), currentFrame.getSize());
             zoomArray[i] = currentZoom;
         }
@@ -155,7 +142,7 @@ public class TrackerFeatures {
         return array;
     }
 
-    public double[] getEyeSpeedArray() { return Arrays.copyOf(eyeSpeedArray, eyeSpeedArray.length);}
+    double[] getEyeSpeedArray() { return Arrays.copyOf(eyeSpeedArray, eyeSpeedArray.length);}
 
     public double[] getZoomArray() { return Arrays.copyOf(zoomArray, zoomArray.length); }
 
@@ -163,7 +150,7 @@ public class TrackerFeatures {
         return this.tracker;
     }
 
-    public ImageServer getServer() {
+    ImageServer getServer() {
         return this.server;
     }
 
@@ -189,162 +176,47 @@ public class TrackerFeatures {
         return array;
     }
 
-
-    /**
-     * Finds local minima in an array.
-     * To be used to find areas of high zoom, because zoom here is defined
-     * using area of bounding rectangle.
-     * Could also use to find areas of low zoom by finding maxima.
-     *
-     * @return void
-     */
-    private TrackerFeatureList findZoomPeaks() {
-
-        ArrayList<Integer> inds = new ArrayList<>();
-        ArrayList<ArrayList> indList = new ArrayList<>();
-
-//        NB: ZOOM HERE IS AREA SO LOCAL MINIMA ARE REQUIRED, NOT MAXIMA!!!!
-        for (int iteration = 0; iteration < zoomPeakThreshold; iteration ++) {
-            int[] candidates;
-            if (iteration == 0) {
-                candidates = java.util.stream.IntStream.range(0, tracker.nFrames() - 1).toArray();
-            } else {
-                candidates = new int[indList.size()];
-                for (int i = 0; i < indList.size(); i ++) {
-                    candidates[i] = (int)(indList.get(i).get(0));
-                }
-                indList = new ArrayList<>();
-            }
-
-            double lastdx = -1;
-            double dx;
-
-            for (int counter = 0; counter < candidates.length; counter ++) {
-                if (counter > 0) {
-                    dx = zoomArray[candidates[counter]] - zoomArray[candidates[counter - 1]];
-                } else {
-                    dx = 0;
-                }
-
-                if (dx > 0) {
-                    if (lastdx < 0 || counter == (candidates.length - 1)) {
-                        inds.add(candidates[counter - 1]);
-                        indList.add(inds);
-                    }
-                    inds = new ArrayList<>();
-                } else if (dx == 0) {
-                    inds.add(candidates[counter]);
-                } else if (dx < 0) {
-                    inds = new ArrayList<>();
-                    inds.add(candidates[counter]);
-                }
-
-                if (dx != 0) {
-                    lastdx = dx;
-                }
-            }
-        }
-        TrackerFeatureList zoomPeaks = new TrackerFeatureList();
-        for (ArrayList<Integer> list: indList) {
-            TrackerFeature zoomPeak = new TrackerFeature();
-            for (int i: list) {
-                zoomPeak.add(tracker.getFrame(i));
-            }
-            zoomPeaks.add(zoomPeak);
-        }
-        return zoomPeaks;
-    }
-
-
-
-
-
-    private TrackerFeatureList findSlowPans() {
-        ArrayList<ArrayList> slowPanInds = new ArrayList<>(0);
-        TrackerFeatureList slowPans = new TrackerFeatureList();
-        TrackerFeature feature = new TrackerFeature();
-
-
-        for (int i = 1; i < zoomArray.length; i++) {
-            if (zoomArray[i] == zoomArray[i - 1]) {
-                if (boundsSpeedArray[i] < slowPanSpeedThreshold) {
-                    feature.add(tracker.getFrame(i));
-                } else {
-                    if (feature.size() != 0) {
-                        if (feature.get(feature.size() - 1).getTimestamp() - feature.get(0).getTimestamp() > slowPanTimeThreshold) {
-                            slowPans.add(feature);
-                            feature = new TrackerFeature();
-                        }
-                    }
-                }
-            } else {
-                if (feature.size() != 0) {
-                    if (feature.get(feature.size() - 1).getTimestamp() - feature.get(0).getTimestamp() > slowPanTimeThreshold) {
-                        slowPans.add(feature);
-                        feature = new TrackerFeature();
-                    }
-                }
-            }
-        }
-        return slowPans;
-    }
-
-    private TrackerFeatureList findBoundsFixations() {
-        TrackerFeatureList fixations = new TrackerFeatureList();
-        ViewRecordingFrame currentFrame, previousFrame = null;
-        TrackerFeature thisFixation = new TrackerFeature();
-
-        long timeFixated = 0;
-        for (int i = 0; i < tracker.nFrames(); i ++) {
-            currentFrame = tracker.getFrame(i);
-            if (i != 0) {
-                if (currentFrame.getImageBounds().equals(previousFrame.getImageBounds())) {
-                    thisFixation.add(currentFrame);
-                    timeFixated += currentFrame.getTimestamp() - previousFrame.getTimestamp();
-                } else {
-                    if (timeFixated > boundsFixationThreshold) {
-                        fixations.add(thisFixation);
-                        thisFixation = new TrackerFeature();
-                    } else {
-                        thisFixation = new TrackerFeature();
-                    }
-                    timeFixated = 0;
-                }
-            }
-            previousFrame = currentFrame;
-        }
-        return fixations;
-    }
-
-    public TrackerFeatureList getZoomPeaks() {
-        return zoomPeaks;
-    }
-
-    public TrackerFeatureList getSlowPans() {
-        return slowPans;
-    }
-
-    public TrackerFeatureList getBoundsFixations() {
-        return boundsFixations;
-    }
-
     public void setSlowPanTimeThreshold(double slowPanTimeThreshold) {
-        this.slowPanTimeThreshold = slowPanTimeThreshold;
-        this.slowPans = findSlowPans();
+        this.boundsFeatures.slowPanTimeThreshold = slowPanTimeThreshold;
+        this.boundsFeatures.slowPans = boundsFeatures.findSlowPans();
     }
 
     public void setSlowPanSpeedThreshold(double slowPanSpeedThreshold) {
-        this.slowPanSpeedThreshold = slowPanSpeedThreshold;
-        this.slowPans = findSlowPans();
+        this.boundsFeatures.slowPanSpeedThreshold = slowPanSpeedThreshold;
+        this.boundsFeatures.slowPans = boundsFeatures.findSlowPans();
     }
 
     public void setBoundsFixationThreshold(long boundsFixationThreshold) {
-        this.boundsFixationThreshold = boundsFixationThreshold;
-        this.boundsFixations = findBoundsFixations();
+        this.boundsFeatures.boundsFixationThreshold = boundsFixationThreshold;
+        this.boundsFeatures.boundsFixations = boundsFeatures.findBoundsFixations();
     }
 
     public void setZoomPeakThreshold(int zoomPeakThreshold) {
-        this.zoomPeakThreshold = zoomPeakThreshold;
-        this.zoomPeaks = findZoomPeaks();
+        this.boundsFeatures.zoomPeakThreshold = zoomPeakThreshold;
+        this.boundsFeatures.zoomPeaks = boundsFeatures.findZoomPeaks();
+    }
+
+    double[] getBoundsSpeedArray() {
+        return boundsSpeedArray;
+    }
+
+    public BoundsFeatures getBoundsFeatures() {
+        return boundsFeatures;
+    }
+
+    public Fixations getEyeFixations() {
+        return eyeFixations;
+    }
+
+    public Fixations getCursorFixations() {
+        return cursorFixations;
+    }
+
+    public JsonObject toJSON() {
+        JsonObject output = new JsonObject();
+        output.add("eye_fixations", eyeFixations.toJSON());
+        output.add("cursor_fixations", cursorFixations.toJSON());
+        output.add("bounds_features", boundsFeatures.toJSON());
+        return output;
     }
 }

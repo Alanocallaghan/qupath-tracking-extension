@@ -35,6 +35,11 @@ import qupath.lib.gui.commands.interfaces.PathCommand;
 class TrackingQuPathLoadCommand implements PathCommand {
 	public void run() {
         TrackerPaintStage stage = TrackerPaintStage.getInstance();
+        stage.setWidth(1000);
         stage.show();
 	}
+
+	public static void main(String[] args) {
+
+    }
 }
