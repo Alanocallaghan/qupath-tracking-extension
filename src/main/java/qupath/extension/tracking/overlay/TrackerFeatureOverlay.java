@@ -121,19 +121,13 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
 
     private void drawTrail(Graphics2D g2d, double downsampleFactor, Rectangle clippingRectangle, Fixations fixations) {
         g2d.setStroke(new BasicStroke((downsampleFactor > 1) ? (float) downsampleFactor : 1));
-        double[] zoomArray = trackerFeatures.getZoomArray();
 
         double[] zoomLevel;
-        Point2D[] points;
-        if (fixations.getFixations() == null) {
-            zoomLevel = zoomArray;
-            points = trackerFeatures.getArray(fixations.getFeatureType());
-        } else {
-            zoomLevel = new double[fixations.getFixations().size()];
-            for (int j = 0; j < fixations.getFixations().size(); j++) {
-                zoomLevel[j] = fixations.calculateAverageZoom(fixations.getFixations().get(j));
-            }
-            points = fixations.getCentroids();
+        Point2D[] points = fixations.getCentroids();
+        zoomLevel = new double[fixations.getFixations().size()];
+        for (int j = 0; j < fixations.getFixations().size(); j++) {
+            zoomLevel[j] = fixations.getFixations().get(j).calculateAverageZoom(
+                    viewer.getServer().getAveragedPixelSizeMicrons());
         }
 
         Point2D previousPoint = null;

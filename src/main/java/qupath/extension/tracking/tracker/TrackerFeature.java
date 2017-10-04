@@ -3,6 +3,7 @@ package qupath.extension.tracking.tracker;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import qupath.extension.tracking.TrackerUtils;
 import qupath.lib.gui.viewer.recording.ViewRecordingFrame;
 import qupath.lib.gui.viewer.recording.ViewTracker;
 
@@ -12,9 +13,13 @@ public class TrackerFeature extends ArrayList<Integer> {
 
     private final ViewTracker tracker;
 
-    TrackerFeature(ViewTracker tracker) {
-        super();
+    TrackerFeature(ViewTracker tracker, int size) {
+        super(size);
         this.tracker = tracker;
+    }
+
+    TrackerFeature(ViewTracker tracker) {
+        this(tracker, 0);
     }
 
     ViewRecordingFrame getFrame(int index) {
@@ -41,5 +46,21 @@ public class TrackerFeature extends ArrayList<Integer> {
         }
         object.add("indices", array);
         return object;
+    }
+
+    public double calculateAverageZoom() {
+        return calculateAverageZoom(1);
+    }
+
+    public double calculateAverageZoom(double pixelSize) {
+        double sumzoom = 0;
+        for (int i : this) {
+            ViewRecordingFrame frame = this.getFrame(i);
+            sumzoom += TrackerUtils.calculateZoom(
+                    frame.getImageBounds(),
+                    frame.getSize(),
+                    pixelSize);
+        }
+        return sumzoom / this.size();
     }
 }

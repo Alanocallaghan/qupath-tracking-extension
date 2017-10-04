@@ -141,7 +141,15 @@ public class TrackerUtils {
     }
 
     public static double calculateZoom(Rectangle visibleRegion, Dimension viewerSize, ImageServer server) {
-        return (visibleRegion.getWidth() / viewerSize.getWidth()) * server.getAveragedPixelSizeMicrons();
+        return calculateZoom(visibleRegion, viewerSize, server.getAveragedPixelSizeMicrons());
+    }
+
+    public static double calculateZoom(Rectangle visibleRegion, Dimension viewerSize, double pixelSize) {
+        return (visibleRegion.getWidth() / viewerSize.getWidth()) * pixelSize;
+    }
+
+    public static double calculateZoom(Rectangle visibleRegion, Dimension viewerSize) {
+        return calculateZoom(visibleRegion, viewerSize, 1);
     }
 
 

@@ -46,7 +46,9 @@ public class TrackerFeatures {
             boundsFeatures = new BoundsFeatures(this);
 
             generateEyeArray();
-            eyeFixations = new Fixations(this, "eye", "IVT");
+            if (tracker.hasEyeTrackingData()) {
+                eyeFixations = new Fixations(this, "eye", "IVT");
+            }
             cursorFixations = new Fixations(this, "cursor", "IVT");
         }
 

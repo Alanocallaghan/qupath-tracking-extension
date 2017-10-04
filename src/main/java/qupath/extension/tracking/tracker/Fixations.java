@@ -32,7 +32,8 @@ public class Fixations {
 
     private TrackerFeatureList IVTFixations,
             IDTFixations,
-            eyeTribeFixations = null;
+            eyeTribeFixations = null,
+            allPointFixations;
 
     private final TrackerFeatures trackerFeatures;
 
@@ -44,52 +45,37 @@ public class Fixations {
             lowColor = colorFXtoAWT(javafx.scene.paint.Color.BLUE);
     private FixationType fixationType;
 
-    public void setIVTSpeedThreshold(double IVTSpeedThreshold) {
-        this.IVTSpeedThreshold = IVTSpeedThreshold;
-        recalculateFixations();
-    }
-
     private double IVTSpeedThreshold;
-
-    public void setIDTDurationThreshold(double IDTDurationThreshold) {
-        this.IDTDurationThreshold = IDTDurationThreshold;
-        recalculateFixations();
-    }
-
-    private double IDTDurationThreshold;
-
-    public void setIDTDispersionThreshold(double IDTDispersionThreshold) {
-        this.IDTDispersionThreshold = IDTDispersionThreshold;
-        recalculateFixations();
-    }
-
-    private double IDTDispersionThreshold;
-
-    public double getThicknessScalar() {
-        return thicknessScalar;
-    }
-
-    public void setThicknessScalar(double thicknessScalar) {
-        this.thicknessScalar = thicknessScalar;
-    }
-
+    private double IDTDurationThreshold = 50;
+    private double IDTDispersionThreshold = 1000;
     private double thicknessScalar = 1;
 
     public void recalculateFixations() {
         switch(fixationType) {
             case IDT:
-                calculateIDTFixations();
+                IDTFixations = calculateIDTFixations();
                 break;
             case IVT:
-                calculateIVTFixations();
+                IVTFixations = calculateIVTFixations();
                 break;
             case EYETRIBE:
-                findEyeTribeFixations();
+                eyeTribeFixations = findEyeTribeFixations();
                 break;
             case ALL_POINTS:
+                allPointFixations = makeAllPointFixations();
                 break;
         }
         this.setFixationType(fixationType);
+    }
+
+    private TrackerFeatureList makeAllPointFixations() {
+        TrackerFeatureList trackerFeatureList = new TrackerFeatureList();
+        for (int i = 0; i < allFrames.length; i ++) {
+            TrackerFeature feature = new TrackerFeature(this.trackerFeatures.getTracker());
+            feature.add(i);
+            trackerFeatureList.add(feature);
+        }
+        return trackerFeatureList;
     }
 
     // todo: check correlation between this method and EyeTribe method using real tracking data
@@ -99,95 +85,13 @@ public class Fixations {
         allFrames = TrackerUtils.getFramesAsArray(trackerFeatures.getTracker());
         IDTFixations = calculateIDTFixations();
         IVTFixations = calculateIVTFixations();
-
+        allPointFixations = makeAllPointFixations();
         if (this.featureType == EYE) {
             eyeTribeFixations = findEyeTribeFixations();
         }
 
         this.setFixationType(fixationType);
     }
-
-    private void setFeatureType(String featureType) {
-        FeatureType enumtype = EYE;
-        switch(featureType.toLowerCase()) {
-            case "eye":
-                enumtype = FeatureType.EYE;
-                break;
-            case "cursor":
-                enumtype = FeatureType.CURSOR;
-                break;
-        }
-        this.featureType = enumtype;
-    }
-
-    public FeatureType getFeatureType() {
-        return featureType;
-    }
-
-    void setLowColor(Color lowColor) {
-        this.lowColor = lowColor;
-    }
-
-    void setMedColor(Color medColor) {
-        this.medColor = medColor;
-    }
-
-    void setHighColor(Color highColor) {
-        this.highColor = highColor;
-    }
-
-    public Color getLowColor() {
-        return lowColor;
-    }
-
-    public Color getHighColor() {
-        return highColor;
-    }
-
-    public Color getMedColor() {
-        return medColor;
-    }
-
-    public void setColor(String level, Color color) {
-        if (Objects.equals(level, "low")) {
-            lowColor = color;
-        } else if (Objects.equals(level, "med")) {
-            medColor = color;
-        } else if (Objects.equals(level, "high")) {
-            highColor = color;
-        }
-    }
-
-    public enum FeatureType {
-        EYE, CURSOR;
-
-        @Override
-        public String toString() {
-            if (this.equals(EYE)) {
-                return "Eye";
-            } else {
-                return "Cursor";
-            }
-        }
-    }
-
-    public enum FixationType {
-        EYETRIBE, IDT, IVT, ALL_POINTS;
-
-        @Override
-        public String toString() {
-            if (this.equals(EYETRIBE)) {
-                return "Eyetribe";
-            } else if(this.equals(IDT)) {
-                return "IDT";
-            } else if(this.equals(IVT)) {
-                return "IVT";
-            } else {
-                return "All Points";
-            }
-        }
-    }
-
 
     private ViewRecordingFrame imageSpaceToComponentSpace(ViewRecordingFrame frame) {
 
@@ -261,49 +165,42 @@ public class Fixations {
     private TrackerFeatureList calculateIDTFixations() {
 
         TrackerFeatureList fixations = new TrackerFeatureList();
-        int[] inds = java.util.stream.IntStream.range(0, this.allFrames.length).toArray();
-        List allFramesForMethod = Arrays.asList(inds);
+        ArrayList<Integer> allIndsForMethod = new ArrayList<>(allFrames.length);
+        for (int i = 0; i < allFrames.length; i ++) {
+            allIndsForMethod.add(i);
+        }
 
-        while (allFramesForMethod.size() > 0) {
-
+        while (allIndsForMethod.size() > 1) {
             TrackerFeature windowPoints = new TrackerFeature(trackerFeatures.getTracker());
-            ArrayList<ViewRecordingFrame> windowPointsResized = new ArrayList<>(0);
 
-            int currentIndex = (int)allFramesForMethod.get(0);
-            ViewRecordingFrame currentFrame = allFrames[currentIndex];
-            windowPoints.add(0);
-
-            int timeOfWindow = 0;
+            long timeOfWindow = 0;
             int j = 0;
 
-//            long timeOfFirstFrame = allFramesForMethod.get(j).getTimestamp();
-            long timeOfPreviousFrame = allFrames[j].getTimestamp();
+            long timeOfFirstFrame = allFrames[allIndsForMethod.get(0)].getTimestamp();
 
             while (timeOfWindow <= IDTDurationThreshold) {
-                if (++j < allFramesForMethod.size()) {
-                    long timeOfFrame = allFrames[j].getTimestamp();
-                    timeOfWindow += (timeOfFrame - timeOfPreviousFrame);
-                    timeOfPreviousFrame = timeOfFrame;
-                    windowPoints.add(j);
+                if (++j < allIndsForMethod.size()) {
+                    long timeOfFrame = allFrames[allIndsForMethod.get(j)].getTimestamp();
+                    timeOfWindow = timeOfFrame - timeOfFirstFrame;
+                    windowPoints.add(allIndsForMethod.get(j));
                 } else
                     break;
             }
 
-            double dispersion = calculateDispersion(windowPointsResized);
+            double dispersion = calculateTranslatedDispersionFromTrackerFeature(windowPoints);
             if (dispersion <= IDTDispersionThreshold) {
-
-                while (calculateTranslatedDispersionFromTrackerFeature(windowPoints) <= IDTDispersionThreshold) {
-
-                    if (++j < allFramesForMethod.size()) {
-                        windowPoints.add(j);
+                System.out.println(calculateTranslatedDispersionFromTrackerFeature(windowPoints));
+                while (calculateTranslatedDispersionFromTrackerFeature(windowPoints) <=
+                        IDTDispersionThreshold) {
+                    if (++j < allIndsForMethod.size()) {
+                        windowPoints.add(allIndsForMethod.get(j));
                     } else
                         break;
                 }
-
                 fixations.add(windowPoints);
-                allFramesForMethod.removeAll(windowPoints);
+                allIndsForMethod.removeAll(windowPoints);
             } else {
-                allFramesForMethod.remove(j);
+                allIndsForMethod.remove(allIndsForMethod.get(0));
             }
         }
         return fixations;
@@ -379,7 +276,8 @@ public class Fixations {
     private double calculateTranslatedDispersionFromTrackerFeature(TrackerFeature inds) {
         ArrayList<ViewRecordingFrame> frames = new ArrayList<>(inds.size());
         for (int i : inds) {
-            frames.add(inds.getFrameAtFeatureIndex(i));
+            ViewRecordingFrame frame = inds.getFrame(i);
+            frames.add(frame);
         }
         return calculateTranslatedDispersion(frames);
     }
@@ -414,7 +312,10 @@ public class Fixations {
                 }
             }
         }
-        return (xMaxSoFar - xMinSoFar) + (yMaxSoFar - yMinSoFar);
+        double dispersionX = Math.abs(xMaxSoFar - xMinSoFar);
+        double dispersionY = Math.abs(yMaxSoFar - yMinSoFar);
+
+        return (dispersionX + dispersionY);
     }
 
     private Point2D getPosition(ViewRecordingFrame frame) {
@@ -435,7 +336,7 @@ public class Fixations {
         int sumX = 0, sumY = 0;
 
         for (int i: fixationPoints) {
-            ViewRecordingFrame frame = fixationPoints.getFrameAtFeatureIndex(i);
+            ViewRecordingFrame frame = fixationPoints.getFrame(i);
             Point2D point = getPosition(frame);
             if (point != null) {
                 sumX += point.getX();
@@ -448,17 +349,6 @@ public class Fixations {
         return (new Point2D.Double(meanX, meanY));
     }
 
-    public double calculateAverageZoom(TrackerFeature feature) {
-        double sumzoom = 0;
-        for (int i : feature) {
-            ViewRecordingFrame frame = feature.getFrameAtFeatureIndex(i);
-            sumzoom += TrackerUtils.calculateZoom(
-                    frame.getImageBounds(),
-                    frame.getSize(),
-                    trackerFeatures.getServer());
-        }
-        return sumzoom / feature.size();
-    }
 
 //    public double[] calculateIDTSaccadeDistances() {
 //        Point2D lastPoint = null;
@@ -497,82 +387,6 @@ public class Fixations {
 //        }
 //        return durations;
 //    }
-//
-//    public double[] calculateIVTSaccadeDistances() {
-//        Point2D lastPoint = null;
-//        double[] saccadeDistances = new double[IVTCentroids.length];
-//        if(saccadeDistances.length==0) {
-//            return new double[1];
-//        }
-//        int i = 0;
-//        for(Point2D point : IVTCentroids) {
-//            if(lastPoint != null && point != null) {
-//                saccadeDistances[i] = TrackerUtils.calculateEuclideanDistance(point, lastPoint);
-//            }
-//            lastPoint = point;
-//            i++;
-//        }
-//        return saccadeDistances;
-//    }
-//
-//    public double[] calculateIVTSaccadeDurations() {
-//        long lastFrameOfPrevious = -1;
-//        long firstFrameOfCurrent;
-//        double[] durations = new double[IVTFixations.size()];
-//        if(durations.length==0) {
-//            return new double[1];
-//        }
-//        int i = 0;
-//        for(ArrayList<ViewRecordingFrame> fixation : IVTFixations) {
-//            firstFrameOfCurrent = fixation.get(0).getTimestamp();
-//
-//            if(lastFrameOfPrevious!=-1) {
-//                long timePassed = firstFrameOfCurrent - lastFrameOfPrevious;
-//                durations[i] = timePassed;
-//            }
-//            lastFrameOfPrevious = fixation.get(fixation.size()-1).getTimestamp();
-//            i++;
-//        }
-//        return durations;
-//    }
-//
-//    public double[] calculateEyetribeSaccadeDistances() {
-//        Point2D lastPoint = null;
-//        double[] saccadeDistances = new double[eyeTribeCentroids.length];
-//        if(saccadeDistances.length==0) {
-//            return new double[1];
-//        }
-//        int i = 0;
-//        for(Point2D point : eyeTribeCentroids) {
-//            if(lastPoint != null && point != null) {
-//                saccadeDistances[i] = TrackerUtils.calculateEuclideanDistance(point, lastPoint);
-//            }
-//            lastPoint = point;
-//            i++;
-//        }
-//        return saccadeDistances;
-//    }
-//
-//    public double[] calculateEyetribeSaccadeDurations() {
-//        long lastFrameOfPrevious = -1;
-//        long firstFrameOfCurrent;
-//        double[] durations = new double[eyeTribeFixations.size()];
-//        if(durations.length==0) {
-//            return new double[1];
-//        }
-//        int i = 0;
-//        for(ArrayList<ViewRecordingFrame> fixation : eyeTribeFixations) {
-//            firstFrameOfCurrent = fixation.get(0).getTimestamp();
-//
-//            if(lastFrameOfPrevious!=-1) {
-//                long timePassed = firstFrameOfCurrent - lastFrameOfPrevious;
-//                durations[i] = timePassed;
-//            }
-//            lastFrameOfPrevious = fixation.get(fixation.size()-1).getTimestamp();
-//            i++;
-//        }
-//        return durations;
-//    }
 
     public TrackerFeatureList getFixations() {
         return fixations;
@@ -599,7 +413,7 @@ public class Fixations {
                 fixations = eyeTribeFixations;
                 break;
             case ALL_POINTS:
-                centroids = trackerFeatures.getArray(this.featureType);
+                fixations = allPointFixations;
                 break;
         }
         centroids = calculateCentroids();
@@ -645,5 +459,111 @@ public class Fixations {
         output.add("durations", durationArray);
         return output;
     }
+
+    public enum FeatureType {
+        EYE, CURSOR;
+
+        @Override
+        public String toString() {
+            if (this.equals(EYE)) {
+                return "Eye";
+            } else {
+                return "Cursor";
+            }
+        }
+    }
+
+    public enum FixationType {
+        EYETRIBE, IDT, IVT, ALL_POINTS;
+
+        @Override
+        public String toString() {
+            if (this.equals(EYETRIBE)) {
+                return "Eyetribe";
+            } else if(this.equals(IDT)) {
+                return "IDT";
+            } else if(this.equals(IVT)) {
+                return "IVT";
+            } else {
+                return "All Points";
+            }
+        }
+    }
+
+    public void setIVTSpeedThreshold(double IVTSpeedThreshold) {
+        this.IVTSpeedThreshold = IVTSpeedThreshold;
+        recalculateFixations();
+    }
+
+    public void setIDTDurationThreshold(double IDTDurationThreshold) {
+        this.IDTDurationThreshold = IDTDurationThreshold;
+        recalculateFixations();
+    }
+
+    public void setIDTDispersionThreshold(double IDTDispersionThreshold) {
+        this.IDTDispersionThreshold = IDTDispersionThreshold;
+        recalculateFixations();
+    }
+
+    public double getThicknessScalar() {
+        return thicknessScalar;
+    }
+
+    public void setThicknessScalar(double thicknessScalar) {
+        this.thicknessScalar = thicknessScalar;
+    }
+
+
+    private void setFeatureType(String featureType) {
+        FeatureType enumtype = EYE;
+        switch(featureType.toLowerCase()) {
+            case "eye":
+                enumtype = FeatureType.EYE;
+                break;
+            case "cursor":
+                enumtype = FeatureType.CURSOR;
+                break;
+        }
+        this.featureType = enumtype;
+    }
+
+    public FeatureType getFeatureType() {
+        return featureType;
+    }
+
+    void setLowColor(Color lowColor) {
+        this.lowColor = lowColor;
+    }
+
+    void setMedColor(Color medColor) {
+        this.medColor = medColor;
+    }
+
+    void setHighColor(Color highColor) {
+        this.highColor = highColor;
+    }
+
+    public Color getLowColor() {
+        return lowColor;
+    }
+
+    public Color getHighColor() {
+        return highColor;
+    }
+
+    public Color getMedColor() {
+        return medColor;
+    }
+
+    public void setColor(String level, Color color) {
+        if (Objects.equals(level, "low")) {
+            lowColor = color;
+        } else if (Objects.equals(level, "med")) {
+            medColor = color;
+        } else if (Objects.equals(level, "high")) {
+            highColor = color;
+        }
+    }
+
 }
 
