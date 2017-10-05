@@ -22,7 +22,7 @@ import java.awt.image.ImageObserver;
  */
 public class TrackerFeatureOverlay extends AbstractOverlay {
 
-//    TODO: Singleton class like heatmapoverlay
+    //    TODO: Singleton class like heatmapoverlay
 //    TODO: Separate class for bounds features?
     private final TrackerFeatures trackerFeatures;
 
@@ -35,14 +35,11 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
     private final int lowZoomThreshold = 5;
     private final int medZoomThreshold = 1;
     private double boundsThicknessScalar;
-    private Number boundsFixationTimeThreshold;
-
 
     public TrackerFeatureOverlay(TrackerFeatures trackerFeatures) {
         this.viewer = QuPathGUI.getInstance().getViewer();
         this.trackerFeatures = trackerFeatures;
     }
-
 
     @Override
     public void paintOverlay(Graphics2D g2d, ImageRegion imageRegion, double downsampleFactor, ImageObserver observer, boolean paintCompletely) {
@@ -138,7 +135,6 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
                 if (clippingRectangle.contains(point)) {
 
 //                  TODO: Toggle colors for zoom levels
-
                     Color lowColor = fixations.getLowColor();
                     Color medColor = fixations.getMedColor();
                     Color highColor = fixations.getHighColor();
@@ -359,4 +355,13 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
         this.trackerFeatures.setZoomPeakThreshold(zoomPeakThreshold.intValue());
         this.viewer.repaint();
     }
+
+    public TrackerFeatures getTrackerFeatures() {
+        return trackerFeatures;
+    }
+
+    public TrackerFeatures setTrackerFeatures() {
+        return trackerFeatures;
+    }
+
 }

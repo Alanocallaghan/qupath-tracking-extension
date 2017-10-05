@@ -1,5 +1,8 @@
 package qupath.extension.tracking;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.image.WritableImage;
@@ -197,4 +200,20 @@ public class TrackerUtils {
                 return Double.parseDouble(null);
         }
     }
+    public static double getSpeed(ViewRecordingFrame[] frames, int ind1, int ind2, SpeedType type) {
+        if (ind1 == 0) {
+            return 0;
+        } else {
+            return getSpeed(frames[ind1], frames[ind2], type);
+        }
+    }
+
+    public static double getSpeed(ViewTracker tracker, int ind1, int ind2, SpeedType type) {
+        if (ind1 == 0) {
+            return 0;
+        } else {
+            return getSpeed(tracker.getFrame(ind1), tracker.getFrame(ind2), type);
+        }
+    }
+
 }

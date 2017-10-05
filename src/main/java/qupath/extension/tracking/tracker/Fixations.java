@@ -189,7 +189,6 @@ public class Fixations {
 
             double dispersion = calculateTranslatedDispersionFromTrackerFeature(windowPoints);
             if (dispersion <= IDTDispersionThreshold) {
-                System.out.println(calculateTranslatedDispersionFromTrackerFeature(windowPoints));
                 while (calculateTranslatedDispersionFromTrackerFeature(windowPoints) <=
                         IDTDispersionThreshold) {
                     if (++j < allIndsForMethod.size()) {
@@ -210,13 +209,13 @@ public class Fixations {
 //    todo: downsample?
     private TrackerFeatureList calculateIVTFixations() {
         ViewRecordingFrame[] allFramesForMethod = this.allFrames;
-        double[] eyeSpeedArray = trackerFeatures.getEyeSpeedArray();
+        double[] speedArray = trackerFeatures.getSpeedArray(this.featureType);
         boolean[] isFixated = new boolean[allFramesForMethod.length];
 
         TrackerFeatureList fixations = new TrackerFeatureList();
 
-        for (int i = 0; i < eyeSpeedArray.length; i++) {
-            isFixated[i] = eyeSpeedArray[i] < IVTSpeedThreshold;
+        for (int i = 0; i < speedArray.length; i++) {
+            isFixated[i] = speedArray[i] < IVTSpeedThreshold;
         }
 
         TrackerFeature currentFixation = new TrackerFeature(trackerFeatures.getTracker());

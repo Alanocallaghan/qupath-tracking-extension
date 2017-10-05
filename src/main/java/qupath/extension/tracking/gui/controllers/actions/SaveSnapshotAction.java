@@ -17,19 +17,16 @@ import static qupath.extension.tracking.TrackerUtils.saveSnapshot;
 public class SaveSnapshotAction implements EventHandler<ActionEvent> {
     @Override
     public void handle(ActionEvent event) {
-        QuPathGUI gui = QuPathGUI.getInstance();
-        DialogHelperFX dfx = new DialogHelperFX(gui.getStage());
-
         String date = LocalDateTime.now().format(ISO_LOCAL_DATE_TIME);
 
-        File file = dfx.promptToSaveFile("Save snapshot",
+        File file = QuPathGUI.getSharedDialogHelper().promptToSaveFile("Save snapshot",
                 new File(System.getProperty("user.home")),
                 "QuPath_snapshot_" + date,
                 "png",
                 ".png"
         );
         if (file != null) {
-            saveSnapshot(gui.getViewer(), file);
+            saveSnapshot(QuPathGUI.getInstance().getViewer(), file);
         }
     }
 }

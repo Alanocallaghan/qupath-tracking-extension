@@ -1,40 +1,42 @@
 package qupath.extension.tracking.gui.controllers.actions;
 
-import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import qupath.extension.tracking.gui.TrackerPaintStage;
+import qupath.extension.tracking.tracker.TrackerFeatures;
 import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.commands.interfaces.PathCommand;
 import qupath.lib.gui.helpers.DisplayHelpers;
-import qupath.lib.gui.viewer.recording.ViewTracker;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.time.LocalDateTime;
 
-/**
- * Created by alan on 06/09/17.
- */
-public class SaveTrackerAction implements EventHandler<ActionEvent>, PathCommand {
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+
+public class SaveFeaturesAction implements EventHandler, PathCommand {
 
     @Override
-    public void handle(ActionEvent event) {
-        ViewTracker tracker = TrackerPaintStage.getTracker();
-        if (tracker == null || tracker.isEmpty()) {
-            DisplayHelpers.showErrorMessage("Tracking export", "Tracker is empty - nothing to export!");
+    public void handle(Event event) {
+        TrackerFeatures features = TrackerPaintStage.getTrackerOverlay().getTrackerFeatures();
+        if (features == null || features.getTracker().isEmpty()) {
+            DisplayHelpers.showErrorMessage("Tracking export", "No features - nothing to export!");
         } else {
+            String date = LocalDateTime.now().format(ISO_LOCAL_DATE_TIME);
+
             File fileExport = QuPathGUI.getSharedDialogHelper().promptToSaveFile(
                     null,
                     null,
-                    null,
-                    "QuPath tracking data (csv)",
-                    "csv");
+                    "QuPath_tracking_features_" + date,
+                    "QuPath tracking features (json)",
+                    ".json");
             if (fileExport != null) {
                 PrintWriter out = null;
 
                 try {
                     out = new PrintWriter(fileExport);
-                    out.print(tracker.getSummaryString());
+                    out.print(features.toJSON());
                 } catch (FileNotFoundException fe) {
                     fe.printStackTrace();
                 } finally {
@@ -44,6 +46,7 @@ public class SaveTrackerAction implements EventHandler<ActionEvent>, PathCommand
                 }
             }
         }
+
     }
 
     @Override

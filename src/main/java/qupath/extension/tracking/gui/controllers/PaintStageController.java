@@ -13,10 +13,7 @@ import javafx.scene.paint.Color;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
 import qupath.extension.tracking.gui.TrackerPaintStage;
-import qupath.extension.tracking.gui.controllers.actions.LoadTrackerAction;
-import qupath.extension.tracking.gui.controllers.actions.ResetTrackerAction;
-import qupath.extension.tracking.gui.controllers.actions.SaveSnapshotAction;
-import qupath.extension.tracking.gui.controllers.actions.SaveTrackerAction;
+import qupath.extension.tracking.gui.controllers.actions.*;
 import qupath.extension.tracking.tracker.ExtendedViewTrackerPlayback;
 import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.icons.PathIconFactory;
@@ -36,6 +33,11 @@ public class PaintStageController implements Initializable {
     private Action actionRecord;
     public Action actionPlayback;
     private ExtendedViewTrackerPlayback playback;
+
+    BooleanProperty boundsHeatmapCheck, eyeHeatmapCheck, cursorHeatmapCheck,
+        boundsTrailCheck, cursorTrailCheck, eyeTrailCheck,
+        boundsFixationCheck, slowPanCheck, zoomPeakCheck;
+
 
     public void resetOptions() {
         TrackerPaintStage.getHeatmapOverlay().setDoPaintBoundsHeatmap(bHCheck.isSelected());
@@ -110,9 +112,8 @@ public class PaintStageController implements Initializable {
 
         SaveTracker.setOnAction(new SaveTrackerAction());
         LoadTracker.setOnAction(new LoadTrackerAction());
-        SaveFeatures.setOnAction(event -> {});
-        LoadFeatures.setOnAction(event -> {
-        });
+        SaveFeatures.setOnAction(new SaveFeaturesAction());
+        LoadFeatures.setOnAction(new LoadFeaturesAction());
         Close.setOnAction(event -> TrackerPaintStage.getInstance().close());
 
         

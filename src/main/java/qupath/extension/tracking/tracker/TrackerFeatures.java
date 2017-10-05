@@ -1,6 +1,7 @@
 package qupath.extension.tracking.tracker;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import qupath.extension.tracking.TrackerUtils;
 import qupath.lib.gui.viewer.recording.ViewRecordingFrame;
 import qupath.lib.gui.viewer.recording.ViewTracker;
@@ -26,7 +27,9 @@ public class TrackerFeatures {
     private Rectangle[] boundsArray;
     private Point2D[] eyeArray;
     private Point2D[] cursorArray;
-    private double[] eyeSpeedArray = new double[0], zoomArray = new double[0];
+    private double[] eyeSpeedArray = new double[0],
+            cursorSpeedArray = new double[0],
+            zoomArray = new double[0];
 
     private double[] boundsSpeedArray;
     private Fixations eyeFixations;
@@ -58,14 +61,19 @@ public class TrackerFeatures {
     private Point2D[] makeCursor() {
         int nFrames = tracker.nFrames();
         Point2D[] point2Ds = new Point2D[nFrames];
-
+        cursorSpeedArray = new double[nFrames];
         for (int i = 0; i < nFrames; i++) {
             Point2D currentCursor = tracker.getFrame(i).getCursorPosition();
+            ViewRecordingFrame currentFrame = tracker.getFrame(i);
 
             if (currentCursor != null && !(currentCursor.getX() == 0 && currentCursor.getY() == 0)) {
                 point2Ds[i] = currentCursor;
             } else {
                 point2Ds[i] = null;
+            }
+            if (currentCursor != null && !(i == 0)) {
+                cursorSpeedArray[i] = getSpeed(tracker, i, i - 1, TrackerUtils.SpeedType.CURSOR)
+                        / calculateDownsample(currentFrame.getImageBounds(), currentFrame.getSize());
             }
         }
         return point2Ds;
@@ -131,20 +139,38 @@ public class TrackerFeatures {
     private double[] calculateBoundsSpeedArray() {
         int nFrames = tracker.nFrames();
         double[] array = new double[nFrames];
-        for (int i = 0; i < nFrames; i++) {
-            if (i != 0) {
-                double speed = getSpeed(tracker.getFrame(i), tracker.getFrame(i - 1),
-                        TrackerUtils.SpeedType.BOUNDS) / calculateDownsample(tracker.getFrame(i - 1).getImageBounds(),
-                        tracker.getFrame(i - 1).getSize());
-                if (!Double.isNaN(speed) && Double.isFinite(speed)) {
-                    array[i] = speed;
-                }
+        for (int i = 1; i < nFrames; i++) {
+            double speed = getSpeed(tracker, i, i - 1,
+                    TrackerUtils.SpeedType.BOUNDS) /
+                        calculateDownsample(tracker.getFrame(i).getImageBounds(),
+                    tracker.getFrame(i).getSize());
+            if (!Double.isNaN(speed) && Double.isFinite(speed)) {
+                array[i] = speed;
             }
         }
         return array;
     }
 
-    double[] getEyeSpeedArray() { return Arrays.copyOf(eyeSpeedArray, eyeSpeedArray.length);}
+    double[] getCursorSpeedArray() {
+        return cursorSpeedArray;
+    }
+
+    double[] getEyeSpeedArray() {
+        return eyeSpeedArray;
+    }
+
+    double[] getSpeedArray(Fixations.FeatureType featureType) {
+        double[] out = null;
+        switch(featureType) {
+            case EYE:
+                out = getEyeSpeedArray();
+                break;
+            case CURSOR:
+                out = getCursorSpeedArray();
+                break;
+        }
+        return out;
+    }
 
     public double[] getZoomArray() { return Arrays.copyOf(zoomArray, zoomArray.length); }
 
@@ -216,6 +242,7 @@ public class TrackerFeatures {
 
     public JsonObject toJSON() {
         JsonObject output = new JsonObject();
+        output.add("tracker", new JsonPrimitive(tracker.getSummaryString()));
         output.add("eye_fixations", eyeFixations.toJSON());
         output.add("cursor_fixations", cursorFixations.toJSON());
         output.add("bounds_features", boundsFeatures.toJSON());
