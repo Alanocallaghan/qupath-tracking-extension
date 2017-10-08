@@ -40,7 +40,7 @@ public class TrackerPaintStage extends Stage {
         }
         this.setTitle("Visualisation options");
         if (root != null) {
-            Scene scene = new Scene(root, 500, 350);
+            Scene scene = new Scene(root, 1000, 500);
             this.setScene(scene);
         }
     }

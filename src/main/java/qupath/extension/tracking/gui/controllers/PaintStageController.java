@@ -37,7 +37,52 @@ public class PaintStageController implements Initializable {
     private ExtendedViewTrackerPlayback playback;
 
     private TrackingPrefs trackingPrefs;
+    private PointPrefControls eyePointPrefControls;
+    private BoundsPrefControls boundsPrefControls;
+    private PointPrefControls cursorPointPrefControls;
 
+
+    public void resetOptions() {
+//        TrackerPaintStage.getHeatmapOverlay().setDoPaintBoundsHeatmap(bHCheck.isSelected());
+//        TrackerPaintStage.getHeatmapOverlay().setDoPaintCursorHeatmap(cHCheck.isSelected());
+//        TrackerPaintStage.getHeatmapOverlay().setDoPaintEyeHeatmap(eHCheck.isSelected());
+//
+//        TrackerPaintStage.getTrackerOverlay().setDoPaintBoundsTrail(bTCheck.isSelected());
+//        TrackerPaintStage.getTrackerOverlay().setDoPaintCursorTrail(cTCheck.isSelected());
+//        TrackerPaintStage.getTrackerOverlay().setDoPaintEyeTrail(eTCheck.isSelected());
+//
+//        TrackerPaintStage.getTrackerOverlay().setDoPaintBoundFixations(bfCheck.isSelected());
+//        TrackerPaintStage.getTrackerOverlay().setDoPaintSlowPans(spCheck.isSelected());
+//        TrackerPaintStage.getTrackerOverlay().setDoPaintZoomPeaks(zpCheck.isSelected());
+//
+//        TrackerPaintStage.getTrackerOverlay().setEyeThicknessScalar(eyeThicknessSlider.getValue());
+//        TrackerPaintStage.getTrackerOverlay().setBoundsThicknessScalar(boundsThicknessSlider.getValue());
+//        TrackerPaintStage.getTrackerOverlay().setCursorThicknessScalar(cursorThicknessSlider.getValue());
+//
+//
+//        TrackerPaintStage.getTrackerOverlay().setCursorFixationType((String)cursorFixationTypes.getValue());
+//        TrackerPaintStage.getTrackerOverlay().setCursorFixationColor("low", cursorLowPicker.getValue());
+//        TrackerPaintStage.getTrackerOverlay().setCursorFixationColor("med", cursorMedPicker.getValue());
+//        TrackerPaintStage.getTrackerOverlay().setCursorFixationColor("high", cursorHighPicker.getValue());
+//
+//        TrackerPaintStage.getTrackerOverlay().setEyeFixationType((String)eyeFixationTypes.getValue());
+//        TrackerPaintStage.getTrackerOverlay().setEyeFixationColor("low", eyeLowPicker.getValue());
+//        TrackerPaintStage.getTrackerOverlay().setEyeFixationColor("med", eyeMedPicker.getValue());
+//        TrackerPaintStage.getTrackerOverlay().setEyeFixationColor("high", eyeHighPicker.getValue());
+//
+//        TrackerPaintStage.getTrackerOverlay().setEyeIVTSpeedThreshold(eyeIVTSpeedSlider.getValue());
+//        TrackerPaintStage.getTrackerOverlay().setEyeIDTDispersionThreshold(eyeIDTDispersionSlider.getValue());
+//        TrackerPaintStage.getTrackerOverlay().setEyeIDTDurationThreshold(eyeIDTDurationSlider.getValue());
+//
+//        TrackerPaintStage.getTrackerOverlay().setCursorIVTSpeedThreshold(cursorIVTSpeedSlider.getValue());
+//        TrackerPaintStage.getTrackerOverlay().setCursorIDTDispersionThreshold(cursorIDTDispersionSlider.getValue());
+//        TrackerPaintStage.getTrackerOverlay().setCursorIDTDurationThreshold(cursorIDTDurationSlider.getValue());
+//
+//        TrackerPaintStage.getTrackerOverlay().setSlowPanTimeThreshold(slowPanTimeSlider.getValue());
+//        TrackerPaintStage.getTrackerOverlay().setSlowPanSpeedThreshold(slowPanSpeedSlider.getValue());
+//        TrackerPaintStage.getTrackerOverlay().setBoundsFixationTimeThreshold(boundsFixationSlider.getValue());
+//        TrackerPaintStage.getTrackerOverlay().setZoomPeakThreshold(zoomPeakSlider.getValue());
+    }
 
     private static final Node iconRecord, iconRecordStop,
             iconPlay, iconPlayStop;
@@ -75,7 +120,7 @@ public class PaintStageController implements Initializable {
 
         
 //      Toggles for visualisations
-        BoundsPrefControls boundsPrefControls = new BoundsPrefControls(boundsThicknessSlider,
+        boundsPrefControls = new BoundsPrefControls(boundsThicknessSlider,
                 bTCheck,
                 bHCheck,
                 zpCheck,
@@ -86,7 +131,7 @@ public class PaintStageController implements Initializable {
                 boundsFixationSlider,
                 zoomPeakSlider);
 
-        PointPrefControls eyePointPrefControls = new PointPrefControls("eye",
+        eyePointPrefControls = new PointPrefControls("eye",
                 eyeThicknessSlider,
                 eHCheck,
                 eyeFixationTypes,
@@ -98,7 +143,7 @@ public class PaintStageController implements Initializable {
                 eyeMedPicker,
                 eyeHighPicker);
 
-        PointPrefControls cursorPointPrefControls = new PointPrefControls("cursor",
+        cursorPointPrefControls = new PointPrefControls("cursor",
                 cursorThicknessSlider,
                 cHCheck,
                 cursorFixationTypes,
@@ -110,122 +155,8 @@ public class PaintStageController implements Initializable {
                 cursorMedPicker,
                 cursorHighPicker);
 
-//        eHCheck.selectedProperty().bindBidirectional(TrackingPrefs.eyePointPrefs.doPaintHeatmap);
-//        cHCheck.selectedProperty().bindBidirectional(TrackingPrefs.cursorPointPrefs.doPaintHeatmap);
-
-//        bHCheck.setOnAction(event ->
-//                TrackerPaintStage.getHeatmapOverlay().setDoPaintBoundsHeatmap(bHCheck.isSelected()));
-//        cHCheck.setOnAction(event ->
-//                TrackerPaintStage.getHeatmapOverlay().setDoPaintCursorHeatmap(cHCheck.isSelected()));
-//        eHCheck.setOnAction(event ->
-//                TrackerPaintStage.getHeatmapOverlay().setDoPaintEyeHeatmap(eHCheck.isSelected()));
-//        bTCheck.setOnAction(event ->
-//                TrackerPaintStage.getTrackerOverlay().setDoPaintBoundsTrail(bTCheck.isSelected()));
-//        cTCheck.setOnAction(event ->
-//                TrackerPaintStage.getTrackerOverlay().setDoPaintCursorTrail(cTCheck.isSelected()));
-//        eTCheck.setOnAction(event ->
-//                TrackerPaintStage.getTrackerOverlay().setDoPaintEyeTrail(eTCheck.isSelected()));
-//
-//        spCheck.setOnAction(event ->
-//                TrackerPaintStage.getTrackerOverlay().setDoPaintSlowPans(spCheck.isSelected()));
-//        bfCheck.setOnAction(event ->
-//                TrackerPaintStage.getTrackerOverlay().setDoPaintBoundFixations(bfCheck.isSelected()));
-//        zpCheck.setOnAction(event ->
-//                TrackerPaintStage.getTrackerOverlay().setDoPaintZoomPeaks(zpCheck.isSelected()));
-
-
-//      Visualisation options
-//        eyeThicknessSlider.valueProperty().addListener(
-//                (observable, oldValue, newValue) ->
-//                        TrackerPaintStage.getTrackerOverlay().setEyeThicknessScalar(newValue));
-//        boundsThicknessSlider.valueProperty().addListener(
-//                (observable, oldValue, newValue) ->
-//                        TrackerPaintStage.getTrackerOverlay().setBoundsThicknessScalar(newValue));
-//        cursorThicknessSlider.valueProperty().addListener(
-//                (observable, oldValue, newValue) ->
-//                        TrackerPaintStage.getTrackerOverlay().setCursorThicknessScalar(newValue));
-//
-//        eyeFixationTypes.valueProperty().addListener((observable, oldValue, newValue) ->
-//                TrackerPaintStage.getTrackerOverlay().setEyeFixationType((String)newValue));
-//        cursorFixationTypes.valueProperty().addListener((observable, oldValue, newValue) ->
-//                TrackerPaintStage.getTrackerOverlay().setCursorFixationType((String)newValue));
-//
-//        cursorLowPicker.setOnAction(event -> TrackerPaintStage.getTrackerOverlay().setCursorFixationColor("low", cursorLowPicker.getValue()));
-//        cursorLowPicker.setValue(Color.BLUE);
-//        cursorMedPicker.setValue(Color.LIME);
-//        cursorHighPicker.setValue(Color.RED);
-//        eyeLowPicker.setValue(Color.BLUE);
-//        eyeMedPicker.setValue(Color.LIME);
-//        eyeHighPicker.setValue(Color.RED);
-
-//        cursorMedPicker.setOnAction(event -> TrackerPaintStage.getTrackerOverlay().setCursorFixationColor("med", cursorMedPicker.getValue()));
-
-//        cursorHighPicker.setOnAction(event -> TrackerPaintStage.getTrackerOverlay().setCursorFixationColor("high", cursorHighPicker.getValue()));
-
-//        eyeLowPicker.setOnAction(event -> TrackerPaintStage.getTrackerOverlay().setEyeFixationColor("low", eyeLowPicker.getValue()));
-
-//        eyeMedPicker.setOnAction(event -> TrackerPaintStage.getTrackerOverlay().setEyeFixationColor("med", eyeMedPicker.getValue()));
-
-//        eyeHighPicker.setOnAction(event -> TrackerPaintStage.getTrackerOverlay().setEyeFixationColor("high", eyeHighPicker.getValue()));
-
-
-//      Feature options
-//        eyeIVTSpeedSlider.valueProperty().addListener(
-//                (observable, oldValue, newValue) -> {
-//                    if (!Objects.equals(newValue, oldValue)) {
-//                        TrackerPaintStage.getTrackerOverlay().setEyeIVTSpeedThreshold(newValue);
-//                    }
-//                });
-//        eyeIDTDispersionSlider.valueProperty().addListener(
-//                (observable, oldValue, newValue) -> {
-//                    if (!Objects.equals(newValue, oldValue)) {
-//                        TrackerPaintStage.getTrackerOverlay().setEyeIDTDispersionThreshold(newValue);
-//                    }
-//                });
-//        eyeIDTDurationSlider.valueProperty().addListener(
-//                (observable, oldValue, newValue) -> {
-//                    if (!Objects.equals(newValue, oldValue)) {
-//                        TrackerPaintStage.getTrackerOverlay().setEyeIDTDurationThreshold(newValue);
-//                    }
-//                });
-//        cursorIVTSpeedSlider.valueProperty().addListener(
-//                (observable, oldValue, newValue) -> {
-//                    if (!Objects.equals(newValue, oldValue)) {
-//                        TrackerPaintStage.getTrackerOverlay().setCursorIVTSpeedThreshold(newValue);
-//                    }
-//                });
-//        cursorIDTDispersionSlider.valueProperty().addListener(
-//                (observable, oldValue, newValue) -> {
-//                    if (!Objects.equals(newValue, oldValue)) {
-//                        TrackerPaintStage.getTrackerOverlay().setCursorIDTDispersionThreshold(newValue);
-//                    }
-//                });
-//        cursorIDTDurationSlider.valueProperty().addListener(
-//                (observable, oldValue, newValue) -> {
-//                    if (!Objects.equals(newValue, oldValue)) {
-//                        TrackerPaintStage.getTrackerOverlay().setCursorIDTDurationThreshold(newValue);
-//                    }
-//                });
-//        slowPanTimeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-//            if (!Objects.equals(newValue, oldValue)) {
-//                TrackerPaintStage.getTrackerOverlay().setSlowPanTimeThreshold(newValue);
-//            }
-//        });
-//        slowPanSpeedSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-//            if (!Objects.equals(newValue, oldValue)) {
-//                TrackerPaintStage.getTrackerOverlay().setSlowPanSpeedThreshold(newValue);
-//            }
-//        });
-//        boundsFixationSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-//            if (!Objects.equals(newValue, oldValue)) {
-//                TrackerPaintStage.getTrackerOverlay().setBoundsFixationTimeThreshold(newValue);
-//            }
-//        });
-//        zoomPeakSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-//            if (!Objects.equals(newValue, oldValue)) {
-//                TrackerPaintStage.getTrackerOverlay().setZoomPeakThreshold(newValue);
-//            }
-//        });
+        TrackingPrefs.medZoomThreshold.bindBidirectional(medZoomSlider.valueProperty());
+        TrackingPrefs.lowZoomThreshold.bindBidirectional(lowZoomSlider.valueProperty());
 
 
 //      Recording/Playback
@@ -247,7 +178,7 @@ public class PaintStageController implements Initializable {
                 playback.playingProperty(),
                 "Play", iconPlay, (KeyCombination)null);
         actionPlayback.setDisabled(TrackerPaintStage.getTracker().isEmpty());
-        actionRecord.disabledProperty().bind(actionPlayback.selectedProperty());
+        actionRecord.disabledProperty().bindBidirectional(actionPlayback.selectedProperty());
 
         TrackerPaintStage.getTracker().recordingProperty().addListener((v, o, n) -> {
             if (n) {
@@ -335,7 +266,9 @@ public class PaintStageController implements Initializable {
     @FXML
     public GridPane VisualisatonTogglePane, VisualisationOptionPane;
 
-
+    @FXML
+    public Slider medZoomSlider,
+            lowZoomSlider;
 
     @FXML
     private Slider boundsThicknessSlider;
@@ -429,6 +362,7 @@ class PointPrefControls extends PrefControls {
         prefs.highColor.bindBidirectional(highPicker.valueProperty());
         prefs.medColor.bindBidirectional(medPicker.valueProperty());
         prefs.lowColor.bindBidirectional(lowPicker.valueProperty());
+
     }
 
     PointPrefControls(String type,

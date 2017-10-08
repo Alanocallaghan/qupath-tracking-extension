@@ -1,16 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.collections.FXCollections?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import java.lang.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.paint.Color?>
-<BorderPane fx:id="BorderPane" maxHeight="-Infinity"
-            maxWidth="-Infinity" minHeight="-Infinity"
-            minWidth="-Infinity" prefHeight="500.0" prefWidth="500.0"
-            xmlns="http://javafx.com/javafx/8.0.131"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="qupath.extension.tracking.gui.controllers.PaintStageController">
+
+<BorderPane fx:id="BorderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="qupath.extension.tracking.gui.controllers.PaintStageController">
 
 
     <top>
@@ -28,7 +37,7 @@
 
 
     <center>
-        <TabPane fx:id="TabPane" prefHeight="500.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE">
+        <TabPane fx:id="TabPane" tabClosingPolicy="UNAVAILABLE">
 
             <Tab fx:id="RecordingTab" text="Recording">
                 <BorderPane fx:id="TrackerBorderPane">
@@ -66,78 +75,128 @@
 
 
             <Tab fx:id="VisualisationOptionTab" text="Visualisation options">
-                <GridPane fx:id="VisualisationOptionPane">
+                <GridPane fx:id="VisualisationOptionPane" hgap="10">
+                    <padding><Insets left="5" right="10" /></padding>
 
-                    <Label fx:id="BoundThicknessLabel" text="Cursor fixation type" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                    <Slider fx:id="boundsThicknessSlider" max="3" min="0.5" value="1" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-
-                    <Label fx:id="CursorThicknessLabel" text="Cursor trail thickness" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                    <Slider fx:id="cursorThicknessSlider" max="3" min="0.5" value="1" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-
-                    <Label fx:id="EyeThicknessLabel" text="Eye trail thickness" GridPane.columnIndex="2" GridPane.rowIndex="0" />
-                    <Slider fx:id="eyeThicknessSlider" max="3" min="0.5" value="1" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-
-
-                    <Label fx:id="cursorLabel" text="Cursor fixation type" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                    <ComboBox fx:id="cursorFixationTypes" prefHeight="21.0" prefWidth="105.0" value="IVT" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                        <items>
-                            <FXCollections fx:factory="observableArrayList">
-                                <String fx:value="IDT" />
-                                <String fx:value="IVT" />
-                                <String fx:value="All points" />
-                            </FXCollections>
-                        </items>
-                    </ComboBox>
+                    <Label fx:id="BoundThicknessLabel" text="Bounds trail thickness"
+                           GridPane.columnIndex="0" GridPane.rowIndex="0">
+                        <padding><Insets top="10" /></padding>
+                    </Label>
+                    <Slider fx:id="boundsThicknessSlider" majorTickUnit="1"
+                            max="5" min="0"
+                            showTickLabels="true" showTickMarks="true"
+                            value="1"
+                            GridPane.columnIndex="0" GridPane.rowIndex="1" />
 
 
-                    <Label fx:id="eyeLabel" text="Eye fixation type" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                    <ComboBox fx:id="eyeFixationTypes" prefHeight="21.0" prefWidth="105.0" value="IVT" GridPane.columnIndex="2" GridPane.rowIndex="3">
-                        <items>
-                            <FXCollections fx:factory="observableArrayList">
-                                <String fx:value="Eyetribe" />
-                                <String fx:value="IDT" />
-                                <String fx:value="IVT" />
-                                <String fx:value="All points" />
-                            </FXCollections>
-                        </items>
-                    </ComboBox>
+
+                    <Label fx:id="CursorThicknessLabel" text="Cursor trail thickness"
+                           GridPane.columnIndex="1" GridPane.rowIndex="0">
+                        <padding><Insets top="10" /> </padding>
+                    </Label>
+                    <Slider fx:id="cursorThicknessSlider" majorTickUnit="1"
+                            max="5" min="0"
+                            showTickLabels="true" showTickMarks="true"
+                            value="1"
+                            GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                    <Label fx:id="EyeThicknessLabel" text="Eye trail thickness"
+                           GridPane.columnIndex="2" GridPane.rowIndex="0">
+                        <padding><Insets top="10" /> </padding>
+                    </Label>
+                    <Slider fx:id="eyeThicknessSlider" majorTickUnit="1"
+                            max="5" min="0"
+                            showTickLabels="true" showTickMarks="true"
+                            value="1"
+                            GridPane.columnIndex="2" GridPane.rowIndex="1" />
 
 
-                    <Label fx:id="cursorColorLabel" text="Cursor trail colors" GridPane.columnIndex="1" GridPane.rowIndex="4" />
 
-                    <ColorPicker fx:id="cursorLowPicker" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                    <Label fx:id="lowZoomLabel" text="Low zoom threshold"
+                           GridPane.columnIndex="0" GridPane.rowIndex="2">
+                        <padding><Insets top="10" /></padding>
+                    </Label>
+                    <Slider fx:id="lowZoomSlider"
+                            majorTickUnit="5"
+                            showTickLabels="true" showTickMarks="true"
+                            max="80" min="10"
+                            value="20"
+                            GridPane.columnIndex="0" GridPane.rowIndex="3" />
+
+
+
+                    <Label fx:id="medZoomLabel" text="Medium zoom threshold"
+                           GridPane.columnIndex="0" GridPane.rowIndex="4">
+                        <padding><Insets top="10" /></padding>
+                    </Label>
+                    <Slider fx:id="medZoomSlider"
+                            majorTickUnit="5"
+                            max="10" min="1"
+                            showTickLabels="true" showTickMarks="true"
+                            value="5"
+                            GridPane.columnIndex="0" GridPane.rowIndex="5" />
+
+
+
+                    <!--<Label fx:id="highZoomLabel" text="Low zoom threshold"-->
+                           <!--GridPane.columnIndex="0" GridPane.rowIndex="6">-->
+                        <!--<padding><Insets top="10" /></padding>-->
+                    <!--</Label>-->
+                    <!--<Slider fx:id="highZoomSlider" majorTickUnit="1" max="5" min="0"-->
+                            <!--showTickLabels="true" showTickMarks="true"-->
+                            <!--value="1"-->
+                            <!--GridPane.columnIndex="0" GridPane.rowIndex="7" />-->
+
+
+
+
+                    <Label fx:id="cursorColorLabel" text="Cursor trail colors"
+                           GridPane.columnIndex="1" GridPane.rowIndex="2">
+                        <padding><Insets top="10" /></padding>
+                    </Label>
+
+                    <ColorPicker fx:id="cursorLowPicker"
+                                 GridPane.columnIndex="1" GridPane.rowIndex="3">
                         <value>
-                            <Color red="0" green="0" blue="1"/>
+                            <Color blue="1" green="0" red="0" />
                         </value>
                     </ColorPicker>
 
-                    <ColorPicker fx:id="cursorMedPicker" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                    <ColorPicker fx:id="cursorMedPicker"
+                                 GridPane.columnIndex="1" GridPane.rowIndex="4">
                         <value>
-                            <Color red="0" green="1" blue="0"/>
+                            <Color blue="0" green="1" red="0" />
                         </value>
                     </ColorPicker>
 
-                    <ColorPicker fx:id="cursorHighPicker" GridPane.columnIndex="1" GridPane.rowIndex="7">
+                    <ColorPicker fx:id="cursorHighPicker"
+                                 GridPane.columnIndex="1" GridPane.rowIndex="5">
                         <value>
-                            <Color red="1" green="0" blue="0"/>
+                            <Color blue="0" green="0" red="1" />
                         </value>
                     </ColorPicker>
 
-                    <Label fx:id="eyeColorLabel" text="Eye trail colors" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-                    <ColorPicker fx:id="eyeLowPicker" GridPane.columnIndex="2" GridPane.rowIndex="5">
+                    <Label fx:id="eyeColorLabel" text="Eye trail colors"
+                           GridPane.columnIndex="2" GridPane.rowIndex="2">
+                        <padding><Insets top="10" /> </padding>
+                    </Label>
+                    <ColorPicker fx:id="eyeLowPicker"
+                                 GridPane.columnIndex="2" GridPane.rowIndex="3">
                         <value>
-                            <Color red="0" green="0" blue="1"/>
+                            <Color blue="1" green="0" red="0" />
                         </value>
                     </ColorPicker>
-                    <ColorPicker fx:id="eyeMedPicker" GridPane.columnIndex="2" GridPane.rowIndex="6">
+                    <ColorPicker fx:id="eyeMedPicker"
+                                 GridPane.columnIndex="2" GridPane.rowIndex="4">
                         <value>
-                            <Color red="0" green="1" blue="0"/>
+                            <Color blue="0" green="1" red="0" />
                         </value>
                     </ColorPicker>
 
-                    <ColorPicker fx:id="eyeHighPicker" GridPane.columnIndex="2" GridPane.rowIndex="7">
+                    <ColorPicker fx:id="eyeHighPicker"
+                                 GridPane.columnIndex="2" GridPane.rowIndex="5">
                         <value>
-                            <Color red="1" green="0" blue="0"/>
+                            <Color blue="0" green="0" red="1" />
                         </value>
                     </ColorPicker>
 
@@ -161,55 +220,100 @@
                 </GridPane>
             </Tab>
 
-
+            
             <Tab fx:id="FeatureOptionsTab" text="Feature options">
-                <GridPane fx:id="FeatureOptionPane">
+                <GridPane fx:id="FeatureOptionPane" hgap="10">
+                    <padding><Insets left="5" right="10" /></padding>
 
-                    <Label fx:id="EyeIVTSpeedLabel" text="Eye IVT speed threshold" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                    <Slider fx:id="eyeIVTSpeedSlider" max="1000" min="10" value="100" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                    <Label fx:id="SlowPanSpeedLabel" text="Slow pan speed threshold" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <Slider fx:id="slowPanSpeedSlider" majorTickUnit="200" max="1000" min="0" minorTickCount="5" showTickLabels="true" showTickMarks="true" value="100" GridPane.columnIndex="0" GridPane.rowIndex="1" />
 
-                    <Label fx:id="EyeIDTDurationLabel" text="Eye IDT duration threshold" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                    <Slider fx:id="eyeIDTDurationSlider" max="1000" min="10" value="250" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-                    <Label fx:id="EyeIDTDispersionLabel" text="Eye IDT dispersion threshold" GridPane.columnIndex="2" GridPane.rowIndex="0" />
-                    <Slider fx:id="eyeIDTDispersionSlider" max="1000" min="5" value="50" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                    <Label fx:id="CursorIVTSpeedLabel" text="Cursor IVT speed threshold" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                    <Slider fx:id="cursorIVTSpeedSlider" majorTickUnit="200" max="1000" min="0" minorTickCount="5" showTickLabels="true" showTickMarks="true" value="100" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-                    <Label fx:id="CursorIVTSpeedLabel" text="Cursor IVT speed threshold" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                    <Slider fx:id="cursorIVTSpeedSlider" max="1000" min="10" value="100" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+
+                    <Label fx:id="EyeIVTSpeedLabel" text="Eye IVT speed threshold" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                    <Slider fx:id="eyeIVTSpeedSlider" majorTickUnit="200" max="1000" min="0" minorTickCount="5" showTickLabels="true" showTickMarks="true" value="100" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+
+
+                    <Label fx:id="SlowPanTimeLabel" text="Slow pan time threshold" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                    <Slider fx:id="slowPanTimeSlider" majorTickUnit="200" max="1000" min="0" minorTickCount="5" showTickLabels="true" showTickMarks="true" value="100" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+
+
+
                     <Label fx:id="CursorIDTDurationLabel" text="Cursor IDT duration threshold" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                    <Slider fx:id="cursorIDTDurationSlider" max="1000" min="10" value="250" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                    <Slider fx:id="cursorIDTDurationSlider" majorTickUnit="200" max="1000" min="0" minorTickCount="5" showTickLabels="true" showTickMarks="true" value="250" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
-                    <Label fx:id="CursorIDTDispersionLabel" text="Cursor IDT dispersion threshold" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                    <Slider fx:id="cursorIDTDispersionSlider" max="1000" min="5" value="50" GridPane.columnIndex="2" GridPane.rowIndex="3" />
 
-                    <Label fx:id="SlowPanSpeedLabel" text="Slow pan speed threshold" GridPane.columnIndex="0" GridPane.rowIndex="4" />
-                    <Slider fx:id="slowPanSpeedSlider" max="1000" min="10" value="100" GridPane.columnIndex="0" GridPane.rowIndex="5" />
 
-                    <Label fx:id="SlowPanTimeLabel" text="Slow pan time threshold" GridPane.columnIndex="0" GridPane.rowIndex="6" />
-                    <Slider fx:id="slowPanTimeSlider" max="1000" min="10" value="100" GridPane.columnIndex="0" GridPane.rowIndex="7" />
 
-                    <Label fx:id="BoundsFixationLabel" text="Bounds fixation duration" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                    <Slider fx:id="boundsFixationSlider" max="2000" min="10" value="1000" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                    <Label fx:id="EyeIDTDurationLabel" text="Eye IDT duration threshold" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                    <Slider fx:id="eyeIDTDurationSlider" majorTickUnit="200" max="1000" min="0" minorTickCount="5" showTickLabels="true" showTickMarks="true" value="250" GridPane.columnIndex="2" GridPane.rowIndex="3" />
 
-                    <Label fx:id="ZoomPeakLabel" text="Zoom peak threshold" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-                    <Slider fx:id="zoomPeakSlider" max="5" min="1" value="1"
-                            snapToTicks="true" majorTickUnit="1" showTickMarks="true" showTickLabels="true" minorTickCount="-1"
-                            GridPane.columnIndex="2" GridPane.rowIndex="5" />
+
+
+                    <Label fx:id="BoundsFixationLabel" text="Bounds fixation duration" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                    <Slider fx:id="boundsFixationSlider" majorTickUnit="500" max="2000" min="0" minorTickCount="5" showTickLabels="true" showTickMarks="true" value="1000" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+
+
+
+                    <Label fx:id="EyeIDTDispersionLabel" text="Eye IDT dispersion threshold" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                    <Slider fx:id="eyeIDTDispersionSlider" majorTickUnit="200" max="1000" min="0" minorTickCount="5" showTickLabels="true" showTickMarks="true" value="50" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+
+
+                    <Label fx:id="CursorIDTDispersionLabel" text="Cursor IDT dispersion threshold" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                    <Slider fx:id="cursorIDTDispersionSlider" majorTickUnit="200" max="1000" min="0" minorTickCount="5" showTickLabels="true" showTickMarks="true" value="50" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+
+
+                    <Label fx:id="ZoomPeakLabel" text="Zoom peak threshold" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                    <Slider fx:id="zoomPeakSlider" majorTickUnit="1" max="5" min="1" minorTickCount="-1" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1" GridPane.columnIndex="0" GridPane.rowIndex="7" />
+
+
+                    <Label fx:id="cursorLabel" text="Cursor fixation type" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                        <padding><Insets top="10" /> </padding>
+                    </Label>
+                    <ComboBox fx:id="cursorFixationTypes" prefHeight="21.0" prefWidth="105.0" value="IVT" GridPane.columnIndex="1" GridPane.rowIndex="7">
+                        <items>
+                            <FXCollections fx:factory="observableArrayList">
+                                <String fx:value="IDT" />
+                                <String fx:value="IVT" />
+                                <String fx:value="All points" />
+                            </FXCollections>
+                        </items>
+                    </ComboBox>
+
+
+                    <Label fx:id="eyeLabel" text="Eye fixation type" GridPane.columnIndex="2" GridPane.rowIndex="6">
+                        <padding><Insets top="10" /> </padding>
+                    </Label>
+                    <ComboBox fx:id="eyeFixationTypes" prefHeight="21.0" prefWidth="105.0" value="IVT" GridPane.columnIndex="2" GridPane.rowIndex="7">
+                        <items>
+                            <FXCollections fx:factory="observableArrayList">
+                                <String fx:value="Eyetribe" />
+                                <String fx:value="IDT" />
+                                <String fx:value="IVT" />
+                                <String fx:value="All points" />
+                            </FXCollections>
+                        </items>
+                    </ComboBox>
+
 
                     <columnConstraints>
-                  <ColumnConstraints percentWidth="33"/>
-                  <ColumnConstraints percentWidth="34"/>
-                  <ColumnConstraints percentWidth="33"/>
+                  <ColumnConstraints percentWidth="33" />
+                  <ColumnConstraints percentWidth="34" />
+                  <ColumnConstraints percentWidth="33" />
                </columnConstraints>
                <rowConstraints>
-                   <RowConstraints percentHeight="5.0" />
-                   <RowConstraints percentHeight="10.0" />
-                   <RowConstraints percentHeight="5.0" />
-                   <RowConstraints percentHeight="10.0" />
-                   <RowConstraints percentHeight="5.0" />
-                   <RowConstraints percentHeight="10.0" />
-                   <RowConstraints percentHeight="5.0" />
-                   <RowConstraints percentHeight="10.0" />
+                   <RowConstraints percentHeight="5" />
+                   <RowConstraints percentHeight="10" />
+                   <RowConstraints percentHeight="5" />
+                   <RowConstraints percentHeight="10" />
+                   <RowConstraints percentHeight="5" />
+                   <RowConstraints percentHeight="10" />
+                   <RowConstraints percentHeight="5" />
+                   <RowConstraints percentHeight="10" />
+
                </rowConstraints>
 
 

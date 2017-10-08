@@ -33,10 +33,10 @@ import static qupath.extension.tracking.TrackerUtils.colorFXtoAWT;
 public class Fixations {
 
 
-    private TrackerFeatureList IVTFixations,
-            IDTFixations,
+    private TrackerFeatureList IVTFixations = null,
+            IDTFixations = null,
             eyeTribeFixations = null,
-            allPointFixations;
+            allPointFixations = null;
 
     private final TrackerFeatures trackerFeatures;
 
@@ -48,10 +48,10 @@ public class Fixations {
             lowColor = colorFXtoAWT(javafx.scene.paint.Color.BLUE);
     private StringProperty fixationType = new SimpleStringProperty();
 
-    private DoubleProperty IVTSpeedThreshold = new SimpleDoubleProperty(50);
-    private DoubleProperty IDTDurationThreshold = new SimpleDoubleProperty(50),
-            IDTDispersionThreshold = new SimpleDoubleProperty(1000),
-            thicknessScalar = new SimpleDoubleProperty(1);
+    private DoubleProperty IVTSpeedThreshold = new SimpleDoubleProperty();
+    private DoubleProperty IDTDurationThreshold = new SimpleDoubleProperty(),
+            IDTDispersionThreshold = new SimpleDoubleProperty(),
+            thicknessScalar = new SimpleDoubleProperty();
 
     // todo: check correlation between this method and EyeTribe method using real tracking data
     Fixations(TrackerFeatures trackerFeatures, String featureType) {
@@ -85,6 +85,8 @@ public class Fixations {
         if (this.featureType == EYE) {
             eyeTribeFixations = findEyeTribeFixations();
         }
+
+        thicknessScalar.bind(prefs.getThicknessScalarProperty());
 
         this.fixationType.bind(prefs.fixationType);
         this.fixationType.addListener((observable, oldValue, newValue) -> QuPathGUI.getInstance().getViewer().repaint());

@@ -38,7 +38,6 @@ class TrackingQuPathLoadCommand implements PathCommand {
 	public void run() {
         PathPrefs.setTrackCursorPosition(true);
         TrackerPaintStage stage = TrackerPaintStage.getInstance();
-        stage.setWidth(1000);
         stage.show();
 	}
 

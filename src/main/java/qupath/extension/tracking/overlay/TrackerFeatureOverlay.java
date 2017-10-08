@@ -17,6 +17,8 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.image.ImageObserver;
 
+import static qupath.extension.tracking.TrackerUtils.calculateDownsample;
+
 /**
  * @author Alan O'Callaghan
  * Created by alan on 15/03/17.
@@ -37,8 +39,8 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
 
     //    TODO: Cursor and eye numbers
     private final boolean doPaintNumbers = false;
-    private final int lowZoomThreshold = 5;
-    private final int medZoomThreshold = 1;
+    private DoubleProperty lowZoomThreshold = new SimpleDoubleProperty(),
+            medZoomThreshold = new SimpleDoubleProperty();
     private DoubleProperty boundsThicknessScalar = new SimpleDoubleProperty();
 
     public TrackerFeatureOverlay(TrackerFeatures trackerFeatures) {
@@ -65,6 +67,12 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
 
         doPaintZoomPeaks.bind(TrackingPrefs.boundsPrefs.doPaintZoomPeaks);
         doPaintZoomPeaks.addListener((observable, oldValue, newValue) -> viewer.repaint());
+
+        lowZoomThreshold.bind(TrackingPrefs.lowZoomThreshold);
+        lowZoomThreshold.addListener((observable, oldValue, newValue) -> viewer.repaint());
+
+        medZoomThreshold.bind(TrackingPrefs.medZoomThreshold);
+        medZoomThreshold.addListener((observable, oldValue, newValue) -> viewer.repaint());
     }
 
     @Override
@@ -77,13 +85,15 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
                 }
             }
             if (doPaintCursorTrail.get()) {
-                if (trackerFeatures.getCursorFixations() != null) {
+                if (trackerFeatures.getCursorFixations() != null &&
+                        !trackerFeatures.getCursorFixations().getFixations().isEmpty()) {
                     drawTrail(g2d, downsampleFactor, clippingRectangle,
                             trackerFeatures.getCursorFixations());
                 }
             }
             if (doPaintEyeTrail.get()) {
-                if (trackerFeatures.getEyeFixations() != null) {
+                if (trackerFeatures.getEyeFixations() != null &&
+                        !trackerFeatures.getEyeFixations().getFixations().isEmpty()) {
                     drawTrail(g2d, downsampleFactor, clippingRectangle,
                             trackerFeatures.getEyeFixations());
                 }
@@ -94,7 +104,7 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
                 }
             }
             if (doPaintSlowPans.get()) {
-                if (trackerFeatures.getCursorArray() != null) {
+                if (trackerFeatures.getBoundsArray() != null) {
                     drawSlowPans(g2d, downsampleFactor, clippingRectangle);
                 }
             }
@@ -117,9 +127,9 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
             rect = boundsArray[i];
             if ((!rect.equals(previousRect)) && rect.intersects(clippingRectangle)) {
                 g2d.setColor(Color.BLUE);
-                if (zoomArray[i] < lowZoomThreshold) {
+                if (zoomArray[i] < lowZoomThreshold.get()) {
                     g2d.setColor(Color.GREEN);
-                } else if (zoomArray[i] < medZoomThreshold) {
+                } else if (zoomArray[i] < medZoomThreshold.get()) {
                     g2d.setColor(Color.RED);
                 }
                 g2d.setStroke(new BasicStroke(boundsThicknessScalar.floatValue()));
@@ -165,10 +175,15 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
                     Color medColor = fixations.getMedColor();
                     Color highColor = fixations.getHighColor();
 
+                    System.out.println(lowZoomThreshold.get());
+                    System.out.println(medZoomThreshold.get());
+                    System.out.println(zoomLevel[i]);
+
                     g2d.setColor(lowColor);
-                    if (zoomLevel[i] < lowZoomThreshold) {
+                    if (zoomLevel[i] < lowZoomThreshold.get()) {
                         g2d.setColor(medColor);
-                    } else if (zoomLevel[i] < medZoomThreshold) {
+                    }
+                    if (zoomLevel[i] < medZoomThreshold.get()) {
                         g2d.setColor(highColor);
                     }
                     g2d.setStroke(new BasicStroke((float) (downsampleFactor * fixations.getThicknessScalar())));
