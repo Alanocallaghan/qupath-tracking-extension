@@ -2,33 +2,36 @@ package qupath.extension.tracking.tracker;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import qupath.extension.tracking.TrackerUtils;
+import qupath.extension.tracking.gui.controllers.prefs.PointPrefs;
+import qupath.extension.tracking.gui.controllers.prefs.TrackingPrefs;
+import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.viewer.recording.ViewRecordingFrame;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.*;
-import java.util.List;
 
-import static qupath.extension.tracking.tracker.Fixations.FeatureType.EYE;
-import static qupath.extension.tracking.tracker.Fixations.FixationType.*;
+import static qupath.extension.tracking.TrackerUtils.calculateDownsample;
+import static qupath.extension.tracking.TrackerUtils.getSpeed;
+import static qupath.extension.tracking.tracker.TrackerFeatures.FeatureType.EYE;
 import static qupath.extension.tracking.TrackerUtils.colorFXtoAWT;
 
 
 /**
  * @author Alan O'Callaghan
  *
- * Created by yourname on 15/03/17.
+ * Created by Alan O'Callaghan on 15/03/17.
  */
 
 public class Fixations {
 
-    private TrackerFeatureList fixations;
-
-    private double[] durations;
-    private Point2D[] centroids;
 
     private TrackerFeatureList IVTFixations,
             IDTFixations,
@@ -38,35 +41,55 @@ public class Fixations {
     private final TrackerFeatures trackerFeatures;
 
     private final ViewRecordingFrame[] allFrames;
-    private FeatureType featureType;
+    private TrackerFeatures.FeatureType featureType;
 
     private Color highColor = colorFXtoAWT(javafx.scene.paint.Color.RED),
             medColor = colorFXtoAWT(javafx.scene.paint.Color.LIME),
             lowColor = colorFXtoAWT(javafx.scene.paint.Color.BLUE);
-    private FixationType fixationType;
+    private StringProperty fixationType = new SimpleStringProperty();
 
-    private double IVTSpeedThreshold;
-    private double IDTDurationThreshold = 50;
-    private double IDTDispersionThreshold = 1000;
-    private double thicknessScalar = 1;
+    private DoubleProperty IVTSpeedThreshold = new SimpleDoubleProperty(50);
+    private DoubleProperty IDTDurationThreshold = new SimpleDoubleProperty(50),
+            IDTDispersionThreshold = new SimpleDoubleProperty(1000),
+            thicknessScalar = new SimpleDoubleProperty(1);
 
-    public void recalculateFixations() {
-        switch(fixationType) {
-            case IDT:
-                IDTFixations = calculateIDTFixations();
-                break;
-            case IVT:
-                IVTFixations = calculateIVTFixations();
-                break;
-            case EYETRIBE:
-                eyeTribeFixations = findEyeTribeFixations();
-                break;
-            case ALL_POINTS:
-                allPointFixations = makeAllPointFixations();
-                break;
+    // todo: check correlation between this method and EyeTribe method using real tracking data
+    Fixations(TrackerFeatures trackerFeatures, String featureType) {
+        this.trackerFeatures = trackerFeatures;
+        this.setFeatureType(featureType);
+        allFrames = TrackerUtils.getFramesAsArray(trackerFeatures.getTracker());
+
+        PointPrefs prefs = featureType.equals("eye") ? TrackingPrefs.eyePointPrefs : TrackingPrefs.cursorPointPrefs;
+
+        IVTSpeedThreshold.bind(prefs.IVTSpeedThreshold);
+        IVTSpeedThreshold.addListener((observable, oldValue, newValue) -> {
+            IVTFixations = calculateIVTFixations();
+            QuPathGUI.getInstance().getViewer().repaint();
+        });
+
+        IDTDispersionThreshold.bind(prefs.IDTDispersionThreshold);
+        IDTDispersionThreshold.addListener((observable, oldValue, newValue) -> {
+            IDTFixations = calculateIDTFixations();
+            QuPathGUI.getInstance().getViewer().repaint();
+        });
+        IDTDurationThreshold.bind(prefs.IDTDurationThreshold);
+        IDTDurationThreshold.addListener((observable, oldValue, newValue) -> {
+            IDTFixations = calculateIDTFixations();
+            QuPathGUI.getInstance().getViewer().repaint();
+        });
+
+        IDTFixations = calculateIDTFixations();
+        IVTFixations = calculateIVTFixations();
+        allPointFixations = makeAllPointFixations();
+
+        if (this.featureType == EYE) {
+            eyeTribeFixations = findEyeTribeFixations();
         }
-        this.setFixationType(fixationType);
+
+        this.fixationType.bind(prefs.fixationType);
+        this.fixationType.addListener((observable, oldValue, newValue) -> QuPathGUI.getInstance().getViewer().repaint());
     }
+
 
     private TrackerFeatureList makeAllPointFixations() {
         TrackerFeatureList trackerFeatureList = new TrackerFeatureList();
@@ -76,21 +99,6 @@ public class Fixations {
             trackerFeatureList.add(feature);
         }
         return trackerFeatureList;
-    }
-
-    // todo: check correlation between this method and EyeTribe method using real tracking data
-    Fixations(TrackerFeatures trackerFeatures, String featureType, String fixationType) {
-        this.trackerFeatures = trackerFeatures;
-        this.setFeatureType(featureType);
-        allFrames = TrackerUtils.getFramesAsArray(trackerFeatures.getTracker());
-        IDTFixations = calculateIDTFixations();
-        IVTFixations = calculateIVTFixations();
-        allPointFixations = makeAllPointFixations();
-        if (this.featureType == EYE) {
-            eyeTribeFixations = findEyeTribeFixations();
-        }
-
-        this.setFixationType(fixationType);
     }
 
     private ViewRecordingFrame imageSpaceToComponentSpace(ViewRecordingFrame frame) {
@@ -178,7 +186,7 @@ public class Fixations {
 
             long timeOfFirstFrame = allFrames[allIndsForMethod.get(0)].getTimestamp();
 
-            while (timeOfWindow <= IDTDurationThreshold) {
+            while (timeOfWindow <= IDTDurationThreshold.get()) {
                 if (++j < allIndsForMethod.size()) {
                     long timeOfFrame = allFrames[allIndsForMethod.get(j)].getTimestamp();
                     timeOfWindow = timeOfFrame - timeOfFirstFrame;
@@ -188,9 +196,9 @@ public class Fixations {
             }
 
             double dispersion = calculateTranslatedDispersionFromTrackerFeature(windowPoints);
-            if (dispersion <= IDTDispersionThreshold) {
+            if (dispersion <= IDTDispersionThreshold.get()) {
                 while (calculateTranslatedDispersionFromTrackerFeature(windowPoints) <=
-                        IDTDispersionThreshold) {
+                        IDTDispersionThreshold.get()) {
                     if (++j < allIndsForMethod.size()) {
                         windowPoints.add(allIndsForMethod.get(j));
                     } else
@@ -208,14 +216,14 @@ public class Fixations {
     //    todo: meaningful threshold!!!
 //    todo: downsample?
     private TrackerFeatureList calculateIVTFixations() {
-        ViewRecordingFrame[] allFramesForMethod = this.allFrames;
-        double[] speedArray = trackerFeatures.getSpeedArray(this.featureType);
-        boolean[] isFixated = new boolean[allFramesForMethod.length];
+        boolean[] isFixated = new boolean[trackerFeatures.getTracker().nFrames()];
 
         TrackerFeatureList fixations = new TrackerFeatureList();
 
-        for (int i = 0; i < speedArray.length; i++) {
-            isFixated[i] = speedArray[i] < IVTSpeedThreshold;
+        for (int i = 1; i < allFrames.length; i++) {
+            double speed = getSpeed(trackerFeatures.getTracker(), i, i - 1, this.featureType)
+                    / calculateDownsample(trackerFeatures.getTracker().getFrame(i));
+            isFixated[i] = speed < IVTSpeedThreshold.get();
         }
 
         TrackerFeature currentFixation = new TrackerFeature(trackerFeatures.getTracker());
@@ -235,10 +243,10 @@ public class Fixations {
 
     private Point2D[] calculateCentroids() {
         Point2D[] centroids;
-        if (!this.fixations.isEmpty()) {
-            centroids = new Point2D[fixations.size()];
+        if (!this.getFixations().isEmpty()) {
+            centroids = new Point2D[getFixations().size()];
             int i = 0;
-            for (TrackerFeature fixation : fixations) {
+            for (TrackerFeature fixation : getFixations()) {
                 centroids[i] = calculateCentroid(fixation);
                 i++;
             }
@@ -349,127 +357,85 @@ public class Fixations {
     }
 
 
-//    public double[] calculateIDTSaccadeDistances() {
-//        Point2D lastPoint = null;
-//        double[] saccadeDistances = new double[IDTCentroids.length];
-//        if(saccadeDistances.length == 0) {
-//            return new double[1];
-//        }
-//        int i = 0;
-//        for(Point2D point : IDTCentroids) {
-//            if(lastPoint != null && point != null) {
-//                saccadeDistances[i] = TrackerUtils.calculateEuclideanDistance(point, lastPoint);
-//            }
-//            lastPoint = point;
-//            i++;
-//        }
-//        return saccadeDistances;
-//    }
-//
-//    public double[] calculateIDTSaccadeDurations() {
-//        long lastFrameOfPrevious = -1;
-//        long firstFrameOfCurrent;
-//        double[] durations = new double[IDTFixations.size()];
-//        if(durations.length==0) {
-//            return new double[1];
-//        }
-//        int i = 0;
-//        for(ArrayList<ViewRecordingFrame> fixation : IDTFixations) {
-//            firstFrameOfCurrent = fixation.get(0).getTimestamp();
-//
-//            if(lastFrameOfPrevious!=-1) {
-//                long timePassed = firstFrameOfCurrent - lastFrameOfPrevious;
-//                durations[i] = timePassed;
-//            }
-//            lastFrameOfPrevious = fixation.get(fixation.size()-1).getTimestamp();
-//            i++;
-//        }
-//        return durations;
-//    }
-
-    public TrackerFeatureList getFixations() {
-        return fixations;
-    }
-
-    public Point2D[] getCentroids() {
-        return centroids;
+    public double[] calculateSaccadeDistances() {
+        Point2D lastPoint = null;
+        double[] saccadeDistances = new double[getFixations().size()];
+        if (saccadeDistances.length == 0) {
+            return new double[1];
+        }
+        int i = 0;
+        for (Point2D point : calculateCentroids()) {
+            if (lastPoint != null && point != null) {
+                saccadeDistances[i] = TrackerUtils.calculateEuclideanDistance(point, lastPoint);
+            }
+            lastPoint = point;
+            i++;
+        }
+        return saccadeDistances;
     }
 
     public double[] getDurations() {
+        return getFixations().getDurations();
+    }
+
+    public double[] calculateSaccadeDurations() {
+        long lastFrameOfPrevious = -1;
+        long firstFrameOfCurrent;
+        double[] durations = new double[getFixations().size()];
+        if (durations.length == 0) {
+            return null;
+        }
+        int i = 0;
+        for(TrackerFeature fixation : getFixations()) {
+            firstFrameOfCurrent = fixation.getFrameAtFeatureIndex(0).getTimestamp();
+
+            if (lastFrameOfPrevious != -1) {
+                long timePassed = firstFrameOfCurrent - lastFrameOfPrevious;
+                durations[i] = timePassed;
+            }
+            lastFrameOfPrevious = fixation.getFrameAtFeatureIndex(fixation.size() - 1).getTimestamp();
+            i++;
+        }
         return durations;
     }
 
-    private void setFixationType(FixationType fixationType) {
-        this.fixationType = fixationType;
-        switch(fixationType) {
-            case IDT:
-                fixations = IDTFixations;
-                break;
-            case IVT:
-                fixations = IVTFixations;
-                break;
-            case EYETRIBE:
-                fixations = eyeTribeFixations;
-                break;
-            case ALL_POINTS:
-                fixations = allPointFixations;
-                break;
+    public TrackerFeatureList getFixations() {
+        switch(fixationType.get().toUpperCase()) {
+            case "IDT":
+                return IDTFixations;
+            case "IVT":
+                return IVTFixations;
+            case "EYETRIBE":
+                return eyeTribeFixations;
+            case "ALL POINTS":
+                return allPointFixations;
+            default:
+                return allPointFixations;
         }
-        centroids = calculateCentroids();
-        durations = fixations.getDurations();
     }
 
-    public void setFixationType(String type) {
-        FixationType enumtype;
-        switch(type.toLowerCase()) {
-            case "idt":
-                enumtype = IDT;
-                break;
-            case "ivt":
-                enumtype = IVT;
-                break;
-            case "eyetribe":
-                enumtype = EYETRIBE;
-                break;
-            case "all points":
-                enumtype = ALL_POINTS;
-                break;
-            default:
-                enumtype = EYETRIBE;
-        }
-        setFixationType(enumtype);
+    public Point2D[] getCentroids() {
+        return calculateCentroids();
     }
+
 
     public JsonObject toJSON() {
         JsonObject output = new JsonObject();
         JsonArray centroidArray = new JsonArray();
-        for (Point2D centroid: centroids) {
+        for (Point2D centroid: calculateCentroids()) {
             JsonArray centroidJSON = new JsonArray();
             centroidJSON.add(centroid.getX());
             centroidJSON.add(centroid.getY());
             centroidArray.add(centroidJSON);
         }
         JsonArray durationArray = new JsonArray();
-        for (TrackerFeature fixation: fixations) {
+        for (TrackerFeature fixation: getFixations()) {
             durationArray.add(fixation.getDuration());
         }
-        output.add("fixations", fixations.toJSON(false));
+        output.add("fixations", getFixations().toJSON(false));
         output.add("centroids", centroidArray);
         output.add("durations", durationArray);
         return output;
-    }
-
-    public enum FeatureType {
-        EYE, CURSOR;
-
-        @Override
-        public String toString() {
-            if (this.equals(EYE)) {
-                return "Eye";
-            } else {
-                return "Cursor";
-            }
-        }
     }
 
     public enum FixationType {
@@ -489,44 +455,25 @@ public class Fixations {
         }
     }
 
-    public void setIVTSpeedThreshold(double IVTSpeedThreshold) {
-        this.IVTSpeedThreshold = IVTSpeedThreshold;
-        recalculateFixations();
-    }
-
-    public void setIDTDurationThreshold(double IDTDurationThreshold) {
-        this.IDTDurationThreshold = IDTDurationThreshold;
-        recalculateFixations();
-    }
-
-    public void setIDTDispersionThreshold(double IDTDispersionThreshold) {
-        this.IDTDispersionThreshold = IDTDispersionThreshold;
-        recalculateFixations();
-    }
 
     public double getThicknessScalar() {
-        return thicknessScalar;
+        return thicknessScalar.get();
     }
-
-    public void setThicknessScalar(double thicknessScalar) {
-        this.thicknessScalar = thicknessScalar;
-    }
-
 
     private void setFeatureType(String featureType) {
-        FeatureType enumtype = EYE;
+        TrackerFeatures.FeatureType enumtype = EYE;
         switch(featureType.toLowerCase()) {
             case "eye":
-                enumtype = FeatureType.EYE;
+                enumtype = TrackerFeatures.FeatureType.EYE;
                 break;
             case "cursor":
-                enumtype = FeatureType.CURSOR;
+                enumtype = TrackerFeatures.FeatureType.CURSOR;
                 break;
         }
         this.featureType = enumtype;
     }
 
-    public FeatureType getFeatureType() {
+    public TrackerFeatures.FeatureType getFeatureType() {
         return featureType;
     }
 

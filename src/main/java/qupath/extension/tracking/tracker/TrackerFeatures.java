@@ -2,15 +2,12 @@ package qupath.extension.tracking.tracker;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import qupath.extension.tracking.TrackerUtils;
 import qupath.lib.gui.viewer.recording.ViewRecordingFrame;
 import qupath.lib.gui.viewer.recording.ViewTracker;
 import qupath.lib.images.servers.ImageServer;
 
-import javax.swing.text.View;
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import static qupath.extension.tracking.TrackerUtils.calculateDownsample;
@@ -24,12 +21,10 @@ public class TrackerFeatures {
 
     private final ImageServer server;
     private final ViewTracker tracker;
-    private Rectangle[] boundsArray;
-    private Point2D[] eyeArray;
-    private Point2D[] cursorArray;
-    private double[] eyeSpeedArray = new double[0],
-            cursorSpeedArray = new double[0],
-            zoomArray = new double[0];
+    private Rectangle[] boundsArray = null;
+    private Point2D[] eyeArray = null;
+    private Point2D[] cursorArray = null;
+    private double[] zoomArray = new double[0];
 
     private double[] boundsSpeedArray;
     private Fixations eyeFixations;
@@ -43,37 +38,30 @@ public class TrackerFeatures {
         if (tracker != null) {
             this.boundsArray = makeBounds();
             this.boundsSpeedArray = calculateBoundsSpeedArray();
-            this.cursorArray = makeCursor();
+            this.cursorArray = generateCursorArray();
             this.zoomArray = generateBoundsZoomArray();
 
             boundsFeatures = new BoundsFeatures(this);
 
-            generateEyeArray();
+            eyeArray = generateEyeArray();
             if (tracker.hasEyeTrackingData()) {
-                eyeFixations = new Fixations(this, "eye", "IVT");
+                eyeFixations = new Fixations(this, "eye");
             }
-            cursorFixations = new Fixations(this, "cursor", "IVT");
+            cursorFixations = new Fixations(this, "cursor");
         }
 
     }
 
 
-    private Point2D[] makeCursor() {
+    private Point2D[] generateCursorArray() {
         int nFrames = tracker.nFrames();
         Point2D[] point2Ds = new Point2D[nFrames];
-        cursorSpeedArray = new double[nFrames];
         for (int i = 0; i < nFrames; i++) {
             Point2D currentCursor = tracker.getFrame(i).getCursorPosition();
-            ViewRecordingFrame currentFrame = tracker.getFrame(i);
-
             if (currentCursor != null && !(currentCursor.getX() == 0 && currentCursor.getY() == 0)) {
                 point2Ds[i] = currentCursor;
             } else {
                 point2Ds[i] = null;
-            }
-            if (currentCursor != null && !(i == 0)) {
-                cursorSpeedArray[i] = getSpeed(tracker, i, i - 1, TrackerUtils.SpeedType.CURSOR)
-                        / calculateDownsample(currentFrame.getImageBounds(), currentFrame.getSize());
             }
         }
         return point2Ds;
@@ -91,35 +79,22 @@ public class TrackerFeatures {
         return zoomArray;
     }
 
-    private void generateEyeArray() {
+    private Point2D[] generateEyeArray() {
         if (!tracker.hasEyeTrackingData()) {
-            return;
+            return new Point2D[0];
         }
 
-        ViewRecordingFrame currentFrame;
-        ViewRecordingFrame previousFrame = null;
-
-        Point2D previousEye = null;
         Point2D currentEye;
         int nFrames = tracker.nFrames();
         Point2D[] point2Ds = new Point2D[nFrames];
 
-        eyeSpeedArray = new double[nFrames];
-
         for (int i = 0; i < nFrames; i++) {
-            currentFrame = tracker.getFrame(i);
             currentEye = tracker.getFrame(i).getEyePosition();
-            if (currentEye != null && previousEye != null && previousFrame!=null) {
-                eyeSpeedArray[i] = getSpeed(currentFrame, previousFrame, TrackerUtils.SpeedType.EYE)
-                        / calculateDownsample(currentFrame.getImageBounds(), currentFrame.getSize());
-            }
             if (currentEye != null && !(currentEye.getX() == 0 && currentEye.getY() == 0)) {
                 point2Ds[i] = currentEye;
             }
-            previousEye = currentEye;
-            previousFrame = currentFrame;
         }
-        eyeArray = point2Ds;
+        return point2Ds;
     }
 
     private Rectangle[] makeBounds() {
@@ -141,7 +116,7 @@ public class TrackerFeatures {
         double[] array = new double[nFrames];
         for (int i = 1; i < nFrames; i++) {
             double speed = getSpeed(tracker, i, i - 1,
-                    TrackerUtils.SpeedType.BOUNDS) /
+                    FeatureType.BOUNDS) /
                         calculateDownsample(tracker.getFrame(i).getImageBounds(),
                     tracker.getFrame(i).getSize());
             if (!Double.isNaN(speed) && Double.isFinite(speed)) {
@@ -149,27 +124,6 @@ public class TrackerFeatures {
             }
         }
         return array;
-    }
-
-    double[] getCursorSpeedArray() {
-        return cursorSpeedArray;
-    }
-
-    double[] getEyeSpeedArray() {
-        return eyeSpeedArray;
-    }
-
-    double[] getSpeedArray(Fixations.FeatureType featureType) {
-        double[] out = null;
-        switch(featureType) {
-            case EYE:
-                out = getEyeSpeedArray();
-                break;
-            case CURSOR:
-                out = getCursorSpeedArray();
-                break;
-        }
-        return out;
     }
 
     public double[] getZoomArray() { return Arrays.copyOf(zoomArray, zoomArray.length); }
@@ -194,34 +148,14 @@ public class TrackerFeatures {
         return this.eyeArray;
     }
 
-    public Point2D[] getArray(Fixations.FeatureType featureType) {
+    public Point2D[] getArray(FeatureType featureType) {
         Point2D[] array;
-        if (featureType == Fixations.FeatureType.CURSOR) {
+        if (featureType == FeatureType.CURSOR) {
             array = getCursorArray();
         } else {
             array = getEyeArray();
         }
         return array;
-    }
-
-    public void setSlowPanTimeThreshold(double slowPanTimeThreshold) {
-        this.boundsFeatures.slowPanTimeThreshold = slowPanTimeThreshold;
-        this.boundsFeatures.slowPans = boundsFeatures.findSlowPans();
-    }
-
-    public void setSlowPanSpeedThreshold(double slowPanSpeedThreshold) {
-        this.boundsFeatures.slowPanSpeedThreshold = slowPanSpeedThreshold;
-        this.boundsFeatures.slowPans = boundsFeatures.findSlowPans();
-    }
-
-    public void setBoundsFixationThreshold(long boundsFixationThreshold) {
-        this.boundsFeatures.boundsFixationThreshold = boundsFixationThreshold;
-        this.boundsFeatures.boundsFixations = boundsFeatures.findBoundsFixations();
-    }
-
-    public void setZoomPeakThreshold(int zoomPeakThreshold) {
-        this.boundsFeatures.zoomPeakThreshold = zoomPeakThreshold;
-        this.boundsFeatures.zoomPeaks = boundsFeatures.findZoomPeaks();
     }
 
     double[] getBoundsSpeedArray() {
@@ -247,5 +181,20 @@ public class TrackerFeatures {
         output.add("cursor_fixations", cursorFixations.toJSON());
         output.add("bounds_features", boundsFeatures.toJSON());
         return output;
+    }
+
+    public enum FeatureType {
+        EYE, CURSOR, BOUNDS;
+
+        @Override
+        public String toString() {
+            if (this.equals(EYE)) {
+                return "Eye";
+            } else if (this.equals(CURSOR)){
+                return "Cursor";
+            } else {
+                return "Bounds";
+            }
+        }
     }
 }

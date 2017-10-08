@@ -12,6 +12,7 @@ import qupath.lib.gui.viewer.QuPathViewer;
 import qupath.lib.gui.viewer.recording.DefaultViewTracker;
 
 import java.io.File;
+import java.lang.reflect.Field;
 
 import static qupath.extension.tracking.tracker.ExtendedViewTrackerPlayback.makeTable;
 
@@ -23,12 +24,11 @@ public class LoadTrackerAction implements EventHandler, PathCommand {
     @Override
     public void handle(Event event) {
         QuPathGUI gui = QuPathGUI.getInstance();
-        DialogHelperFX dfx = new DialogHelperFX(gui.getStage());
         QuPathViewer viewer = gui.getViewer();
 
         if (viewer.getServer() != null) {
 
-            File file = dfx.promptForFile("Open csv",
+            File file = QuPathGUI.getSharedDialogHelper().promptForFile("Open csv",
                     new File(
                             System.getProperty("user.home") +
                                     "/Documents/Tracking Folder/Consultants/Fri 31st 3rd"),
@@ -37,8 +37,15 @@ public class LoadTrackerAction implements EventHandler, PathCommand {
 
             if (file != null) {
                 DefaultViewTracker tracker = DefaultViewTrackerFactory.createViewTracker(file);
+                try {
+                    Field declaredField = DefaultViewTracker.class.getDeclaredField("doCursorTracking");
+                    declaredField.setAccessible(true);
+                    declaredField.set(tracker, true);
+                } catch(IllegalAccessException | NoSuchFieldException e) {
+                    e.printStackTrace();
+                }
+
                 TrackerPaintStage.setTracker(tracker);
-                TrackerPaintStage.getInstance().getController().resetOptions();
                 TrackerPaintStage.getInstance().getController().TrackerBorderPane.setCenter(
                         makeTable(viewer, tracker));
                 TrackerPaintStage.getInstance().getController().actionPlayback.setDisabled(false);

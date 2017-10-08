@@ -1,8 +1,10 @@
 package qupath.extension.tracking.gui.controllers.actions;
 
+import com.google.gson.JsonObject;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import qupath.extension.tracking.gui.TrackerPaintStage;
+import qupath.extension.tracking.gui.controllers.prefs.TrackingPrefs;
 import qupath.extension.tracking.tracker.TrackerFeatures;
 import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.commands.interfaces.PathCommand;
@@ -36,7 +38,10 @@ public class SaveFeaturesAction implements EventHandler, PathCommand {
 
                 try {
                     out = new PrintWriter(fileExport);
-                    out.print(features.toJSON());
+                    JsonObject json = new JsonObject();
+                    json.add("features", features.toJSON());
+                    json.add("preferences", TrackingPrefs.toJSON());
+                    out.print(json);
                 } catch (FileNotFoundException fe) {
                     fe.printStackTrace();
                 } finally {

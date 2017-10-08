@@ -4,6 +4,7 @@ import qupath.lib.gui.viewer.QuPathViewer;
 import qupath.lib.gui.viewer.recording.DefaultViewTracker;
 
 import java.io.*;
+import java.lang.reflect.Field;
 
 /**
  * @author Alan O'Callaghan
@@ -23,6 +24,11 @@ public class DefaultViewTrackerFactory {
                     readFile(csvFile),
                     null,
                     tracker);
+
+            Field declaredField = DefaultViewTracker.class.getDeclaredField("doCursorTracking");
+            declaredField.setAccessible(true);
+            declaredField.set(tracker, true);
+
         } catch (Exception e) {
             e.printStackTrace();
         }

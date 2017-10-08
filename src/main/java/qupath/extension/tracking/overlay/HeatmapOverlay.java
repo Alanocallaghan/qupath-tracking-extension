@@ -4,6 +4,9 @@ import ij.IJ;
 import ij.ImagePlus;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import qupath.extension.tracking.gui.controllers.prefs.TrackingPrefs;
 import qupath.extension.tracking.tracker.TrackerFeatures;
 import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.viewer.QuPathViewer;
@@ -28,9 +31,13 @@ import qupath.lib.regions.ImageRegion;
 public class HeatmapOverlay extends AbstractOverlay {
     private final TrackerFeatures trackerFeatures;
     private final double scalex, scaley;
-    private boolean doPaintEyeHeatmap = false, doPaintCursorHeatmap = false,  doPaintBoundsHeatmap = false;
+    public BooleanProperty doPaintEyeHeatmap = new SimpleBooleanProperty(false);
+    public BooleanProperty doPaintCursorHeatmap = new SimpleBooleanProperty(false);
+    public SimpleBooleanProperty doPaintBoundsHeatmap = new SimpleBooleanProperty(false);
 
-    private BufferedImage eyeHeatmap = null, cursorHeatmap = null, boundsHeatmap = null;
+    private BufferedImage eyeHeatmap = null,
+            cursorHeatmap = null,
+            boundsHeatmap = null;
 
     private final QuPathViewer viewer;
 
@@ -41,7 +48,16 @@ public class HeatmapOverlay extends AbstractOverlay {
     public HeatmapOverlay(TrackerFeatures trackerFeatures) {
         this.trackerFeatures = trackerFeatures;
         this.viewer = QuPathGUI.getInstance().getViewer();
-        
+
+        doPaintBoundsHeatmap.bind(TrackingPrefs.boundsPrefs.getDoPaintHeatmapProperty());
+        doPaintBoundsHeatmap.addListener((observable, oldValue, newValue) -> viewer.repaint());
+
+        doPaintCursorHeatmap.bind(TrackingPrefs.cursorPointPrefs.getDoPaintHeatmapProperty());
+        doPaintCursorHeatmap.addListener((observable, oldValue, newValue) -> viewer.repaint());
+
+        doPaintEyeHeatmap.bind(TrackingPrefs.eyePointPrefs.getDoPaintHeatmapProperty());
+        doPaintEyeHeatmap.addListener((observable, oldValue, newValue) -> viewer.repaint());
+
         ImageServer server = QuPathGUI.getInstance().getViewer().getServer();
 
 //      thumbnail is null if no image loaded
@@ -58,13 +74,13 @@ public class HeatmapOverlay extends AbstractOverlay {
     @Override
     public void paintOverlay(Graphics2D g2d, ImageRegion imageRegion, double downsampleFactor, ImageObserver observer, boolean paintCompletely) {
         if (trackerFeatures != null) {
-            if (doPaintBoundsHeatmap) {
+            if (doPaintBoundsHeatmap.get()) {
                 paintBoundsHeatmap(g2d);
             }
-            if (doPaintCursorHeatmap) {
+            if (doPaintCursorHeatmap.get()) {
                 paintCursorHeatmap(g2d);
             }
-            if (doPaintEyeHeatmap) {
+            if (doPaintEyeHeatmap.get()) {
                 paintEyeHeatmap(g2d);
             }
         }
@@ -168,17 +184,17 @@ public class HeatmapOverlay extends AbstractOverlay {
     }
 
     public void setDoPaintBoundsHeatmap(boolean doPaintBoundsHeatmap) {
-        this.doPaintBoundsHeatmap = doPaintBoundsHeatmap;
+        this.doPaintBoundsHeatmap.set(doPaintBoundsHeatmap);
         this.viewer.repaint();
     }
 
     public void setDoPaintCursorHeatmap(boolean doPaintCursorHeatmap) {
-        this.doPaintCursorHeatmap = doPaintCursorHeatmap;
+        this.doPaintCursorHeatmap.set(doPaintCursorHeatmap);
         this.viewer.repaint();
     }
 
     public void setDoPaintEyeHeatmap(boolean doPaintEyeHeatmap) {
-        this.doPaintEyeHeatmap = doPaintEyeHeatmap;
+        this.doPaintEyeHeatmap.set(doPaintEyeHeatmap);
         this.viewer.repaint();
     }
 

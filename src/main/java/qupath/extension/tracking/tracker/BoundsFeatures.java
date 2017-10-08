@@ -1,54 +1,56 @@
 package qupath.extension.tracking.tracker;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import qupath.extension.tracking.gui.controllers.prefs.TrackingPrefs;
 import qupath.lib.gui.viewer.recording.ViewRecordingFrame;
 import qupath.lib.gui.viewer.recording.ViewTracker;
 
-import java.io.IOException;
-import java.io.ObjectStreamException;
-import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * @author Alan O'Callaghan
  **/
-public class BoundsFeatures implements Serializable {
+public class BoundsFeatures {
 
     private final TrackerFeatures features;
     private final ViewTracker tracker;
-    TrackerFeatureList boundsFixations;
-    TrackerFeatureList zoomPeaks;
-    TrackerFeatureList slowPans;
-    double slowPanSpeedThreshold;
-    double slowPanTimeThreshold;
-    long boundsFixationThreshold;
-    int zoomPeakThreshold;
+    private TrackerFeatureList boundsFixations, zoomPeaks, slowPans;
+    private IntegerProperty zoomPeakIterations = new SimpleIntegerProperty();
+    private DoubleProperty slowPanTimeThreshold = new SimpleDoubleProperty(),
+            slowPanSpeedThreshold = new SimpleDoubleProperty(),
+            boundsFixationTimeThreshold = new SimpleDoubleProperty();
 
     BoundsFeatures(TrackerFeatures features) {
         this.features = features;
         this.tracker = features.getTracker();
+
+        zoomPeakIterations.bind(TrackingPrefs.boundsPrefs.zoomPeakIterations);
+        zoomPeakIterations.addListener((observable, oldValue, newValue) -> zoomPeaks = findZoomPeaks());
+
+        slowPanTimeThreshold.bind(TrackingPrefs.boundsPrefs.slowPanTimeThreshold);
+        slowPanTimeThreshold.addListener((observable, oldValue, newValue) -> slowPans = findSlowPans());
+        slowPanSpeedThreshold.bind(TrackingPrefs.boundsPrefs.slowPanSpeedThreshold);
+        slowPanSpeedThreshold.addListener((observable, oldValue, newValue) -> slowPans = findSlowPans());
+
+        boundsFixationTimeThreshold.bind(TrackingPrefs.boundsPrefs.boundsFixationTimeThreshold);
+        boundsFixationTimeThreshold.addListener((observable, oldValue, newValue) -> boundsFixations = findBoundsFixations());
+
         this.slowPans = findSlowPans();
         this.zoomPeaks = findZoomPeaks();
         this.boundsFixations = findBoundsFixations();
     }
 
 
-    /**
-     * Finds local minima in an array.
-     * To be used to find areas of high zoom, because zoom here is defined
-     * using area of bounding rectangle.
-     * Could also use to find areas of low zoom by finding maxima.
-     *
-     * @return void
-     */
     TrackerFeatureList findZoomPeaks() {
 
         TrackerFeatureList indList = new TrackerFeatureList();
         TrackerFeature inds = new TrackerFeature(tracker);
         double[] zoomArray = features.getZoomArray();
-//        NB: ZOOM HERE IS AREA SO LOCAL MINIMA ARE REQUIRED, NOT MAXIMA!!!!
-        for (int iteration = 0; iteration < zoomPeakThreshold; iteration ++) {
+        for (int iteration = 0; iteration < zoomPeakIterations.get(); iteration ++) {
             int[] candidates;
             if (iteration == 0) {
                 candidates = java.util.stream.IntStream.range(0, tracker.nFrames()).toArray();
@@ -99,9 +101,6 @@ public class BoundsFeatures implements Serializable {
         return indList;
     }
 
-
-
-
     TrackerFeatureList findSlowPans() {
         TrackerFeatureList slowPans = new TrackerFeatureList();
         TrackerFeature feature = new TrackerFeature(tracker);
@@ -110,12 +109,12 @@ public class BoundsFeatures implements Serializable {
 
         for (int i = 1; i < zoomArray.length; i++) {
             if (zoomArray[i] == zoomArray[i - 1]) {
-                if (boundsSpeedArray[i] < slowPanSpeedThreshold) {
+                if (boundsSpeedArray[i] < slowPanSpeedThreshold.get()) {
                     feature.add(i);
                 } else {
                     if (!feature.isEmpty()) {
                         if (feature.getFrameAtFeatureIndex(feature.size() - 1).getTimestamp() -
-                                feature.getFrameAtFeatureIndex(0).getTimestamp() > slowPanTimeThreshold) {
+                                feature.getFrameAtFeatureIndex(0).getTimestamp() > slowPanTimeThreshold.get()) {
                             slowPans.add(feature);
                             feature = new TrackerFeature(tracker);
                         }
@@ -124,7 +123,7 @@ public class BoundsFeatures implements Serializable {
             } else {
                 if (!feature.isEmpty()) {
                     if (feature.getFrameAtFeatureIndex(feature.size() - 1).getTimestamp() -
-                            feature.getFrameAtFeatureIndex(0).getTimestamp() > slowPanTimeThreshold) {
+                            feature.getFrameAtFeatureIndex(0).getTimestamp() > slowPanTimeThreshold.get()) {
                         slowPans.add(feature);
                         feature = new TrackerFeature(tracker);
                     }
@@ -148,7 +147,7 @@ public class BoundsFeatures implements Serializable {
                     thisFixation.add(i);
                     timeFixated += currentFrame.getTimestamp() - previousFrame.getTimestamp();
                 } else {
-                    if (timeFixated > boundsFixationThreshold) {
+                    if (timeFixated > boundsFixationTimeThreshold.get()) {
                         fixations.add(thisFixation);
                         thisFixation = new TrackerFeature(tracker);
                     } else {
@@ -173,21 +172,6 @@ public class BoundsFeatures implements Serializable {
 
     public TrackerFeatureList getSlowPans() {
         return slowPans;
-    }
-
-    private void writeObject(java.io.ObjectOutputStream out)
-            throws IOException {
-
-    }
-
-    private void readObject(java.io.ObjectInputStream in)
-            throws IOException, ClassNotFoundException {
-
-    }
-
-    private void readObjectNoData()
-            throws ObjectStreamException {
-
     }
 
     public JsonObject toJSON() {

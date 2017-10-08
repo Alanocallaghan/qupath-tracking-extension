@@ -7,14 +7,12 @@ import java.util.ArrayList;
 public class TrackerFeatureList extends ArrayList<TrackerFeature> {
 
     double[] getDurations() {
-        double[] out;
+        double[] out = null;
         if (!this.isEmpty()) {
             out = new double[this.size()];
             for (int i = 0; i < this.size(); i++) {
                 out[i] = this.get(i).getDuration();
             }
-        } else {
-            out = null;
         }
         return out;
     }

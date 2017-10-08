@@ -27,11 +27,10 @@ public class SaveTrackerAction implements EventHandler<ActionEvent>, PathCommand
                     null,
                     null,
                     null,
-                    "QuPath tracking data (csv)",
-                    "csv");
+                    "QuPath tracking data (xls)",
+                    "xls");
             if (fileExport != null) {
                 PrintWriter out = null;
-
                 try {
                     out = new PrintWriter(fileExport);
                     out.print(tracker.getSummaryString());

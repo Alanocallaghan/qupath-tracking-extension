@@ -25,6 +25,7 @@ package qupath.extension.tracking;
 
 import qupath.extension.tracking.gui.TrackerPaintStage;
 import qupath.lib.gui.commands.interfaces.PathCommand;
+import qupath.lib.gui.prefs.PathPrefs;
 
 /**
  * Command to help with the setup of QuPath and MATLAB integration.
@@ -33,7 +34,9 @@ import qupath.lib.gui.commands.interfaces.PathCommand;
  *
  */
 class TrackingQuPathLoadCommand implements PathCommand {
+
 	public void run() {
+        PathPrefs.setTrackCursorPosition(true);
         TrackerPaintStage stage = TrackerPaintStage.getInstance();
         stage.setWidth(1000);
         stage.show();

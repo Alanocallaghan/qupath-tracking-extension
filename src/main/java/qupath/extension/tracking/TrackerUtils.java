@@ -1,11 +1,9 @@
 package qupath.extension.tracking;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.image.WritableImage;
+import qupath.extension.tracking.tracker.TrackerFeatures;
 import qupath.lib.gui.viewer.QuPathViewer;
 import qupath.lib.gui.viewer.recording.ViewRecordingFrame;
 import qupath.lib.gui.viewer.recording.ViewTracker;
@@ -126,6 +124,10 @@ public class TrackerUtils {
                 canvas.getHeight());
     }
 
+    public static double calculateDownsample(ViewRecordingFrame frame) {
+        return calculateDownsample(frame.getImageBounds(), frame.getSize());
+    }
+
     public static ArrayList<ViewRecordingFrame> getFramesAsArrayList(ViewTracker tracker) {
         ArrayList<ViewRecordingFrame> frames = new ArrayList<>(tracker.nFrames());
         for (int i = 0; i < tracker.nFrames(); i++) {
@@ -160,13 +162,13 @@ public class TrackerUtils {
         return (sqrt(pow(x1 - y1, 2) + pow(x2 - y2, 2)));
     }
 
-    private static double calculateEuclideanDistance(Point2D point1, Point2D point2) {
+    public static double calculateEuclideanDistance(Point2D point1, Point2D point2) {
+        if (point1 == null || point2 == null) {
+            return 0;
+        }
         return calculateEuclideanDistance(point1.getX(), point1.getY(), point2.getX(), point2.getY());
     }
 
-    public enum SpeedType {
-        EYE, BOUNDS, CURSOR
-    }
 
     /**
      * This method takes 2 frames and calculates the instantaneous speed.
@@ -175,7 +177,7 @@ public class TrackerUtils {
      * returns "null" as double object if type is incorrect
      *
      */
-    public static double getSpeed(ViewRecordingFrame frame1, ViewRecordingFrame frame2, SpeedType type) {
+    public static double getSpeed(ViewRecordingFrame frame1, ViewRecordingFrame frame2, TrackerFeatures.FeatureType type) {
         double time = abs(frame1.getTimestamp() - frame2.getTimestamp());
         switch (type) {
             case EYE: {
@@ -200,7 +202,7 @@ public class TrackerUtils {
                 return Double.parseDouble(null);
         }
     }
-    public static double getSpeed(ViewRecordingFrame[] frames, int ind1, int ind2, SpeedType type) {
+    public static double getSpeed(ViewRecordingFrame[] frames, int ind1, int ind2, TrackerFeatures.FeatureType type) {
         if (ind1 == 0) {
             return 0;
         } else {
@@ -208,7 +210,7 @@ public class TrackerUtils {
         }
     }
 
-    public static double getSpeed(ViewTracker tracker, int ind1, int ind2, SpeedType type) {
+    public static double getSpeed(ViewTracker tracker, int ind1, int ind2, TrackerFeatures.FeatureType type) {
         if (ind1 == 0) {
             return 0;
         } else {
