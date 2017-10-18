@@ -19,6 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import qupath.extension.tracking.TrackerUtils;
 import qupath.extension.tracking.gui.TrackerPaintStage;
+import qupath.extension.tracking.gui.controllers.prefs.TrackingPrefs;
+import qupath.extension.tracking.overlay.PlaybackOverlay;
 import qupath.lib.gui.viewer.QuPathViewer;
 import qupath.lib.gui.viewer.recording.ViewRecordingFrame;
 import qupath.lib.gui.viewer.recording.ViewTracker;
@@ -39,6 +41,7 @@ public class ExtendedViewTrackerPlayback {
     private final BooleanProperty playing;
     private final Timeline timeline;
     private long startTimestamp;
+    private static PlaybackOverlay playbackOverlay = new PlaybackOverlay();
 
     public ExtendedViewTrackerPlayback(QuPathViewer viewer) {
         this.viewer = viewer;
@@ -70,6 +73,7 @@ public class ExtendedViewTrackerPlayback {
             }
 
             this.playing.set(true);
+            viewer.addOverlay(playbackOverlay);
             return true;
         }
     }
@@ -91,13 +95,17 @@ public class ExtendedViewTrackerPlayback {
     private void doStopPlayback() {
         this.timeline.stop();
         this.playing.set(false);
+        viewer.removeOverlay(playbackOverlay);
     }
 
     private void handleUpdate() {
         if (!TrackerPaintStage.getTracker().isEmpty()) {
             long timestamp = System.currentTimeMillis();
-            long timestampOfFirstFrame = TrackerPaintStage.getTracker().nFrames() > 0 ? TrackerPaintStage.getTracker().getFrame(0).getTimestamp(): 0L;
-            ViewRecordingFrame frame = TrackerPaintStage.getTracker().getFrameForTime(timestamp - this.startTimestamp + timestampOfFirstFrame);
+            long timestampOfFirstFrame = TrackerPaintStage.getTracker().nFrames() > 0 ?
+                    TrackerPaintStage.getTracker().getFrame(0).getTimestamp(): 0L;
+            ViewRecordingFrame frame = TrackerPaintStage.getTracker().getFrameForTime(
+                    (long)(((double)timestamp - (double)this.startTimestamp) * TrackingPrefs.playbackSpeed.get()) +
+                            timestampOfFirstFrame);
             boolean requestStop;
             if (frame == null) {
                 requestStop = true;
@@ -131,6 +139,9 @@ public class ExtendedViewTrackerPlayback {
         viewer.setCenterPixelLocation(
                 (double)imageBounds.x + (double)imageBounds.width * 0.5D,
                 (double)imageBounds.y + (double)imageBounds.height * 0.5D);
+
+        playbackOverlay.updateIconLocations(frame);
+
         Point2D p2d;
         if (frame.hasCursorPosition()) {
             p2d = viewer.imagePointToComponentPoint(
@@ -159,7 +170,8 @@ public class ExtendedViewTrackerPlayback {
         for (int i = 0; i < nCols(tracker); ++i) {
             TableColumn<ViewRecordingFrame, Object> column = new TableColumn(getColumnName(i));
             final int j = i;
-            column.setCellValueFactory(frame -> new SimpleObjectProperty(getColumnValue((ViewRecordingFrame)frame.getValue(), j)));
+            column.setCellValueFactory(frame -> new SimpleObjectProperty(
+                    getColumnValue((ViewRecordingFrame)frame.getValue(), j)));
             table.getColumns().add(column);
         }
 
@@ -169,7 +181,8 @@ public class ExtendedViewTrackerPlayback {
                 setViewerForFrame(viewer, frame);
             }
         });
-        ObservableList<ViewRecordingFrame> frameList = FXCollections.observableArrayList(TrackerUtils.getFramesAsArrayList(tracker));
+        ObservableList<ViewRecordingFrame> frameList = FXCollections.observableArrayList(
+                TrackerUtils.getFramesAsArrayList(tracker));
 
         table.setItems(frameList);
         return table;

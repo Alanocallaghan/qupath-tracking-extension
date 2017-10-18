@@ -15,6 +15,7 @@ public class TrackingPrefs {
 
     public static DoubleProperty lowZoomThreshold = new SimpleDoubleProperty(),
         medZoomThreshold = new SimpleDoubleProperty();
+    public static DoubleProperty playbackSpeed = new SimpleDoubleProperty();
 
     public static JsonObject toJSON() {
         JsonObject object = new JsonObject();

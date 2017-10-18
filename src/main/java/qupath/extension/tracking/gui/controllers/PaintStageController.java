@@ -8,7 +8,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
+import org.controlsfx.control.RangeSlider;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
 import qupath.extension.tracking.gui.*;
@@ -40,7 +40,6 @@ public class PaintStageController implements Initializable {
     private PointPrefControls eyePointPrefControls;
     private BoundsPrefControls boundsPrefControls;
     private PointPrefControls cursorPointPrefControls;
-
 
     public void resetOptions() {
 //        TrackerPaintStage.getHeatmapOverlay().setDoPaintBoundsHeatmap(bHCheck.isSelected());
@@ -129,7 +128,13 @@ public class PaintStageController implements Initializable {
                 slowPanTimeSlider,
                 slowPanSpeedSlider,
                 boundsFixationSlider,
-                zoomPeakSlider);
+                zoomPeakSlider,
+                boundsLowPicker,
+                boundsMedPicker,
+                boundsHighPicker,
+                spStartPicker,
+                spPathPicker,
+                spEndPicker);
 
         eyePointPrefControls = new PointPrefControls("eye",
                 eyeThicknessSlider,
@@ -155,16 +160,14 @@ public class PaintStageController implements Initializable {
                 cursorMedPicker,
                 cursorHighPicker);
 
-        TrackingPrefs.medZoomThreshold.bindBidirectional(medZoomSlider.valueProperty());
-        TrackingPrefs.lowZoomThreshold.bindBidirectional(lowZoomSlider.valueProperty());
-
+        TrackingPrefs.medZoomThreshold.bindBidirectional(zoomRangeSlider.lowValueProperty());
+        TrackingPrefs.lowZoomThreshold.bindBidirectional(zoomRangeSlider.highValueProperty());
 
 //      Recording/Playback
         QuPathViewer viewer = QuPathGUI.getInstance().getViewer();
         if (TrackerPaintStage.getTracker() == null) {
             TrackerPaintStage.setTracker(new DefaultViewTracker(viewer));
         }
-
 
 //      ViewTracker recording buttons and table
         playback = new ExtendedViewTrackerPlayback(viewer);
@@ -206,6 +209,12 @@ public class PaintStageController implements Initializable {
                                 playing.get() ? "Stop" : "Play",
                         playing));
 
+
+        Label playbackSpeedLabel = new Label("Playback speed:");
+        playbackSpeedSlider = new Slider(0, 1, 1);
+        TrackingPrefs.playbackSpeed.bindBidirectional(playbackSpeedSlider.valueProperty());
+        playbackSpeedSlider.setShowTickLabels(true);
+        playbackSpeedSlider.setMajorTickUnit(0.2);
         ToolBar toolbar = new ToolBar();
         toolbar.getItems().addAll(
                 ActionUtils.createToggleButton(actionRecord,
@@ -224,33 +233,23 @@ public class PaintStageController implements Initializable {
                 ActionUtils.createButton(
                         QuPathGUI.createCommandAction(
                                 new ResetTrackerAction(),
-                                "Reset"))
+                                "Reset")),
+                playbackSpeedLabel,
+                playbackSpeedSlider
         );
 
         TrackerBorderPane.setTop(toolbar);
     }
 
-
     @FXML
-    public Menu FileMenu;
+    private Slider playbackSpeedSlider;
     @FXML
-    public MenuBar Menubar;
-    @FXML
-    private MenuItem SaveFeatures;
-    @FXML
-    private MenuItem LoadFeatures;
-    @FXML
-    private MenuItem LoadTracker;
-    @FXML
-    private MenuItem SaveTracker;
-    @FXML
-    private MenuItem SaveImage;
-    @FXML
-    private MenuItem Close;
-    @FXML
-    public BorderPane BorderPane;
-    @FXML
-    public TabPane TabPane;
+    private MenuItem SaveFeatures,
+            LoadFeatures,
+            LoadTracker,
+            SaveTracker,
+            SaveImage,
+            Close;
     @FXML
     public Tab RecordingTab,
             VisualisationTab,
@@ -261,70 +260,73 @@ public class PaintStageController implements Initializable {
     public BorderPane TrackerBorderPane;
 
     @FXML
-    public GridPane FeatureOptionPane;
+    private Slider boundsThicknessSlider,
+            cursorThicknessSlider,
+            eyeThicknessSlider;
+    @FXML
+    private ComboBox cursorFixationTypes,
+            boundsFeatureTypes,
+            eyeFixationTypes;
 
-    @FXML
-    public GridPane VisualisatonTogglePane, VisualisationOptionPane;
-
-    @FXML
-    public Slider medZoomSlider,
-            lowZoomSlider;
-
-    @FXML
-    private Slider boundsThicknessSlider;
-    @FXML
-    private Slider cursorThicknessSlider;
-    @FXML
-    private Slider eyeThicknessSlider;
-//    @FXML
-//    public Label cursorLabel, eyeLabel,
-//            BoundThicknessLabel, CursorThicknessLabel, EyeThicknessLabel,
-//            cursorColorLabel, eyeColorLabel;
-    @FXML
-    private ComboBox cursorFixationTypes;
-    @FXML
-    private ComboBox eyeFixationTypes;
-
-//    @FXML
-//    public Label EyeIVTSpeedLabel, EyeIDTDurationLabel, EyeIDTDispersionLabel,
-//            CursorIVTSpeedLabel, CursorIDTDurationLabel, CursorIDTDispersionLabel;
     @FXML
     private Slider eyeIVTSpeedSlider, eyeIDTDurationSlider, eyeIDTDispersionSlider,
         cursorIVTSpeedSlider, cursorIDTDurationSlider, cursorIDTDispersionSlider;
     @FXML
-    private Slider slowPanTimeSlider;
-    @FXML
-    private Slider slowPanSpeedSlider;
-    @FXML
-    private Slider boundsFixationSlider;
-    @FXML
-    private Slider zoomPeakSlider;
+    private Slider slowPanTimeSlider,
+            slowPanSpeedSlider,
+            boundsFixationSlider,
+            zoomPeakSlider;
 
     @FXML
     private ColorPicker cursorLowPicker, cursorMedPicker, cursorHighPicker,
             eyeHighPicker, eyeMedPicker, eyeLowPicker;
+
+    @FXML
+    public ColorPicker spStartPicker,
+            spPathPicker,
+            spEndPicker,
+            boundsLowPicker,
+            boundsMedPicker,
+            boundsHighPicker;
+
     @FXML
     private CheckBox bHCheck, eHCheck, cHCheck,
             bTCheck, cTCheck, eTCheck,
             zpCheck, bfCheck, spCheck;
-
+    @FXML
+    private RangeSlider zoomRangeSlider;
 }
 
 class PrefControls {
+    private final ColorPicker lowPicker;
+    private final ColorPicker medPicker;
+    private final ColorPicker highPicker;
+
     Slider thicknessSlider;
     CheckBox heatmapCheck, trailCheck;
     PrefControls(TrackingPref prefs,
                  CheckBox heatmapCheck,
                  CheckBox trailCheck,
-                 Slider thicknessSlider) {
+                 Slider thicknessSlider,
+                 ColorPicker lowPicker,
+                 ColorPicker medPicker,
+                 ColorPicker highPicker) {
 
         this.thicknessSlider = thicknessSlider;
         this.heatmapCheck = heatmapCheck;
         this.trailCheck = trailCheck;
 
+        this.lowPicker = lowPicker;
+        this.medPicker = medPicker;
+        this.highPicker = highPicker;
+
         prefs.getDoPaintHeatmapProperty().bindBidirectional(heatmapCheck.selectedProperty());
         prefs.getDoPaintTrailProperty().bindBidirectional(trailCheck.selectedProperty());
         prefs.getThicknessScalarProperty().bindBidirectional(thicknessSlider.valueProperty());
+
+        prefs.getLowColorProperty().bindBidirectional(lowPicker.valueProperty());
+        prefs.getMedColorProperty().bindBidirectional(medPicker.valueProperty());
+        prefs.getHighColorProperty().bindBidirectional(highPicker.valueProperty());
     }
 }
 
@@ -344,11 +346,10 @@ class PointPrefControls extends PrefControls {
                       ColorPicker lowPicker,
                       ColorPicker medPicker,
                       ColorPicker highPicker) {
-        super(prefs, heatmapCheck, trailCheck, thicknessSlider);
+        super(prefs, heatmapCheck, trailCheck, thicknessSlider,
+                lowPicker, medPicker, highPicker);
         this.fixationTypes = fixationTypes;
-        this.lowPicker = lowPicker;
-        this.medPicker = medPicker;
-        this.highPicker = highPicker;
+
         this.IVTSpeedSlider = IVTSpeedSlider;
         this.IDTDispersionSlider = IDTDispersionSlider;
         this.IDTDurationSlider = IDTDurationSlider;
@@ -359,9 +360,6 @@ class PointPrefControls extends PrefControls {
         prefs.IDTDispersionThreshold.bindBidirectional(IDTDispersionSlider.valueProperty());
         prefs.IDTDurationThreshold.bindBidirectional(IDTDurationSlider.valueProperty());
 
-        prefs.highColor.bindBidirectional(highPicker.valueProperty());
-        prefs.medColor.bindBidirectional(medPicker.valueProperty());
-        prefs.lowColor.bindBidirectional(lowPicker.valueProperty());
 
     }
 
@@ -406,8 +404,15 @@ class BoundsPrefControls extends PrefControls {
                        Slider slowPanTimeSlider,
                        Slider slowPanSpeedSlider,
                        Slider boundsFixationSlider,
-                       Slider zoomPeakSlider) {
-        super(TrackingPrefs.boundsPrefs, heatmapCheck, trailCheck, thicknessSlider);
+                       Slider zoomPeakSlider,
+                       ColorPicker lowPicker,
+                       ColorPicker medPicker,
+                       ColorPicker highPicker,
+                       ColorPicker zpStartPicker,
+                       ColorPicker zpPathPicker,
+                       ColorPicker zpEndPicker) {
+        super(TrackingPrefs.boundsPrefs, heatmapCheck, trailCheck, thicknessSlider,
+                lowPicker, medPicker, highPicker);
 
         BoundsPrefs prefs = TrackingPrefs.boundsPrefs;
 
@@ -428,5 +433,9 @@ class BoundsPrefControls extends PrefControls {
         prefs.slowPanSpeedThreshold.bindBidirectional(slowPanSpeedSlider.valueProperty());
         prefs.zoomPeakIterations.bindBidirectional(zoomPeakSlider.valueProperty());
         prefs.boundsFixationTimeThreshold.bindBidirectional(boundsFixationSlider.valueProperty());
+
+        prefs.zoomPeakStartColorProperty.bindBidirectional(zpStartPicker.valueProperty());
+        prefs.zoomPeakPathColorProperty.bindBidirectional(zpPathPicker.valueProperty());
+        prefs.zoomPeakEndColorProperty.bindBidirectional(zpEndPicker.valueProperty());
     }
 }

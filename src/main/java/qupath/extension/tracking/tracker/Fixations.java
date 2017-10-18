@@ -87,6 +87,7 @@ public class Fixations {
         }
 
         thicknessScalar.bind(prefs.getThicknessScalarProperty());
+        thicknessScalar.addListener((observable, oldValue, newValue) -> QuPathGUI.getInstance().getViewer().repaint());
 
         this.fixationType.bind(prefs.fixationType);
         this.fixationType.addListener((observable, oldValue, newValue) -> QuPathGUI.getInstance().getViewer().repaint());

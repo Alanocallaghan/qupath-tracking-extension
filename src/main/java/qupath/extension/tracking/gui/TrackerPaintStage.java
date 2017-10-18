@@ -5,6 +5,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import qupath.extension.tracking.gui.controllers.PaintStageController;
+import qupath.extension.tracking.overlay.BoundsFeaturesOverlay;
 import qupath.extension.tracking.overlay.HeatmapOverlay;
 import qupath.extension.tracking.overlay.TrackerFeatureOverlay;
 import qupath.extension.tracking.tracker.TrackerFeatures;
@@ -20,11 +21,12 @@ public class TrackerPaintStage extends Stage {
 
     private static TrackerFeatures features;
     private Parent root;
-    private static TrackerPaintStage instance = null;
     private static ViewTracker tracker;
 
     private static HeatmapOverlay heatmapOverlay = null;
     private static TrackerFeatureOverlay trackerOverlay = null;
+    private static TrackerPaintStage instance = null;
+    private static BoundsFeaturesOverlay boundsFeaturesOverlay = null;
     private PaintStageController paintStageController;
     private static final QuPathViewer viewer = QuPathGUI.getInstance().getViewer();
 
@@ -70,17 +72,20 @@ public class TrackerPaintStage extends Stage {
         removeOverlays();
         TrackerPaintStage.heatmapOverlay = new HeatmapOverlay(features);
         TrackerPaintStage.trackerOverlay = new TrackerFeatureOverlay(features);
+        TrackerPaintStage.boundsFeaturesOverlay = new BoundsFeaturesOverlay(features);
         addOverlays();
     }
 
     private static void removeOverlays() {
         viewer.removeOverlay(heatmapOverlay);
         viewer.removeOverlay(trackerOverlay);
+        viewer.removeOverlay(boundsFeaturesOverlay);
     }
 
     private static void addOverlays() {
         viewer.addOverlay(heatmapOverlay);
         viewer.addOverlay(trackerOverlay);
+        viewer.addOverlay(boundsFeaturesOverlay);
     }
 
     public PaintStageController getController() {

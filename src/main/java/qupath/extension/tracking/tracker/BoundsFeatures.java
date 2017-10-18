@@ -6,6 +6,8 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import qupath.extension.tracking.gui.controllers.prefs.TrackingPrefs;
+import qupath.lib.gui.QuPathGUI;
+import qupath.lib.gui.viewer.QuPathViewer;
 import qupath.lib.gui.viewer.recording.ViewRecordingFrame;
 import qupath.lib.gui.viewer.recording.ViewTracker;
 
@@ -28,16 +30,32 @@ public class BoundsFeatures {
         this.features = features;
         this.tracker = features.getTracker();
 
+        QuPathViewer viewer = QuPathGUI.getInstance().getViewer();
         zoomPeakIterations.bind(TrackingPrefs.boundsPrefs.zoomPeakIterations);
-        zoomPeakIterations.addListener((observable, oldValue, newValue) -> zoomPeaks = findZoomPeaks());
+        zoomPeakIterations.addListener((observable, oldValue, newValue) -> {
+            zoomPeaks = findZoomPeaks();
+            viewer.repaint();
+        });
 
         slowPanTimeThreshold.bind(TrackingPrefs.boundsPrefs.slowPanTimeThreshold);
-        slowPanTimeThreshold.addListener((observable, oldValue, newValue) -> slowPans = findSlowPans());
+        slowPanTimeThreshold.addListener((observable, oldValue, newValue) -> {
+            slowPans = findSlowPans();
+            viewer.repaint();
+        });
+
         slowPanSpeedThreshold.bind(TrackingPrefs.boundsPrefs.slowPanSpeedThreshold);
-        slowPanSpeedThreshold.addListener((observable, oldValue, newValue) -> slowPans = findSlowPans());
+        slowPanSpeedThreshold.addListener((observable, oldValue, newValue) -> {
+            slowPans = findSlowPans();
+            viewer.repaint();
+        });
+
+
 
         boundsFixationTimeThreshold.bind(TrackingPrefs.boundsPrefs.boundsFixationTimeThreshold);
-        boundsFixationTimeThreshold.addListener((observable, oldValue, newValue) -> boundsFixations = findBoundsFixations());
+        boundsFixationTimeThreshold.addListener((observable, oldValue, newValue) -> {
+            boundsFixations = findBoundsFixations();
+            viewer.repaint();
+        });
 
         this.slowPans = findSlowPans();
         this.zoomPeaks = findZoomPeaks();
