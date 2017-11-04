@@ -166,7 +166,8 @@ public class TrackerFeatureOverlay extends AbstractOverlay {
 
                     if (fixations.getFixations() != null) {
                         g2d.setStroke(new BasicStroke((float) downsampleFactor));
-                        double circleSizeCoef = (downsampleFactor * fixations.getDurations()[i] / 30);
+                        double circleSizeCoef = (downsampleFactor * fixations.getDurations()[i] / 30) *
+                                fixations.getDurationSizeScalarScalar();
 
                         g2d.fillOval(
                                 (int) point.getX() - (int) (circleSizeCoef / 2),

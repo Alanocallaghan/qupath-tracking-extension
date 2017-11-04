@@ -6,8 +6,6 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import qupath.extension.tracking.TrackerUtils;
 import qupath.extension.tracking.gui.controllers.prefs.PointPrefs;
 import qupath.extension.tracking.gui.controllers.prefs.TrackingPrefs;
@@ -32,7 +30,6 @@ import static qupath.extension.tracking.TrackerUtils.colorFXtoAWT;
 
 public class Fixations {
 
-
     private TrackerFeatureList IVTFixations = null,
             IDTFixations = null,
             eyeTribeFixations = null,
@@ -51,7 +48,9 @@ public class Fixations {
     private DoubleProperty IVTSpeedThreshold = new SimpleDoubleProperty();
     private DoubleProperty IDTDurationThreshold = new SimpleDoubleProperty(),
             IDTDispersionThreshold = new SimpleDoubleProperty(),
-            thicknessScalar = new SimpleDoubleProperty();
+            thicknessScalar = new SimpleDoubleProperty(),
+            durationSizeScalar = new SimpleDoubleProperty();
+
 
     // todo: check correlation between this method and EyeTribe method using real tracking data
     Fixations(TrackerFeatures trackerFeatures, String featureType) {
@@ -91,6 +90,11 @@ public class Fixations {
 
         this.fixationType.bind(prefs.fixationType);
         this.fixationType.addListener((observable, oldValue, newValue) -> QuPathGUI.getInstance().getViewer().repaint());
+
+
+        durationSizeScalar.bind(prefs.getDurationSizeScalar());
+        durationSizeScalar.addListener((observable, oldValue, newValue) -> QuPathGUI.getInstance().getViewer().repaint());
+
     }
 
 
@@ -136,7 +140,6 @@ public class Fixations {
         return frame;
     }
 
-    @NotNull
     private static ViewRecordingFrame translateCoords(ViewRecordingFrame frame) {
 
         double downsample = TrackerUtils.calculateDownsample(
@@ -338,7 +341,6 @@ public class Fixations {
         return point;
     }
 
-    @Nullable
     private Point2D calculateCentroid(TrackerFeature fixationPoints) {
         if (fixationPoints.size() == 0) {
             return null;
@@ -461,6 +463,10 @@ public class Fixations {
 
     public double getThicknessScalar() {
         return thicknessScalar.get();
+    }
+
+    public double getDurationSizeScalarScalar() {
+        return durationSizeScalar.get();
     }
 
     private void setFeatureType(String featureType) {

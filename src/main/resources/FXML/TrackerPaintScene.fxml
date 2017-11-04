@@ -79,29 +79,31 @@
                 <GridPane fx:id="VisualisationOptionPane" hgap="10">
                     <padding><Insets left="5" right="10" /></padding>
 
-                    <Label fx:id="BoundThicknessLabel" text="Bounds trail thickness"
-                           GridPane.columnIndex="0" GridPane.rowIndex="0">
-                        <padding><Insets top="10" /></padding>
-                    </Label>
-                    <Slider fx:id="boundsThicknessSlider" majorTickUnit="1"
-                            max="5" min="0"
-                            showTickLabels="true" showTickMarks="true"
-                            value="1"
-                            GridPane.columnIndex="0" GridPane.rowIndex="1" />
 
 
 
-
-
-                    <Label fx:id="zoomLabel" text="Zoom thresholds"
-                           GridPane.columnIndex="0" GridPane.rowIndex="2">
+                    <Label fx:id="zoomLabel" text="Zoom thresholds (high-medium, medium-low"
+                           GridPane.columnIndex="1" GridPane.rowIndex="0"
+                           >
                         <padding><Insets top="10" /></padding>
                     </Label>
                     <RangeSlider fx:id="zoomRangeSlider"
                                  max="80" min="0" majorTickUnit="5"
                                  showTickLabels="true" showTickMarks="true"
                                  highValue="15" lowValue="5"
-                                 GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                                 GridPane.columnIndex="0" GridPane.rowIndex="1"
+                                 GridPane.columnSpan="3"/>
+
+
+                    <Label fx:id="BoundThicknessLabel" text="Bounds trail thickness"
+                           GridPane.columnIndex="0" GridPane.rowIndex="2">
+                        <padding><Insets top="10" /></padding>
+                    </Label>
+                    <Slider fx:id="boundsThicknessSlider" majorTickUnit="1"
+                            max="5" min="0"
+                            showTickLabels="true" showTickMarks="true"
+                            value="1"
+                            GridPane.columnIndex="0" GridPane.rowIndex="3" />
 
 
 
@@ -159,29 +161,6 @@
                         </value>
                     </ColorPicker>
 
-
-
-
-                    <Label fx:id="CursorThicknessLabel" text="Cursor trail thickness"
-                    GridPane.columnIndex="1" GridPane.rowIndex="0">
-                        <padding><Insets top="10" /> </padding>
-                    </Label>
-                    <Slider fx:id="cursorThicknessSlider" majorTickUnit="1"
-                        max="5" min="0"
-                        showTickLabels="true" showTickMarks="true"
-                        value="1"
-                        GridPane.columnIndex="1" GridPane.rowIndex="1" />
-
-                    <Label fx:id="EyeThicknessLabel" text="Eye trail thickness"
-                    GridPane.columnIndex="2" GridPane.rowIndex="0">
-                        <padding><Insets top="10" /> </padding>
-                    </Label>
-                    <Slider fx:id="eyeThicknessSlider" majorTickUnit="1"
-                        max="5" min="0"
-                        showTickLabels="true" showTickMarks="true"
-                        value="1"
-                        GridPane.columnIndex="2" GridPane.rowIndex="1" />
-
                     <!--<Slider fx:id="lowZoomSlider"-->
                             <!--majorTickUnit="5"-->
                             <!--showTickLabels="true" showTickMarks="true"-->
@@ -213,58 +192,106 @@
 
 
 
+                    <Label fx:id="CursorThicknessLabel" text="Cursor trail thickness"
+                           GridPane.columnIndex="1" GridPane.rowIndex="2">
+                        <padding><Insets top="10" /> </padding>
+                    </Label>
+                    <Slider fx:id="cursorThicknessSlider" majorTickUnit="1"
+                            max="5" min="0"
+                            showTickLabels="true" showTickMarks="true"
+                            value="1"
+                            GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+
 
                     <Label fx:id="cursorColorLabel" text="Cursor trail colors (low, medium, high zoom)"
-                           GridPane.columnIndex="1" GridPane.rowIndex="2">
+                           GridPane.columnIndex="1" GridPane.rowIndex="4">
                         <padding><Insets top="10" /></padding>
                     </Label>
 
                     <ColorPicker fx:id="cursorLowPicker"
-                                 GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                 GridPane.columnIndex="1" GridPane.rowIndex="5">
                         <value>
                             <Color blue="1" green="0" red="0" />
                         </value>
                     </ColorPicker>
 
                     <ColorPicker fx:id="cursorMedPicker"
-                                 GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                 GridPane.columnIndex="1" GridPane.rowIndex="6">
                         <value>
                             <Color blue="0" green="1" red="0" />
                         </value>
                     </ColorPicker>
 
                     <ColorPicker fx:id="cursorHighPicker"
-                                 GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                 GridPane.columnIndex="1" GridPane.rowIndex="7">
                         <value>
                             <Color blue="0" green="0" red="1" />
                         </value>
                     </ColorPicker>
 
-                    <Label fx:id="eyeColorLabel" text="Eye trail colors (low, medium, high zoom)"
+                    <Label fx:id="CursorDurationLabel" text="Cursor duration scaling"
+                           GridPane.columnIndex="1" GridPane.rowIndex="8">
+                        <padding><Insets top="10" /> </padding>
+                    </Label>
+                    <Slider fx:id="cursorDurationSlider" majorTickUnit="1"
+                            max="5" min="0"
+                            showTickLabels="true" showTickMarks="true"
+                            value="1"
+                            GridPane.columnIndex="1" GridPane.rowIndex="9" />
+
+
+
+
+
+
+                    <Label fx:id="EyeThicknessLabel" text="Eye trail thickness"
                            GridPane.columnIndex="2" GridPane.rowIndex="2">
                         <padding><Insets top="10" /> </padding>
                     </Label>
+                    <Slider fx:id="eyeThicknessSlider" majorTickUnit="1"
+                            max="5" min="0"
+                            showTickLabels="true" showTickMarks="true"
+                            value="1"
+                            GridPane.columnIndex="2" GridPane.rowIndex="3" />
+
+                    <Label fx:id="eyeColorLabel" text="Eye trail colors (low, medium, high zoom)"
+                           GridPane.columnIndex="2" GridPane.rowIndex="4">
+                        <padding><Insets top="10" /> </padding>
+                    </Label>
                     <ColorPicker fx:id="eyeLowPicker"
-                                 GridPane.columnIndex="2" GridPane.rowIndex="3">
+                                 GridPane.columnIndex="2" GridPane.rowIndex="5">
                         <value>
                             <Color blue="1" green="0" red="0" />
                         </value>
                     </ColorPicker>
                     <ColorPicker fx:id="eyeMedPicker"
-                                 GridPane.columnIndex="2" GridPane.rowIndex="4">
+                                 GridPane.columnIndex="2" GridPane.rowIndex="6">
                         <value>
                             <Color blue="0" green="1" red="0" />
                         </value>
                     </ColorPicker>
 
                     <ColorPicker fx:id="eyeHighPicker"
-                                 GridPane.columnIndex="2" GridPane.rowIndex="5">
+                                 GridPane.columnIndex="2" GridPane.rowIndex="7">
                         <value>
                             <Color blue="0" green="0" red="1" />
                         </value>
                     </ColorPicker>
 
-               <columnConstraints>
+                    <Label fx:id="EyeDurationLabel" text="Eye duration scaling"
+                           GridPane.columnIndex="2" GridPane.rowIndex="8">
+                        <padding><Insets top="10" /> </padding>
+                    </Label>
+                    <Slider fx:id="eyeDurationSlider" majorTickUnit="1"
+                            max="5" min="0"
+                            showTickLabels="true" showTickMarks="true"
+                            value="1"
+                            GridPane.columnIndex="2" GridPane.rowIndex="9" />
+
+
+
+                    <columnConstraints>
                   <ColumnConstraints percentWidth="33.0" />
                   <ColumnConstraints percentWidth="34.0" />
                   <ColumnConstraints percentWidth="33.0" />

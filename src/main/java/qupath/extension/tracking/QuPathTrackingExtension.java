@@ -30,6 +30,7 @@ import javafx.scene.input.KeyCombination;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import qupath.QuPath;
 import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.commands.OpenWebpageCommand;
 import qupath.lib.gui.extensions.QuPathExtension;

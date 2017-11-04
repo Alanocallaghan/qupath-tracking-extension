@@ -3,6 +3,7 @@ package qupath.extension.tracking.gui.controllers.prefs;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import javafx.beans.property.*;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.paint.Color;
 
 public class PointPrefs extends TrackingPref {
@@ -12,6 +13,7 @@ public class PointPrefs extends TrackingPref {
             IDTDurationThreshold = new SimpleDoubleProperty();
 
     public StringProperty fixationType = new SimpleStringProperty();
+    private DoubleProperty durationSizeScalar = new SimpleDoubleProperty();
 
     JsonObject toJSON() {
         JsonObject object = new JsonObject();
@@ -60,5 +62,9 @@ public class PointPrefs extends TrackingPref {
                 jsonObject.get("g").getAsDouble(),
                 jsonObject.get("b").getAsDouble(),
                 1);
+    }
+
+    public DoubleProperty getDurationSizeScalar() {
+        return durationSizeScalar;
     }
 }

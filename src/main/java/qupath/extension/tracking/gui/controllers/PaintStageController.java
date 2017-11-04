@@ -146,7 +146,8 @@ public class PaintStageController implements Initializable {
                 eyeIDTDurationSlider,
                 eyeLowPicker,
                 eyeMedPicker,
-                eyeHighPicker);
+                eyeHighPicker,
+                eyeDurationSlider);
 
         cursorPointPrefControls = new PointPrefControls("cursor",
                 cursorThicknessSlider,
@@ -158,7 +159,8 @@ public class PaintStageController implements Initializable {
                 cursorIDTDurationSlider,
                 cursorLowPicker,
                 cursorMedPicker,
-                cursorHighPicker);
+                cursorHighPicker,
+                cursorDurationSlider);
 
         TrackingPrefs.medZoomThreshold.bindBidirectional(zoomRangeSlider.lowValueProperty());
         TrackingPrefs.lowZoomThreshold.bindBidirectional(zoomRangeSlider.highValueProperty());
@@ -295,6 +297,11 @@ public class PaintStageController implements Initializable {
             zpCheck, bfCheck, spCheck;
     @FXML
     private RangeSlider zoomRangeSlider;
+    @FXML
+    public Slider eyeDurationSlider;
+    @FXML
+    public Slider cursorDurationSlider;
+
 }
 
 class PrefControls {
@@ -345,7 +352,8 @@ class PointPrefControls extends PrefControls {
                       Slider IDTDurationSlider,
                       ColorPicker lowPicker,
                       ColorPicker medPicker,
-                      ColorPicker highPicker) {
+                      ColorPicker highPicker,
+                      Slider durationSlider) {
         super(prefs, heatmapCheck, trailCheck, thicknessSlider,
                 lowPicker, medPicker, highPicker);
         this.fixationTypes = fixationTypes;
@@ -360,6 +368,7 @@ class PointPrefControls extends PrefControls {
         prefs.IDTDispersionThreshold.bindBidirectional(IDTDispersionSlider.valueProperty());
         prefs.IDTDurationThreshold.bindBidirectional(IDTDurationSlider.valueProperty());
 
+        prefs.getDurationSizeScalar().bindBidirectional(durationSlider.valueProperty());
 
     }
 
@@ -373,7 +382,8 @@ class PointPrefControls extends PrefControls {
                       Slider IDTDurationSlider,
                       ColorPicker lowPicker,
                       ColorPicker medPicker,
-                      ColorPicker highPicker) {
+                      ColorPicker highPicker,
+                      Slider durationSlider) {
         this(thicknessSlider,
                 heatmapCheck,
                 trailCheck,
@@ -384,7 +394,8 @@ class PointPrefControls extends PrefControls {
                 IDTDurationSlider,
                 lowPicker,
                 medPicker,
-                highPicker);
+                highPicker,
+                durationSlider);
     }
 }
 
