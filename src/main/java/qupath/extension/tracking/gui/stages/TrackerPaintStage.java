@@ -1,4 +1,4 @@
-package qupath.extension.tracking.gui;
+package qupath.extension.tracking.gui.stages;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

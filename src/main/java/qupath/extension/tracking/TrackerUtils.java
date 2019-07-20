@@ -80,7 +80,7 @@ public class TrackerUtils {
         return ret;
     }
 
-    public static boolean saveSnapshot(QuPathViewer viewer, File file) {
+    public static void saveSnapshot(QuPathViewer viewer, File file) {
         ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
 
         javafx.scene.canvas.Canvas canvas = viewer.getCanvas();
@@ -97,9 +97,7 @@ public class TrackerUtils {
             byteOutput.close();
         } catch (IOException e) {
             e.printStackTrace();
-            return false;
         }
-        return true;
     }
 
     public static Color colorFXtoAWT(javafx.scene.paint.Color color) {

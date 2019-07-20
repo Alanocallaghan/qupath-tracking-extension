@@ -2,7 +2,7 @@ package qupath.extension.tracking.gui.controllers.actions;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import qupath.extension.tracking.gui.TrackerPaintStage;
+import qupath.extension.tracking.gui.stages.TrackerPaintStage;
 import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.commands.interfaces.PathCommand;
 import qupath.lib.gui.helpers.DisplayHelpers;
@@ -30,16 +30,10 @@ public class SaveTrackerAction implements EventHandler<ActionEvent>, PathCommand
                     "QuPath tracking data (xls)",
                     "xls");
             if (fileExport != null) {
-                PrintWriter out = null;
-                try {
-                    out = new PrintWriter(fileExport);
+                try (PrintWriter out = new PrintWriter(fileExport)) {
                     out.print(tracker.getSummaryString());
                 } catch (FileNotFoundException fe) {
                     fe.printStackTrace();
-                } finally {
-                    if(out != null) {
-                        out.close();
-                    }
                 }
             }
         }

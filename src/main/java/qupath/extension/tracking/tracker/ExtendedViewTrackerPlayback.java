@@ -7,18 +7,16 @@ import javafx.animation.Timeline;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.util.Callback;
 import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import qupath.extension.tracking.TrackerUtils;
-import qupath.extension.tracking.gui.TrackerPaintStage;
+import qupath.extension.tracking.gui.stages.TrackerPaintStage;
 import qupath.extension.tracking.gui.controllers.prefs.TrackingPrefs;
 import qupath.extension.tracking.overlay.PlaybackOverlay;
 import qupath.lib.gui.viewer.QuPathViewer;
@@ -61,9 +59,8 @@ public class ExtendedViewTrackerPlayback {
         });
     }
 
-    private boolean doStartPlayback() {
+    private void doStartPlayback() {
         if (TrackerPaintStage.getTracker().isEmpty()) {
-            return false;
         } else {
             this.startTimestamp = System.currentTimeMillis();
             if(this.timeline.getStatus() == Animation.Status.RUNNING) {
@@ -74,7 +71,6 @@ public class ExtendedViewTrackerPlayback {
 
             this.playing.set(true);
             viewer.addOverlay(playbackOverlay);
-            return true;
         }
     }
 

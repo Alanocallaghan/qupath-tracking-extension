@@ -2,12 +2,11 @@ package qupath.extension.tracking.gui.controllers.actions;
 
 import javafx.event.Event;
 import javafx.event.EventHandler;
-import qupath.extension.tracking.gui.TrackerPaintStage;
+import qupath.extension.tracking.gui.stages.TrackerPaintStage;
 import qupath.extension.tracking.tracker.DefaultViewTrackerFactory;
 import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.commands.interfaces.PathCommand;
 import qupath.lib.gui.helpers.DisplayHelpers;
-import qupath.lib.gui.helpers.dialogs.DialogHelperFX;
 import qupath.lib.gui.viewer.QuPathViewer;
 import qupath.lib.gui.viewer.recording.DefaultViewTracker;
 

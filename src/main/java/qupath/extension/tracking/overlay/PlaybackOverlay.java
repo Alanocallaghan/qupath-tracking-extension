@@ -9,12 +9,12 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
-import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 public class PlaybackOverlay extends AbstractOverlay {
 
-    private Icon cursorIcon = null, eyeIcon = null;
+    private Icon cursorIcon, eyeIcon;
     private boolean drawCursor = false, drawEye = false;
 
     public PlaybackOverlay() {
@@ -54,7 +54,7 @@ public class PlaybackOverlay extends AbstractOverlay {
             BufferedImage img;
             try {
                 ClassLoader classLoader = getClass().getClassLoader();
-                icon = ImageIO.read(classLoader.getResource("playback/" + type + ".png"));
+                icon = ImageIO.read(Objects.requireNonNull(classLoader.getResource("playback/" + type + ".png")));
             } catch (IOException e) {
                 System.err.println("Failed to load " + type + " icon!");
                 e.printStackTrace();

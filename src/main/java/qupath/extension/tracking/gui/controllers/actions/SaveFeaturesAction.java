@@ -3,7 +3,7 @@ package qupath.extension.tracking.gui.controllers.actions;
 import com.google.gson.JsonObject;
 import javafx.event.Event;
 import javafx.event.EventHandler;
-import qupath.extension.tracking.gui.TrackerPaintStage;
+import qupath.extension.tracking.gui.stages.TrackerPaintStage;
 import qupath.extension.tracking.gui.controllers.prefs.TrackingPrefs;
 import qupath.extension.tracking.tracker.TrackerFeatures;
 import qupath.lib.gui.QuPathGUI;
@@ -34,20 +34,14 @@ public class SaveFeaturesAction implements EventHandler, PathCommand {
                     "QuPath tracking features (json)",
                     ".json");
             if (fileExport != null) {
-                PrintWriter out = null;
 
-                try {
-                    out = new PrintWriter(fileExport);
+                try (PrintWriter out = new PrintWriter(fileExport)) {
                     JsonObject json = new JsonObject();
                     json.add("features", features.toJSON());
                     json.add("preferences", TrackingPrefs.toJSON());
                     out.print(json);
                 } catch (FileNotFoundException fe) {
                     fe.printStackTrace();
-                } finally {
-                    if(out != null) {
-                        out.close();
-                    }
                 }
             }
         }

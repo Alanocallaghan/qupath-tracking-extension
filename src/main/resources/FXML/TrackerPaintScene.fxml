@@ -30,6 +30,7 @@
                 <MenuItem fx:id="SaveTracker" text="Save CSV" />
                 <MenuItem fx:id="SaveFeatures" text="Save features" />
                 <MenuItem fx:id="LoadFeatures" text="Load features" />
+                <MenuItem fx:id="BatchAnalysis" text="Batch analysis" />
                 <MenuItem fx:id="SaveImage" text="Save snapshot (png)" />
                 <MenuItem fx:id="Close" text="Close extension" />
             </Menu>
@@ -82,7 +83,7 @@
 
 
 
-                    <Label fx:id="zoomLabel" text="Zoom thresholds (high-medium, medium-low"
+                    <Label fx:id="zoomLabel" text="Zoom thresholds (high-medium, medium-low)"
                            GridPane.columnIndex="1" GridPane.rowIndex="0"
                            >
                         <padding><Insets top="10" /></padding>

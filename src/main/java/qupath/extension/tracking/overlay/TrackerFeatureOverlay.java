@@ -15,8 +15,6 @@ import java.awt.font.GlyphVector;
 import java.awt.geom.Point2D;
 import java.awt.image.ImageObserver;
 
-import static qupath.extension.tracking.TrackerUtils.calculateDownsample;
-
 /**
  * @author Alan O'Callaghan
  * Created by alan on 15/03/17.

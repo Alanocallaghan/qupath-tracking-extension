@@ -33,7 +33,7 @@ public class Fixations {
     private TrackerFeatureList IVTFixations = null,
             IDTFixations = null,
             eyeTribeFixations = null,
-            allPointFixations = null;
+            allPointFixations;
 
     private final TrackerFeatures trackerFeatures;
 

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="qupath.extension.tracking.gui.controllers.BatchAnalysisController"
+            prefHeight="400.0" prefWidth="600.0">
+
+    <GridPane>
+
+        <TextField fx:id="DirectoryField"/>
+        <Button fx:id="ChooseDirButton" text="Choose directory" GridPane.columnIndex="1"/>
+        <TextField fx:id="RegexField" GridPane.rowIndex="1" />
+        <CheckBox fx:id="RecursiveCheckBox" text="Recursive" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+        <Button fx:id="RunButton" text="Run" GridPane.rowIndex="2"/>
+
+    </GridPane>
+</AnchorPane>

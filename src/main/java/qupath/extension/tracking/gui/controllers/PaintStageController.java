@@ -11,12 +11,12 @@ import javafx.scene.layout.BorderPane;
 import org.controlsfx.control.RangeSlider;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
-import qupath.extension.tracking.gui.*;
 import qupath.extension.tracking.gui.controllers.actions.*;
 import qupath.extension.tracking.gui.controllers.prefs.BoundsPrefs;
 import qupath.extension.tracking.gui.controllers.prefs.PointPrefs;
 import qupath.extension.tracking.gui.controllers.prefs.TrackingPref;
 import qupath.extension.tracking.gui.controllers.prefs.TrackingPrefs;
+import qupath.extension.tracking.gui.stages.TrackerPaintStage;
 import qupath.extension.tracking.tracker.ExtendedViewTrackerPlayback;
 import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.icons.PathIconFactory;
@@ -115,6 +115,7 @@ public class PaintStageController implements Initializable {
         LoadTracker.setOnAction(new LoadTrackerAction());
         SaveFeatures.setOnAction(new SaveFeaturesAction());
         LoadFeatures.setOnAction(new LoadFeaturesAction());
+        BatchAnalysis.setOnAction(new BatchAnalysisAction());
         Close.setOnAction(event -> TrackerPaintStage.getInstance().close());
 
         
@@ -177,11 +178,11 @@ public class PaintStageController implements Initializable {
                 TrackerPaintStage.getTracker().recordingProperty(),
                 "Record",
                 iconRecord,
-                (KeyCombination)null);
+                null);
 
         actionPlayback = QuPathGUI.createSelectableCommandAction(
                 playback.playingProperty(),
-                "Play", iconPlay, (KeyCombination)null);
+                "Play", iconPlay, null);
         actionPlayback.setDisabled(TrackerPaintStage.getTracker().isEmpty());
         actionRecord.disabledProperty().bindBidirectional(actionPlayback.selectedProperty());
 
@@ -246,10 +247,11 @@ public class PaintStageController implements Initializable {
     @FXML
     private Slider playbackSpeedSlider;
     @FXML
-    private MenuItem SaveFeatures,
-            LoadFeatures,
-            LoadTracker,
+    private MenuItem LoadTracker,
             SaveTracker,
+            LoadFeatures,
+            SaveFeatures,
+            BatchAnalysis,
             SaveImage,
             Close;
     @FXML

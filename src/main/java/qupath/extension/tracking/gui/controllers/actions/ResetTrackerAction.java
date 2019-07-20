@@ -1,6 +1,6 @@
 package qupath.extension.tracking.gui.controllers.actions;
 
-import qupath.extension.tracking.gui.TrackerPaintStage;
+import qupath.extension.tracking.gui.stages.TrackerPaintStage;
 import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.commands.interfaces.PathCommand;
 import qupath.lib.gui.viewer.recording.DefaultViewTracker;

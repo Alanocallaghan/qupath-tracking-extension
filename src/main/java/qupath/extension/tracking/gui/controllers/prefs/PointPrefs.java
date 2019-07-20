@@ -3,7 +3,6 @@ package qupath.extension.tracking.gui.controllers.prefs;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import javafx.beans.property.*;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.paint.Color;
 
 public class PointPrefs extends TrackingPref {

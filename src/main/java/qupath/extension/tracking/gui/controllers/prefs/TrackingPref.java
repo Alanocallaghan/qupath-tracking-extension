@@ -1,6 +1,5 @@
 package qupath.extension.tracking.gui.controllers.prefs;
 
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 
 public abstract class TrackingPref {

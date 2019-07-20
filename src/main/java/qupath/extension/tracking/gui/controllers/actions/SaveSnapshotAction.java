@@ -3,7 +3,6 @@ package qupath.extension.tracking.gui.controllers.actions;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import qupath.lib.gui.QuPathGUI;
-import qupath.lib.gui.helpers.dialogs.DialogHelperFX;
 
 import java.io.File;
 import java.time.LocalDateTime;
