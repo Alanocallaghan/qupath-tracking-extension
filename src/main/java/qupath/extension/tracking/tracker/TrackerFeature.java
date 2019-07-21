@@ -48,9 +48,9 @@ public class TrackerFeature extends ArrayList<Integer> {
         return object;
     }
 
-    public double calculateAverageZoom() {
-        return calculateAverageZoom(1);
-    }
+//    public double calculateAverageZoom() {
+//        return calculateAverageZoom(1);
+//    }
 
     public double calculateAverageZoom(double pixelSize) {
         double sumzoom = 0;

@@ -46,7 +46,7 @@ import static qupath.extension.tracking.tracker.DefaultViewTrackerFactory.initDe
  */
 public class QuPathTrackingExtension implements QuPathExtension {
 
-	private static Logger logger = LoggerFactory.getLogger(QuPathTrackingExtension .class);
+	public static Logger logger = LoggerFactory.getLogger(QuPathTrackingExtension .class);
 
 	public void installExtension(QuPathGUI qupath) {
 		initDefaultViewTrackerFactory(qupath.getViewer());

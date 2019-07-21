@@ -6,7 +6,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import org.controlsfx.control.RangeSlider;
 import org.controlsfx.control.action.Action;
@@ -115,7 +114,7 @@ public class PaintStageController implements Initializable {
         LoadTracker.setOnAction(new LoadTrackerAction());
         SaveFeatures.setOnAction(new SaveFeaturesAction());
         LoadFeatures.setOnAction(new LoadFeaturesAction());
-        BatchAnalysis.setOnAction(new BatchAnalysisAction());
+        BatchAnalysis.setOnAction(new OpenBatchAnalysisAction());
         Close.setOnAction(event -> TrackerPaintStage.getInstance().close());
 
         

@@ -175,8 +175,14 @@ public class TrackerFeatures {
     }
 
     public JsonObject toJSON() {
+        return(toJSON(true));
+    }
+
+    public JsonObject toJSON(boolean includeTracker) {
         JsonObject output = new JsonObject();
-        output.add("tracker", new JsonPrimitive(tracker.getSummaryString()));
+        if (includeTracker) {
+            output.add("tracker", new JsonPrimitive(tracker.getSummaryString()));
+        }
         output.add("eye_fixations", eyeFixations.toJSON());
         output.add("cursor_fixations", cursorFixations.toJSON());
         output.add("bounds_features", boundsFeatures.toJSON());

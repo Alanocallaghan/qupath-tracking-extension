@@ -10,11 +10,17 @@
 
     <GridPane>
 
-        <TextField fx:id="DirectoryField"/>
-        <Button fx:id="ChooseDirButton" text="Choose directory" GridPane.columnIndex="1"/>
-        <TextField fx:id="RegexField" GridPane.rowIndex="1" />
-        <CheckBox fx:id="RecursiveCheckBox" text="Recursive" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-        <Button fx:id="RunButton" text="Run" GridPane.rowIndex="2"/>
+        <Button fx:id="ChooseInputDirButton" text="Input directory"/>
+        <TextField fx:id="InputDirectoryField" GridPane.columnIndex="1"/>
+        <Label fx:id="RegexLabel" text="Filter" GridPane.rowIndex="1"/>
+        <TextField fx:id="RegexField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+        <!--<CheckBox fx:id="RecursiveLabel" text="Recursive"/>-->
+        <CheckBox fx:id="RecursiveCheckBox" text="Recursive" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+        <TextField fx:id="OutputDirectoryField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+        <Button fx:id="ChooseOutputDirButton" text="Output directory" GridPane.rowIndex="2" />
+        <Button fx:id="SearchButton" text="Search" GridPane.rowIndex="3"/>
+        <ListView fx:id="FileList" GridPane.rowIndex="4"/>
+        <Button fx:id="RunButton" text="Run" GridPane.rowIndex="5"/>
 
     </GridPane>
 </AnchorPane>

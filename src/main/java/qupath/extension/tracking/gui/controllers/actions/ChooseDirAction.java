@@ -3,21 +3,22 @@ package qupath.extension.tracking.gui.controllers.actions;
 
 import javafx.event.Event;
 import javafx.event.EventHandler;
-import qupath.extension.tracking.gui.controllers.BatchAnalysisController;
+import javafx.scene.control.TextField;
 import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.commands.interfaces.PathCommand;
 import qupath.lib.gui.helpers.DisplayHelpers;
 import qupath.lib.gui.viewer.QuPathViewer;
-
 import java.io.File;
+
+import static qupath.lib.gui.tma.TMASummaryViewer.logger;
 
 public class ChooseDirAction implements EventHandler, PathCommand {
 
-    private final BatchAnalysisController b;
+    private TextField f;
 
-    public ChooseDirAction(BatchAnalysisController b) {
+    public ChooseDirAction(TextField f) {
         super();
-        this.b = b;
+        this.f = f;
     }
     @Override
     public void handle(Event event) {
@@ -28,7 +29,7 @@ public class ChooseDirAction implements EventHandler, PathCommand {
             File directory = QuPathGUI.getSharedDialogHelper().promptForDirectory(
                     new File(System.getProperty("user.home"))
             );
-            b.setDirectory(directory);
+            f.setText(directory.toString());
         } else {
             DisplayHelpers.showErrorMessage("An error message",
                     "A helpful description.");

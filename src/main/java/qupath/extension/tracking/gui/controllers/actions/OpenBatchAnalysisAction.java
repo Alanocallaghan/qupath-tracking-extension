@@ -5,7 +5,7 @@ import javafx.event.EventHandler;
 import qupath.extension.tracking.gui.stages.BatchAnalysisStage;
 import qupath.lib.gui.commands.interfaces.PathCommand;
 
-public class BatchAnalysisAction implements EventHandler, PathCommand {
+public class OpenBatchAnalysisAction implements EventHandler, PathCommand {
 
     @Override
     public void handle(Event event) {
