@@ -1,5 +1,6 @@
 package qupath.extension.tracking.gui.controllers.actions;
 
+import com.google.gson.JsonObject;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -22,29 +23,34 @@ import static qupath.lib.gui.tma.TMASummaryViewer.logger;
 public class RunBatchAnalysisAction implements EventHandler, PathCommand {
 
     private final ListView<File> files;
-    private final File outputDirectory;
+    private final TextField outputDirectory, outputFileName;
 
-    public RunBatchAnalysisAction(ListView files, TextField outputDirectoryField) {
+    public RunBatchAnalysisAction(ListView files,
+                                  TextField outputDirectoryField,
+                                  TextField outputFileName) {
         super();
         this.files = files;
-        this.outputDirectory = new File(outputDirectoryField.getText());
+        this.outputDirectory = outputDirectoryField;
+        this.outputFileName = outputFileName;
     }
 
     @Override
     public void handle(Event event) {
-        StringBuilder builder = new StringBuilder();
+        JsonObject jsonObject = new JsonObject();
         for (File file: files.getItems()) {
             ViewTracker tracker = DefaultViewTrackerFactory.createViewTracker(file);
+
             TrackerFeatures features = new TrackerFeatures(
                     tracker,
                     QuPathGUI.getInstance().getViewer().getServer());
-            builder.append(features.toJSON(false));
+
+            jsonObject.add(file.toString(), features.toJSON(false));
         }
         try {
-            File file = new File(outputDirectory.toString() + File.separator + "tmp");
+            File file = new File(outputDirectory.getText() + File.separator + outputFileName.getText());
             FileWriter fw = new FileWriter(file);
             BufferedWriter writer = new BufferedWriter(fw);
-            writer.write(builder.toString());
+            writer.write(jsonObject.toString());
             writer.close();
         } catch (IOException io) {
             io.printStackTrace();

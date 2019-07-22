@@ -14,10 +14,10 @@ import java.io.File;
 
 public class RecursiveSearchAction implements EventHandler, PathCommand {
 
-    private final String regex;
-    private final boolean recursive;
+    private final TextField regex;
+    private final CheckBox recursive;
     private final ListView listView;
-    private File directory;
+    private TextField directory;
 
     public RecursiveSearchAction(
             TextField directoryField,
@@ -25,14 +25,20 @@ public class RecursiveSearchAction implements EventHandler, PathCommand {
             CheckBox recursiveCheckBox,
             ListView listView) {
         super();
-        this.directory = new File(directoryField.getText());
-        this.regex = regexField.getText();
-        this.recursive = recursiveCheckBox.isSelected();
+        this.directory = directoryField;
+        this.regex = regexField;
+        this.recursive = recursiveCheckBox;
         this.listView = listView;
     }
     @Override
     public void handle(Event event) {
-        listView.setItems(searchDirectory(directory, regex, recursive));
+        listView.setItems(
+                searchDirectory(
+                    new File(directory.getText()),
+                    regex.getText(),
+                    recursive.isSelected()
+                )
+        );
     }
 
     private ObservableList<File> searchDirectory(File directory, String regex, boolean recursive) {

@@ -24,7 +24,7 @@ public class BatchAnalysisController implements Initializable {
     @FXML
     public TextField InputDirectoryField, OutputDirectoryField;
     @FXML
-    private TextField RegexField;
+    private TextField RegexField, OutputFileName;
     @FXML
     private Button ChooseInputDirButton, SearchButton, ChooseOutputDirButton, RunButton;
     @FXML
@@ -36,7 +36,11 @@ public class BatchAnalysisController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         InputDirectoryField.setText("/home/alan/Documents/github/Tracking.Visualisations/resources/Tracking Folder");
         RegexField.setText(".*Tracking data for image 05.txt");
-        OutputDirectoryField.setText("/home/alan/Desktop");
+        OutputDirectoryField.setText(
+                System.getProperty("user.home") +
+                        File.separator +
+                        "Documents"
+        );
 
         RecursiveCheckBox.setSelected(true);
         ChooseInputDirButton.setOnAction(new ChooseDirAction(this.InputDirectoryField));
@@ -52,7 +56,8 @@ public class BatchAnalysisController implements Initializable {
         RunButton.setOnAction(
             new RunBatchAnalysisAction(
                 FileList,
-                OutputDirectoryField
+                OutputDirectoryField,
+                OutputFileName
             )
         );
     }

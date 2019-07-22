@@ -44,6 +44,7 @@ public class TrackerPaintStage extends Stage {
         if (root != null) {
             Scene scene = new Scene(root, 1000, 500);
             this.setScene(scene);
+            this.toFront();
         }
     }
 

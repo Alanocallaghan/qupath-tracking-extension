@@ -426,19 +426,25 @@ public class Fixations {
 
     public JsonObject toJSON() {
         JsonObject output = new JsonObject();
+        TrackerFeatureList fixations = getFixations();
         JsonArray centroidArray = new JsonArray();
-        for (Point2D centroid: calculateCentroids()) {
-            JsonArray centroidJSON = new JsonArray();
-            centroidJSON.add(centroid.getX());
-            centroidJSON.add(centroid.getY());
-            centroidArray.add(centroidJSON);
-        }
         JsonArray durationArray = new JsonArray();
-        for (TrackerFeature fixation: getFixations()) {
-            durationArray.add(fixation.getDuration());
+        JsonArray centroidJSON = new JsonArray();
+        if (fixations.size() > 0) {
+            for (TrackerFeature fixation: fixations) {
+                durationArray.add(fixation.getDuration());
+            }
+            Point2D[] points = calculateCentroids();
+            if (points != null) {
+                for (Point2D centroid: points) {
+                    centroidJSON.add(centroid.getX());
+                    centroidJSON.add(centroid.getY());
+                    centroidArray.add(centroidJSON);
+                }
+            }
         }
-        output.add("fixations", getFixations().toJSON(false));
         output.add("centroids", centroidArray);
+        output.add("fixations", fixations.toJSON(false));
         output.add("durations", durationArray);
         return output;
     }
